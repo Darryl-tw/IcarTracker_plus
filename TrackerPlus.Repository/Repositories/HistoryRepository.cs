@@ -2,6 +2,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Models;
@@ -229,7 +230,7 @@ public class HistoryRepository : IHistoryRepository
             $"SELECT {GpsSelectColumns()} FROM {t} " +
             $"WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End AND (GPSStatus='A' OR GPSStatus='V')"));
 
-    public async Task<IEnumerable<DailyHistorySummary>> GetDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc)
+    public async Task<IEnumerable<DailyHistorySummary>> GetDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes)
     {
         using var conn = _db.CreateLogConnection();
         var tables = await GetExistingGpsTables(conn, startUtc, endUtc);
@@ -237,13 +238,14 @@ public class HistoryRepository : IHistoryRepository
         if (tables.Count == 0)
             return Enumerable.Empty<DailyHistorySummary>();
 
+        // Group by local date so Taiwan/Australia users see the correct day boundary
         var unionParts = tables.Select(t =>
-            $"SELECT CAST(GPSDateTime AS DATE) AS [Date], " +
+            $"SELECT CAST(DATEADD(MINUTE, @TZOffset, GPSDateTime) AS DATE) AS [Date], " +
             $"COUNT(*) AS RecordCount, " +
             $"ISNULL(SUM(ISNULL(TRY_CAST(Distance AS FLOAT),0)),0) AS TotalDistanceM, " +
             $"MIN(GPSDateTime) AS FirstGPS, MAX(GPSDateTime) AS LastGPS " +
             $"FROM {t} WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End AND GPSStatus='A' " +
-            $"GROUP BY CAST(GPSDateTime AS DATE)");
+            $"GROUP BY CAST(DATEADD(MINUTE, @TZOffset, GPSDateTime) AS DATE)");
 
         var sql = $@"SELECT [Date], SUM(RecordCount) AS RecordCount,
             SUM(TotalDistanceM) AS TotalDistanceM,
@@ -252,15 +254,117 @@ public class HistoryRepository : IHistoryRepository
             GROUP BY [Date]
             ORDER BY [Date] DESC";
 
-        var rows = await conn.QueryAsync(sql, new { IMEI = imei, Start = startUtc, End = endUtc });
+        var rows = await conn.QueryAsync(sql, new { IMEI = imei, Start = startUtc, End = endUtc, TZOffset = timezoneMinutes });
         return rows.Select(r => new DailyHistorySummary
         {
-            Date = (DateTime)r.Date,
-            FirstGPS = (DateTime?)r.FirstGPS,
+            Date = (DateTime)r.Date,     // already a local date
+            FirstGPS = (DateTime?)r.FirstGPS,  // UTC — service converts
             LastGPS = (DateTime?)r.LastGPS,
             RecordCount = (int)r.RecordCount,
             TotalDistanceKm = Math.Round((double)r.TotalDistanceM / 1000.0, 2)
         });
+    }
+
+    public async IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(
+        string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var offset = TimeSpan.FromMinutes(timezoneMinutes);
+
+        using var conn = _db.CreateLogConnection();
+        await conn.OpenAsync(ct);
+        var existing = (await GetExistingGpsTables(conn, startUtc, endUtc))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // Iterate by local day (newest first) so results match what the user sees on-screen
+        var localEnd   = (endUtc   + offset).Date;
+        var localStart = (startUtc + offset).Date;
+
+        for (var localDay = localEnd; localDay >= localStart; localDay = localDay.AddDays(-1))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            // UTC window for this local day
+            var dayUtcStart = localDay - offset;                 // local 00:00 → UTC
+            var dayUtcEnd   = localDay.AddDays(1) - offset;     // local 00:00 next day → UTC (exclusive)
+
+            // Which UTC tables cover this local day?
+            var utcTableEnd = dayUtcEnd.TimeOfDay == TimeSpan.Zero
+                ? dayUtcEnd.Date.AddDays(-1)
+                : dayUtcEnd.Date;
+
+            var tables = new List<string>();
+            for (var t = dayUtcStart.Date; t <= utcTableEnd; t = t.AddDays(1))
+            {
+                var tn = $"TLG_{t:yyyyMMdd}";
+                if (existing.Contains(tn)) tables.Add(tn);
+            }
+            if (tables.Count == 0) continue;
+
+            // Aggregate across all relevant tables for this local day
+            var unionParts = tables.Select(t =>
+                $"SELECT COUNT(*) AS RecordCount, " +
+                $"ISNULL(SUM(ISNULL(TRY_CAST(Distance AS FLOAT),0)),0) AS TotalDistanceM, " +
+                $"MIN(GPSDateTime) AS FirstGPS, MAX(GPSDateTime) AS LastGPS " +
+                $"FROM {t} " +
+                $"WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime < @End AND GPSStatus='A'");
+
+            var aggSql =
+                $"SELECT SUM(RecordCount) AS RecordCount, SUM(TotalDistanceM) AS TotalDistanceM, " +
+                $"MIN(FirstGPS) AS FirstGPS, MAX(LastGPS) AS LastGPS " +
+                $"FROM ({string.Join(" UNION ALL ", unionParts)}) AS t";
+
+            var row = await conn.QuerySingleAsync(aggSql, new { IMEI = imei, Start = dayUtcStart, End = dayUtcEnd });
+
+            var count = (int)row.RecordCount;
+            if (count == 0) continue;
+
+            yield return new DailyHistorySummary
+            {
+                Date = localDay,   // local date — correct for any timezone
+                RecordCount = count,
+                TotalDistanceKm = Math.Round(Convert.ToDouble(row.TotalDistanceM) / 1000.0, 2),
+                FirstGPS = row.FirstGPS != null ? (DateTime?)row.FirstGPS : null,  // UTC — service converts
+                LastGPS  = row.LastGPS  != null ? (DateTime?)row.LastGPS  : null
+            };
+        }
+    }
+
+    public async IAsyncEnumerable<TrackingLog> StreamGPSHistoryAsync(
+        string imei, DateTime startUtc, DateTime endUtc,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        using var conn = _db.CreateLogConnection();
+        await conn.OpenAsync(ct);
+        var tables = await GetExistingGpsTables(conn, startUtc, endUtc);
+        if (tables.Count == 0) yield break;
+
+        var sql = $"SELECT * FROM ({BuildGpsUnionSql(tables)}) AS t ORDER BY UTCTime ASC";
+        var param = new { IMEI = imei, Start = startUtc, End = endUtc };
+
+        await foreach (var row in conn.QueryUnbufferedAsync<TrackingLogDbRow>(sql, param).WithCancellation(ct))
+            yield return TrackingLogMapper.ToModel(row);
+    }
+
+    public async IAsyncEnumerable<TrackingLog> StreamLBSHistoryAsync(
+        string imei, DateTime startUtc, DateTime endUtc,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        using var conn = _db.CreateLogConnection();
+        await conn.OpenAsync(ct);
+        var tables = await GetExistingGpsTables(conn, startUtc, endUtc);
+        if (tables.Count == 0) yield break;
+
+        var lbsUnion = string.Join(" UNION ALL ", tables.Select(t =>
+            $"SELECT RTRIM(IMEICode) AS IMEICode, GPSDateTime AS UTCTime, Lat, LatPos, Lng, LngPos, " +
+            $"Speed, Direction, Distance, OtherStatus, QTY_GPS, NULL AS SatelliteStatus, '0' AS HDOP, 'L' AS Type " +
+            $"FROM {t} WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End AND GPSStatus='L'"));
+
+        var sql = $"SELECT * FROM ({lbsUnion}) AS t ORDER BY UTCTime ASC";
+        var param = new { IMEI = imei, Start = startUtc, End = endUtc };
+
+        await foreach (var row in conn.QueryUnbufferedAsync<TrackingLogDbRow>(sql, param).WithCancellation(ct))
+            yield return TrackingLogMapper.ToModel(row);
     }
 
     private static TrackingHistoryResult EmptyResult(int pageIndex, int pageSize) =>

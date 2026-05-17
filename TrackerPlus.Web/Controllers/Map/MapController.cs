@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Text.Json;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
@@ -273,6 +274,88 @@ public class MapController : Controller
     }
 
     [HttpGet]
+    public async Task HistoryDataStream(string imei, string? date, string type = "GPS")
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        if (!trackers.Any(t => t.IMEICODE == imei))
+        {
+            Response.StatusCode = 403;
+            return;
+        }
+
+        Response.ContentType = "text/event-stream";
+        Response.Headers["Cache-Control"] = "no-cache";
+        Response.Headers["X-Accel-Buffering"] = "no";
+
+        var ct = HttpContext.RequestAborted;
+        var queryDate = DateTime.TryParse(date, out var d) ? d.Date : DateTime.Today;
+        var localStart = queryDate;
+        var localEnd = queryDate.AddDays(1).AddSeconds(-1);
+
+        const int batchSize = 150;
+        var batch = new List<object>(batchSize);
+        int seq = 0;
+        double totalDistance = 0, maxSpeed = 0, totalSpeedSum = 0;
+
+        var stream = type == "LBS"
+            ? _historyService.StreamLBSHistoryAsync(imei, localStart, localEnd, memberTimezone, ct)
+            : _historyService.StreamGPSHistoryAsync(imei, localStart, localEnd, memberTimezone, ct);
+
+        async Task FlushBatch()
+        {
+            if (batch.Count == 0) return;
+            await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { type = "batch", logs = batch })}\n\n", ct);
+            await Response.Body.FlushAsync(ct);
+            batch.Clear();
+        }
+
+        try
+        {
+            await foreach (var l in stream.WithCancellation(ct))
+            {
+                if (Math.Abs(l.Lat) < 0.0001 && Math.Abs(l.Lng) < 0.0001) continue;
+                seq++;
+                batch.Add(new
+                {
+                    seq,
+                    lat = l.Lat,
+                    lng = l.Lng,
+                    speed = Math.Round(l.Speed, 1),
+                    direction = l.Direction,
+                    time = l.UTCTime.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss"),
+                    distanceM = (int)Math.Round(l.Distance, 0),
+                    distanceKm = Math.Round(l.Distance / 1000.0, 3),
+                    gpsNo = l.GPSNo,
+                    hdop = Math.Round(l.HDOP, 2),
+                    csq = l.CSQ,
+                    voltage = l.Voltage,
+                    voltageV = l.VoltageStr
+                });
+                totalDistance += l.Distance;
+                if (l.Speed > maxSpeed) maxSpeed = l.Speed;
+                totalSpeedSum += l.Speed;
+
+                if (batch.Count >= batchSize) await FlushBatch();
+            }
+            await FlushBatch();
+
+            await Response.WriteAsync($"data: {JsonSerializer.Serialize(new
+            {
+                type = "done",
+                totalDistance = Math.Round(totalDistance / 1000.0, 2),
+                maxSpeed = Math.Round(maxSpeed, 1),
+                avgSpeed = seq > 0 ? Math.Round(totalSpeedSum / seq, 1) : 0.0,
+                totalCount = seq
+            })}\n\n", ct);
+            await Response.Body.FlushAsync(ct);
+        }
+        catch (OperationCanceledException) { /* client disconnected */ }
+    }
+
+    [HttpGet]
     public async Task<IActionResult> HistoryData(string imei, string? date, string type = "GPS")
     {
         var sw = Stopwatch.StartNew();
@@ -323,6 +406,50 @@ public class MapController : Controller
             avgSpeed = Math.Round(result.AvgSpeed, 1),
             totalCount = logs.Count
         });
+    }
+
+    [HttpGet]
+    public async Task HistoryDailySummaryStream(string imei, string? endDate)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        if (!trackers.Any(t => t.IMEICODE == imei))
+        {
+            Response.StatusCode = 403;
+            return;
+        }
+
+        Response.ContentType = "text/event-stream";
+        Response.Headers["Cache-Control"] = "no-cache";
+        Response.Headers["X-Accel-Buffering"] = "no";
+
+        var ct = HttpContext.RequestAborted;
+        var end = DateTime.TryParse(endDate, out var ed) ? ed.Date : DateTime.Today.AddMinutes(memberTimezone);
+
+        try
+        {
+            await foreach (var s in _historyService.StreamDailySummaryAsync(imei, end, memberTimezone).WithCancellation(ct))
+            {
+                TimeSpan? dur = s.FirstGPS.HasValue && s.LastGPS.HasValue ? s.LastGPS.Value - s.FirstGPS.Value : null;
+                var d = dur ?? TimeSpan.Zero;
+                var row = new
+                {
+                    date = s.Date.ToString("yyyy-MM-dd"),
+                    firstGPS = s.FirstGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
+                    lastGPS = s.LastGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
+                    duration = s.RecordCount > 0 ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}" : "—",
+                    recordCount = s.RecordCount,
+                    totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
+                };
+                await Response.WriteAsync($"data: {JsonSerializer.Serialize(row)}\n\n", ct);
+                await Response.Body.FlushAsync(ct);
+            }
+            await Response.WriteAsync("data: {\"done\":true}\n\n", ct);
+            await Response.Body.FlushAsync(ct);
+        }
+        catch (OperationCanceledException) { }
     }
 
     [HttpGet]

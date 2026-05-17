@@ -14,4 +14,7 @@ public interface IHistoryService
     Task<OperationResult> DeleteHistoryAsync(string imei, DateTime localStart, DateTime localEnd, int memberTimezone);
     Task<IEnumerable<AlertLog>> GetAlertHistoryAsync(string imei, DateTime localStart, DateTime localEnd, int memberTimezone);
     Task<IEnumerable<DailyHistorySummary>> GetDailySummaryAsync(string imei, DateTime localEnd, int memberTimezone, int days = 7);
+    IAsyncEnumerable<TrackingLog> StreamGPSHistoryAsync(string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default);
+    IAsyncEnumerable<TrackingLog> StreamLBSHistoryAsync(string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default);
+    IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(string imei, DateTime localEnd, int memberTimezone, int days = 7, CancellationToken ct = default);
 }

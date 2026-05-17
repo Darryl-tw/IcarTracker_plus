@@ -860,8 +860,11 @@ let markers = {};        // tbKey ??google.maps.Marker
 let polylines = {};      // tbKey ??google.maps.Polyline (track)
 let historyPolyline = null;
 let historyMarkers = [];
-let historyArrowMarkers = [];   // parallel to data.logs — index matches row index
-let hoveredHistMarker = null;   // temporary highlight marker on hover
+let historyArrowMarkers = [];
+let hoveredHistMarker = null;
+let historyStreamSource = null;  // active EventSource for detail SSE streaming
+let summaryStreamSource = null;  // active EventSource for summary SSE streaming
+let historyPolylinePath = [];    // accumulated path during streaming
 let activeTab = 'live';
 let refreshTimer = null;
 let refreshCount = 0;
@@ -1753,140 +1756,177 @@ function loadHistorySummary() {
     const imei = document.getElementById('hist-device-sel').value;
     const endDate = document.getElementById('hist-gps-date').value;
     if (!imei) return;
+
+    // Reset UI
     document.getElementById('hist-loading').style.display = 'inline';
     document.getElementById('hist-summary-nodata').style.display = 'none';
     document.getElementById('hist-summary-table').style.display = 'none';
     document.getElementById('hist-summary-tbody').innerHTML = '';
 
-    $.getJSON(`/Map/HistoryDailySummary?imei=${encodeURIComponent(imei)}&endDate=${endDate}`, function (data) {
-        document.getElementById('hist-loading').style.display = 'none';
-        if (!data || data.length === 0) {
-            document.getElementById('hist-summary-nodata').textContent = i18n.histNoData;
-            document.getElementById('hist-summary-nodata').style.display = 'block';
+    // Close any in-progress summary stream
+    if (summaryStreamSource) { summaryStreamSource.close(); summaryStreamSource = null; }
+
+    const url = `/Map/HistoryDailySummaryStream?imei=${encodeURIComponent(imei)}&endDate=${endDate}`;
+    const es = new EventSource(url);
+    summaryStreamSource = es;
+    let hasData = false;
+
+    es.onmessage = function(e) {
+        const row = JSON.parse(e.data);
+
+        if (row.done) {
+            es.close(); summaryStreamSource = null;
+            document.getElementById('hist-loading').style.display = 'none';
+            if (!hasData) {
+                document.getElementById('hist-summary-nodata').textContent = i18n.histNoData;
+                document.getElementById('hist-summary-nodata').style.display = 'block';
+            }
             return;
         }
-        const tbody = document.getElementById('hist-summary-tbody');
-        tbody.innerHTML = '';
-        data.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.className = 'data-row';
-            tr.innerHTML = `
-                <td>${row.date}</td>
-                <td>${row.firstGPS}</td>
-                <td>${row.lastGPS}</td>
-                <td>${row.duration}</td>
-                <td>${row.recordCount}</td>
-                <td>${row.totalKm}</td>
-            `;
-            if (row.recordCount > 0) {
-                tr.onclick = () => loadHistoryDetail(imei, row.date);
-            } else {
-                tr.style.color = '#94a3b8';
-            }
-            tbody.appendChild(tr);
-        });
+
+        hasData = true;
+        const tr = document.createElement('tr');
+        tr.className = 'data-row';
+        tr.innerHTML = `
+            <td>${row.date}</td>
+            <td>${row.firstGPS}</td>
+            <td>${row.lastGPS}</td>
+            <td>${row.duration}</td>
+            <td>${row.recordCount}</td>
+            <td>${row.totalKm}</td>
+        `;
+        if (row.recordCount > 0) {
+            tr.onclick = () => loadHistoryDetail(imei, row.date);
+        } else {
+            tr.style.color = '#94a3b8';
+        }
+        document.getElementById('hist-summary-tbody').appendChild(tr);
         document.getElementById('hist-summary-table').style.display = '';
-    }).fail(function () {
+    };
+
+    es.onerror = function() {
+        if (es.readyState === EventSource.CLOSED) return;
+        es.close(); summaryStreamSource = null;
         document.getElementById('hist-loading').style.display = 'none';
         document.getElementById('hist-summary-nodata').textContent = i18n.histQueryFailed;
         document.getElementById('hist-summary-nodata').style.display = 'block';
-    });
+    };
 }
 
 function loadHistoryDetail(imei, date) {
     showHistDetailView(imei + '  ' + date);
-    document.getElementById('hist-loading').style.display = 'inline';
     clearHistoryMap();
-
-    $.getJSON(`/Map/HistoryData?imei=${encodeURIComponent(imei)}&date=${date}&type=GPS`, function (data) {
-        document.getElementById('hist-loading').style.display = 'none';
-        if (!data.logs || data.logs.length === 0) {
-            document.getElementById('hist-detail-nodata').style.display = 'block';
-            return;
-        }
-        renderHistoryOnMap(data, 'GPS');
-        document.getElementById('hist-detail-dist').textContent = data.totalDistance;
-        document.getElementById('hist-detail-maxspeed').textContent = data.maxSpeed;
-        document.getElementById('hist-detail-avgspeed').textContent = data.avgSpeed;
-        document.getElementById('hist-detail-count').textContent = data.totalCount;
-
-        const tbody = document.getElementById('hist-detail-tbody');
-        tbody.innerHTML = '';
-        data.logs.forEach((l, idx) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${l.seq}</td>
-                <td>${l.time}</td>
-                <td>${l.lat.toFixed(6)},${l.lng.toFixed(6)}</td>
-                <td>${l.gpsNo}</td>
-                <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
-                <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
-                <td>${voltageCell(l.voltageV, l.voltage)}</td>
-                <td>${l.distanceM}公尺</td>
-                <td>${l.speed.toFixed(1)}公里/時</td>
-                <td>${dirBadge(l.direction)}</td>
-            `;
-            tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
-            tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(idx, l, 'GPS', imei); });
-            tr.addEventListener('mouseleave', () => { tr.classList.remove('row-hover'); restoreHistMarker(); });
-            tbody.appendChild(tr);
-        });
-        document.getElementById('hist-detail-table').style.display = '';
-    }).fail(function () {
-        document.getElementById('hist-loading').style.display = 'none';
-        document.getElementById('hist-detail-nodata').style.display = 'block';
-        document.getElementById('hist-detail-nodata').textContent = i18n.histQueryFailed;
-    });
+    startHistoryStream(imei, date, 'GPS');
 }
 
 function loadLbsHistory() {
     const imei = document.getElementById('hist-device-sel').value;
     const date = document.getElementById('hist-date').value;
     if (!imei || !date) return;
-
     showHistDetailView(imei + '  ' + date + ' (LBS)');
-    document.getElementById('hist-loading').style.display = 'inline';
     clearHistoryMap();
+    startHistoryStream(imei, date, 'LBS');
+}
 
-    $.getJSON(`/Map/HistoryData?imei=${encodeURIComponent(imei)}&date=${date}&type=LBS`, function (data) {
-        document.getElementById('hist-loading').style.display = 'none';
-        if (!data.logs || data.logs.length === 0) {
-            document.getElementById('hist-detail-nodata').style.display = 'block';
-            return;
+// -------- SSE streaming engine --------
+function startHistoryStream(imei, date, type) {
+    document.getElementById('hist-loading').style.display = 'inline';
+
+    const url = `/Map/HistoryDataStream?imei=${encodeURIComponent(imei)}&date=${date}&type=${type}`;
+    const es = new EventSource(url);
+    historyStreamSource = es;
+    let polylineColor = type === 'LBS' ? '#f59e0b' : '#ef4444';
+
+    es.onmessage = function(e) {
+        const msg = JSON.parse(e.data);
+        if (msg.type === 'batch') {
+            appendHistBatch(msg.logs, imei, type, polylineColor);
+        } else if (msg.type === 'done') {
+            es.close(); historyStreamSource = null;
+            document.getElementById('hist-loading').style.display = 'none';
+            if (msg.totalCount === 0) {
+                document.getElementById('hist-detail-nodata').style.display = 'block';
+                return;
+            }
+            document.getElementById('hist-detail-dist').textContent = msg.totalDistance;
+            document.getElementById('hist-detail-maxspeed').textContent = msg.maxSpeed;
+            document.getElementById('hist-detail-avgspeed').textContent = msg.avgSpeed;
+            document.getElementById('hist-detail-count').textContent = msg.totalCount;
+            finalizeHistoryMap();
         }
-        renderHistoryOnMap(data, 'LBS');
-        document.getElementById('hist-detail-dist').textContent = data.totalDistance;
-        document.getElementById('hist-detail-maxspeed').textContent = data.maxSpeed;
-        document.getElementById('hist-detail-avgspeed').textContent = data.avgSpeed;
-        document.getElementById('hist-detail-count').textContent = data.totalCount;
+    };
 
-        const tbody = document.getElementById('hist-detail-tbody');
-        tbody.innerHTML = '';
-        data.logs.forEach((l, idx) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${l.seq}</td>
-                <td>${l.time}</td>
-                <td>${l.lat.toFixed(6)},${l.lng.toFixed(6)}</td>
-                <td>${l.gpsNo}</td>
-                <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
-                <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
-                <td>${voltageCell(l.voltageV, l.voltage)}</td>
-                <td>${l.distanceM}公尺</td>
-                <td>${l.speed.toFixed(1)}公里/時</td>
-                <td>${dirBadge(l.direction)}</td>
-            `;
-            tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
-            tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(idx, l, 'LBS', imei); });
-            tr.addEventListener('mouseleave', () => { tr.classList.remove('row-hover'); restoreHistMarker(); });
-            tbody.appendChild(tr);
-        });
-        document.getElementById('hist-detail-table').style.display = '';
-    }).fail(function () {
+    es.onerror = function() {
+        if (es.readyState === EventSource.CLOSED) return;
+        es.close(); historyStreamSource = null;
         document.getElementById('hist-loading').style.display = 'none';
-        document.getElementById('hist-detail-nodata').style.display = 'block';
         document.getElementById('hist-detail-nodata').textContent = i18n.histQueryFailed;
+        document.getElementById('hist-detail-nodata').style.display = 'block';
+    };
+}
+
+function appendHistBatch(logs, imei, type, polylineColor) {
+    const tbody = document.getElementById('hist-detail-tbody');
+    logs.forEach(l => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${l.seq}</td>
+            <td>${l.time}</td>
+            <td>${l.lat.toFixed(6)},${l.lng.toFixed(6)}</td>
+            <td>${l.gpsNo}</td>
+            <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
+            <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
+            <td>${voltageCell(l.voltageV, l.voltage)}</td>
+            <td>${l.distanceM}公尺</td>
+            <td>${l.speed.toFixed(1)}公里/時</td>
+            <td>${dirBadge(l.direction)}</td>
+        `;
+        tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
+        tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(0, l, type, imei); });
+        tr.addEventListener('mouseleave', () => { tr.classList.remove('row-hover'); restoreHistMarker(); });
+        tbody.appendChild(tr);
+
+        if (map) {
+            const pos = { lat: l.lat, lng: l.lng };
+            historyPolylinePath.push(pos);
+            if (!historyPolyline) {
+                historyPolyline = new google.maps.Polyline({
+                    path: [pos], geodesic: true,
+                    strokeColor: polylineColor, strokeOpacity: 0.8, strokeWeight: 3, map: map
+                });
+            } else {
+                historyPolyline.getPath().push(new google.maps.LatLng(l.lat, l.lng));
+            }
+            const arrowMarker = new google.maps.Marker({
+                position: pos, map: map,
+                icon: makeHistArrowIcon(l.direction, type),
+                title: `${l.time} ${l.speed.toFixed(1)}km/h`
+            });
+            arrowMarker.addListener('click', () => { map.panTo(pos); map.setZoom(17); });
+            historyArrowMarkers.push(arrowMarker);
+            historyMarkers.push(arrowMarker);
+        }
     });
+    document.getElementById('hist-detail-table').style.display = '';
+}
+
+function finalizeHistoryMap() {
+    if (!map || historyPolylinePath.length === 0) return;
+    const path = historyPolylinePath;
+    const startM = new google.maps.Marker({
+        position: path[0], map: map, title: i18n.startPoint,
+        label: { text: 'S', color: '#fff' },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#22c55e', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    const endM = new google.maps.Marker({
+        position: path[path.length - 1], map: map, title: i18n.endPoint,
+        label: { text: 'E', color: '#fff' },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#ef4444', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    historyMarkers.push(startM, endM);
+    const bounds = new google.maps.LatLngBounds();
+    path.forEach(p => bounds.extend(p));
+    map.fitBounds(bounds);
 }
 
 // CSQ signal bars (0-31): render ▁▃▅▇ style Unicode bars
@@ -1953,58 +1993,16 @@ function makeHistArrowIcon(direction, type) {
     };
 }
 
-function renderHistoryOnMap(data, type) {
-    if (!map) return;
-    historyArrowMarkers = [];
-    const path = data.logs.map(l => ({ lat: l.lat, lng: l.lng }));
-    historyPolyline = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: type === 'LBS' ? '#f59e0b' : '#ef4444',
-        strokeOpacity: 0.8,
-        strokeWeight: 3,
-        map: map
-    });
-
-    // Direction arrow markers on each GPS point
-    data.logs.forEach(l => {
-        const arrowMarker = new google.maps.Marker({
-            position: { lat: l.lat, lng: l.lng },
-            map: map,
-            icon: makeHistArrowIcon(l.direction, type),
-            title: `${l.time} ${l.speed.toFixed(1)}km/h`
-        });
-        arrowMarker.addListener('click', () => {
-            if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); }
-        });
-        historyArrowMarkers.push(arrowMarker);
-        historyMarkers.push(arrowMarker);
-    });
-
-    // Start/end markers
-    const startM = new google.maps.Marker({
-        position: path[0], map: map, title: i18n.startPoint,
-        label: { text: 'S', color: '#fff' },
-        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#22c55e', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
-    });
-    const endM = new google.maps.Marker({
-        position: path[path.length - 1], map: map, title: i18n.endPoint,
-        label: { text: 'E', color: '#fff' },
-        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#ef4444', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
-    });
-    historyMarkers.push(startM, endM);
-
-    const bounds = new google.maps.LatLngBounds();
-    path.forEach(p => bounds.extend(p));
-    map.fitBounds(bounds);
-}
 
 function clearHistoryMap() {
+    if (summaryStreamSource) { summaryStreamSource.close(); summaryStreamSource = null; }
+    if (historyStreamSource) { historyStreamSource.close(); historyStreamSource = null; }
     if (hoveredHistMarker) { hoveredHistMarker.setMap(null); hoveredHistMarker = null; }
     if (historyPolyline) { historyPolyline.setMap(null); historyPolyline = null; }
     historyMarkers.forEach(m => m.setMap(null));
     historyMarkers = [];
     historyArrowMarkers = [];
+    historyPolylinePath = [];
 }
 
 // ========== INIT ==========

@@ -1,6 +1,7 @@
 using ClosedXML.Excel;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Linq;
 using TrackerPlus.Core.Common;
@@ -157,15 +158,50 @@ public class HistoryService : IHistoryService
         var offset = TimeSpan.FromMinutes(memberTimezone);
         var utcEnd = localEnd.Date.AddDays(1).AddSeconds(-1) - offset;
         var utcStart = localEnd.Date.AddDays(-(days - 1)) - offset;
-        var rows = await _historyRepo.GetDailySummaryAsync(imei, utcStart, utcEnd);
+        var rows = await _historyRepo.GetDailySummaryAsync(imei, utcStart, utcEnd, memberTimezone);
         return rows.Select(r => new DailyHistorySummary
         {
-            Date = r.Date,
+            Date = r.Date,  // local date from repo
             FirstGPS = r.FirstGPS.HasValue ? r.FirstGPS.Value + offset : null,
             LastGPS = r.LastGPS.HasValue ? r.LastGPS.Value + offset : null,
             RecordCount = r.RecordCount,
             TotalDistanceKm = r.TotalDistanceKm
         });
+    }
+
+    public async IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(
+        string imei, DateTime localEnd, int memberTimezone, int days = 7,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var offset = TimeSpan.FromMinutes(memberTimezone);
+        var utcEnd = localEnd.Date.AddDays(1).AddSeconds(-1) - offset;
+        var utcStart = localEnd.Date.AddDays(-(days - 1)) - offset;
+
+        await foreach (var r in _historyRepo.StreamDailySummaryAsync(imei, utcStart, utcEnd, memberTimezone, ct).WithCancellation(ct))
+        {
+            yield return new DailyHistorySummary
+            {
+                Date = r.Date,
+                RecordCount = r.RecordCount,
+                TotalDistanceKm = r.TotalDistanceKm,
+                FirstGPS = r.FirstGPS.HasValue ? r.FirstGPS.Value + offset : null,
+                LastGPS  = r.LastGPS.HasValue  ? r.LastGPS.Value  + offset : null
+            };
+        }
+    }
+
+    public IAsyncEnumerable<TrackingLog> StreamGPSHistoryAsync(
+        string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default)
+    {
+        var (utcStart, utcEnd) = ToUtc(localStart, localEnd, memberTimezone);
+        return _historyRepo.StreamGPSHistoryAsync(imei, utcStart, utcEnd, ct);
+    }
+
+    public IAsyncEnumerable<TrackingLog> StreamLBSHistoryAsync(
+        string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default)
+    {
+        var (utcStart, utcEnd) = ToUtc(localStart, localEnd, memberTimezone);
+        return _historyRepo.StreamLBSHistoryAsync(imei, utcStart, utcEnd, ct);
     }
 
     private static (DateTime utcStart, DateTime utcEnd) ToUtc(DateTime localStart, DateTime localEnd, int timezoneMinutes)
