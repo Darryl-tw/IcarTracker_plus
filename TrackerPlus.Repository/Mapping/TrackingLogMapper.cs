@@ -12,6 +12,10 @@ internal static class TrackingLogMapper
         _ = double.TryParse((row.Distance ?? "0").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var distance);
         _ = double.TryParse((row.HDOP ?? "0").Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var hdop);
 
+        // QTY_GPS is VARCHAR in DB (may contain spaces); parse safely, fall back to active-sat count
+        var qtyGps = int.TryParse((row.QTY_GPS ?? "").Trim(), out var parsed) ? parsed : 0;
+        var gpsNo = qtyGps > 0 ? qtyGps : GpsHelper.CountActiveSatellites(row.SatelliteStatus);
+
         return new TrackingLog
         {
             IMEICODE = row.IMEICode.Trim(),
@@ -23,7 +27,8 @@ internal static class TrackingLogMapper
             Distance = distance,
             HDOP = hdop,
             Voltage = GpsHelper.ParseVoltagePercent(row.OtherStatus),
-            GPSNo = GpsHelper.ParseGpsSatelliteCount(row.QTY_GPS),
+            VoltageStr = GpsHelper.ParseVoltageStr(row.OtherStatus),
+            GPSNo = gpsNo,
             CSQ = GpsHelper.ParseCsq(row.OtherStatus),
             Type = row.Type
         };

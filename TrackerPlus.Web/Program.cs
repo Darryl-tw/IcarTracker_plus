@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Globalization;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Web.Localization;
@@ -12,6 +13,9 @@ using TrackerPlus.Repository.Repositories;
 using TrackerPlus.Services.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.ReadFrom.Configuration(ctx.Configuration));
 
 // Configuration
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));

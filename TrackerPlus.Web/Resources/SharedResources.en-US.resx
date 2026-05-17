@@ -1771,6 +1771,7 @@
   <data name="Nav_Privacy" xml:space="preserve"><value>Privacy</value></data>
   <data name="Layout_ToggleNav" xml:space="preserve"><value>Toggle navigation</value></data>
   <data name="Common_Required" xml:space="preserve"><value>*</value></data>
+  <data name="Hist_DailySummaryLabel" xml:space="preserve"><value>Daily track history</value></data>
   <data name="Hist_Date" xml:space="preserve"><value>Date</value></data>
   <data name="Hist_FirstGPS" xml:space="preserve"><value>First GPS</value></data>
   <data name="Hist_LastGPS" xml:space="preserve"><value>Last GPS</value></data>
@@ -1780,4 +1781,9 @@
   <data name="Hist_BackToSummary" xml:space="preserve"><value>Back to list</value></data>
   <data name="Hist_GpsNo" xml:space="preserve"><value>GPS satellites</value></data>
   <data name="Hist_Voltage" xml:space="preserve"><value>Voltage</value></data>
+  <data name="Live_SeqCol" xml:space="preserve"><value>Seq</value></data>
+  <data name="History_LatLng" xml:space="preserve"><value>Lat,Lng</value></data>
+  <data name="Hist_GsmSignal" xml:space="preserve"><value>GSM Signal</value></data>
+  <data name="Hist_DistanceM" xml:space="preserve"><value>Distance</value></data>
+  <data name="Hist_SpeedKmh" xml:space="preserve"><value>Speed</value></data>
 </root>

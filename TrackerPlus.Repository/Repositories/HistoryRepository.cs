@@ -222,7 +222,7 @@ public class HistoryRepository : IHistoryRepository
 
     private static string GpsSelectColumns() =>
         "RTRIM(IMEICode) AS IMEICode, GPSDateTime AS UTCTime, Lat, LatPos, Lng, LngPos, " +
-        "Speed, Direction, Distance, OtherStatus, QTY_GPS, ISNULL(CAST(HDOP AS NVARCHAR(20)),'0') AS HDOP, 'G' AS Type";
+        "Speed, Direction, Distance, OtherStatus, QTY_GPS, SatelliteStatus, ISNULL(CAST(HDOP AS NVARCHAR(20)),'0') AS HDOP, 'G' AS Type";
 
     private static string BuildGpsUnionSql(IEnumerable<string> tables) =>
         string.Join(" UNION ALL ", tables.Select(t =>

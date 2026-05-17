@@ -50,6 +50,9 @@ public static class UiIconHelper
         "help" or "info" => """<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>""",
         "layers" => """<path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>""",
         "list" => """<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>""",
+        "signal" => """<path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>""",
+        "battery" => """<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/><rect x="4" y="9" width="8" height="6" fill="currentColor" stroke="none"/>""",
+        "arrow-up" => """<path d="M12 19V5"/><path d="m5 12 7-7 7 7"/>""",
         _ => null
     };
 

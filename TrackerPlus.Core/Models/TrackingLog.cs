@@ -14,6 +14,7 @@ public class TrackingLog
     public int Direction { get; set; }
     public double Distance { get; set; }
     public int Voltage { get; set; }
+    public string VoltageStr { get; set; } = string.Empty;
     public int CSQ { get; set; }
     public int GPSNo { get; set; }
     public double HDOP { get; set; }

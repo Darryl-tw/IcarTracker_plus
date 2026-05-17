@@ -13,6 +13,7 @@ internal sealed class TrackingLogDbRow
     public string? Distance { get; set; }
     public string? OtherStatus { get; set; }
     public string? QTY_GPS { get; set; }
+    public string? SatelliteStatus { get; set; }
     public string? HDOP { get; set; }
     public string Type { get; set; } = "G";
 }

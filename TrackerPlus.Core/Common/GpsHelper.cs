@@ -57,6 +57,20 @@ public static class GpsHelper
         return sign * (hours * 60 + minutes);
     }
 
+    /// <summary>
+    /// Counts active GPS satellites from SatelliteStatus encoded string.
+    /// Each 2-char pair: [PRN char][Signal char]. Signal='0' means no tracking.
+    /// Active count = pairs where signal char != '0'.
+    /// </summary>
+    public static int CountActiveSatellites(string? satelliteStatus)
+    {
+        var s = (satelliteStatus ?? "").Trim();
+        int count = 0;
+        for (int i = 1; i < s.Length; i += 2)
+            if (s[i] != '0') count++;
+        return count;
+    }
+
     public static int ParseCsq(string? otherStatus)
     {
         var status = (otherStatus ?? string.Empty).Trim();
@@ -64,14 +78,31 @@ public static class GpsHelper
         return int.TryParse(status.Substring(0, 2).Trim(), out var csq) ? csq : 0;
     }
 
+    /// <summary>
+    /// Returns raw voltage string from OtherStatus positions 2-5 (e.g., "4.14V").
+    /// Old system stores voltage as a 4-char decimal string like "4.14" or "0000".
+    /// </summary>
+    public static string ParseVoltageStr(string? otherStatus)
+    {
+        var status = (otherStatus ?? string.Empty).Trim();
+        if (status.Length < 3) return "";
+        var raw = status.Length >= 6 ? status.Substring(2, 4) : status.Substring(2);
+        raw = raw.Trim();
+        if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) || value <= 0)
+            return "";
+        return value.ToString("F2", CultureInfo.InvariantCulture) + "V";
+    }
+
     public static int ParseVoltagePercent(string? otherStatus)
     {
         var status = (otherStatus ?? string.Empty).Trim();
-        if (status.Length < 6) return 0;
-        var raw = status.Substring(2, 4).Trim();
-        if (!int.TryParse(raw, out var value)) return 0;
-        // 舊系統：≤5 視為鋰電百分比等級，>5 為車電電壓值；UI 以百分比顯示時做簡化換算
-        if (value <= 5) return Math.Clamp(value * 20, 0, 100);
+        if (status.Length < 3) return 0;
+        var raw = status.Length >= 6 ? status.Substring(2, 4) : status.Substring(2);
+        raw = raw.Trim();
+        // OtherStatus voltage is stored as a decimal string like "4.14" (volts)
+        if (!double.TryParse(raw, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) || value <= 0) return 0;
+        // ≤5V → lithium battery (0–4.2V range); >5V → car battery (0–15V range)
+        if (value <= 5) return Math.Clamp((int)Math.Round(value / 4.2 * 100), 0, 100);
         return Math.Clamp((int)Math.Round(value / 15.0 * 100), 0, 100);
     }
 

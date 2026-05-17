@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Security.Claims;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
@@ -19,11 +21,12 @@ public class MapController : Controller
     private readonly IMapMarkRepository _mapMarkRepository;
     private readonly IDeviceSettingsService _deviceSettingsService;
     private readonly AppSettings _appSettings;
+    private readonly ILogger<MapController> _logger;
 
     public MapController(ITrackerService trackerService, IHistoryService historyService,
         IGoogleApiKeyService googleApiKeyService, ILabelService labelService,
         IMapMarkRepository mapMarkRepository, IDeviceSettingsService deviceSettingsService,
-        IOptions<AppSettings> appSettings)
+        IOptions<AppSettings> appSettings, ILogger<MapController> logger)
     {
         _trackerService = trackerService;
         _historyService = historyService;
@@ -32,6 +35,7 @@ public class MapController : Controller
         _mapMarkRepository = mapMarkRepository;
         _deviceSettingsService = deviceSettingsService;
         _appSettings = appSettings.Value;
+        _logger = logger;
     }
 
     private int GetMemberTbKey()
@@ -160,6 +164,11 @@ public class MapController : Controller
         return Json(new { success = ok });
     }
 
+    private static string FormatElapsed(TimeSpan t) =>
+        t.TotalMinutes >= 1
+            ? $"{(int)t.TotalMinutes}m{t.Seconds:D2}s{t.Milliseconds:D3}ms"
+            : $"{t.Seconds}s{t.Milliseconds:D3}ms";
+
     private async Task<List<int>> FilterOwnedTrackerKeysAsync(string? tbKeys, int memberTbKey)
     {
         var result = new List<int>();
@@ -266,6 +275,7 @@ public class MapController : Controller
     [HttpGet]
     public async Task<IActionResult> HistoryData(string imei, string? date, string type = "GPS")
     {
+        var sw = Stopwatch.StartNew();
         var memberTbKey = GetMemberTbKey();
         var memberTimezone = GetMemberTimezone();
 
@@ -296,9 +306,14 @@ public class MapController : Controller
                 gpsNo = l.GPSNo,
                 hdop = Math.Round(l.HDOP, 2),
                 csq = l.CSQ,
-                voltage = l.Voltage
+                voltage = l.Voltage,
+                voltageV = l.VoltageStr
             })
             .ToList();
+
+        sw.Stop();
+        _logger.LogInformation("[HistoryData] IMEI={IMEI} Date={Date} Type={Type} Logs={Count} Elapsed={Elapsed}",
+            imei, date, type, logs.Count, FormatElapsed(sw.Elapsed));
 
         return Json(new
         {
@@ -313,6 +328,7 @@ public class MapController : Controller
     [HttpGet]
     public async Task<IActionResult> HistoryDailySummary(string imei, string? endDate)
     {
+        var sw = Stopwatch.StartNew();
         var memberTbKey = GetMemberTbKey();
         var memberTimezone = GetMemberTimezone();
 
@@ -339,7 +355,11 @@ public class MapController : Controller
                 recordCount = s.RecordCount,
                 totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
             };
-        });
+        }).ToList();
+
+        sw.Stop();
+        _logger.LogInformation("[HistoryDailySummary] IMEI={IMEI} EndDate={EndDate} Days={Days} Elapsed={Elapsed}",
+            imei, endDate, result.Count, FormatElapsed(sw.Elapsed));
 
         return Json(result);
     }

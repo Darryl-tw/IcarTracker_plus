@@ -1771,6 +1771,7 @@
   <data name="Nav_Privacy" xml:space="preserve"><value>隐私权</value></data>
   <data name="Layout_ToggleNav" xml:space="preserve"><value>切换导览</value></data>
   <data name="Common_Required" xml:space="preserve"><value>*</value></data>
+  <data name="Hist_DailySummaryLabel" xml:space="preserve"><value>每一天的历史轨迹记录</value></data>
   <data name="Hist_Date" xml:space="preserve"><value>日期</value></data>
   <data name="Hist_FirstGPS" xml:space="preserve"><value>连线时间</value></data>
   <data name="Hist_LastGPS" xml:space="preserve"><value>离线时间</value></data>
@@ -1780,4 +1781,9 @@
   <data name="Hist_BackToSummary" xml:space="preserve"><value>返回记录清单</value></data>
   <data name="Hist_GpsNo" xml:space="preserve"><value>GPS卫星数</value></data>
   <data name="Hist_Voltage" xml:space="preserve"><value>电压值</value></data>
+  <data name="Live_SeqCol" xml:space="preserve"><value>记录编号</value></data>
+  <data name="History_LatLng" xml:space="preserve"><value>经纬度</value></data>
+  <data name="Hist_GsmSignal" xml:space="preserve"><value>GSM信号</value></data>
+  <data name="Hist_DistanceM" xml:space="preserve"><value>移动距离</value></data>
+  <data name="Hist_SpeedKmh" xml:space="preserve"><value>行进速度</value></data>
 </root>

@@ -230,7 +230,6 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 .device-table td.col-group, .device-table td.col-days, .device-table td.col-plat {
     text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
-.device-cb { cursor: pointer; accent-color: #2563eb; vertical-align: middle; }
 .device-name {
     color: #e2e8f0; font-size: 11px; font-weight: 600; vertical-align: middle;
     display: inline-block; max-width: calc(100% - 26px);
@@ -445,6 +444,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 #hist-detail-table th { padding: 2px 4px; text-align: left; color: #475569; font-weight: 600; font-size: 9px; white-space: nowrap; border-right: 1px solid #cbd5e1; }
 #hist-detail-table td { padding: 2px 4px; border-bottom: 1px solid #e2e8f0; color: #374151; border-right: 1px solid #e2e8f0; font-size: 9px; }
 #hist-detail-table tr:hover td { background: #eff6ff; cursor: pointer; }
+#hist-detail-table tr.row-hover td { background: #fef08a !important; cursor: pointer; }
 .hist-nodata { text-align: center; padding: 10px; color: #94a3b8; font-size: 10px; }
 
 /* ======= LOADING OVERLAY ======= */
@@ -522,8 +522,6 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
             [<span id="device-count">@Model.Count()</span>]
         </div>
         <div id="sidebar-controls">
-            <button class="ctrl-btn" onclick="selectAll(true)">@Html.UiIcon("select-all")<span>@L["Live_SelectAll"]</span></button>
-            <button class="ctrl-btn" onclick="selectAll(false)">@Html.UiIcon("cancel")<span>@L["Common_Cancel"]</span></button>
             <button class="ctrl-btn" onclick="fitAll()">@Html.UiIcon("fit-all")<span>@L["Live_FitAll"]</span></button>
         </div>
         <div id="device-list">
@@ -548,11 +546,9 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                             data-imei="@t.IMEICODE"
                             data-power-saving="@t.PowerSavingMode.ToString().ToLower()"
                             data-service-days="@(daysLeft.HasValue ? daysLeft.Value.ToString() : "")"
-                            onclick="onDeviceClick(@t.TbKey)">
+                            onclick="onDeviceClick(@t.TbKey)"
+                            onmouseenter="onDeviceHover(@t.TbKey)">
                             <td class="col-name">
-                                <input type="checkbox" class="device-cb" checked
-                                       data-tbkey="@t.TbKey"
-                                       onclick="event.stopPropagation(); toggleDevice(@t.TbKey, this.checked)" />
                                 <span class="status-dot @statusDot"></span>
                                 <span class="device-name" title="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</span>
                             </td>
@@ -587,7 +583,6 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                 <button class="map-tool-btn" id="btn-refresh" onclick="forceRefresh()">
                     @Html.UiIcon("refresh")<span>@L["Live_UpdateNow"] (<span id="refresh-count">0</span>)</span>
                 </button>
-                <button class="map-tool-btn" id="btn-multi" onclick="openMultiWindow()">@Html.UiIcon("multi-window")<span>@L["Live_MultiWindow"]</span></button>
                 <button class="map-tool-btn" id="btn-clear" onclick="clearTracks()">@Html.UiIcon("clear")<span>@L["Live_ClearTrack"]</span></button>
                 <button class="map-tool-btn" id="btn-landmark" onclick="openLandmarkModal()">@Html.UiIcon("landmark")<span>@L["Live_CustomLandmark"]</span></button>
                 <button class="map-tool-btn" id="btn-traffic" onclick="toggleTraffic()">@Html.UiIcon("traffic")<span>@L["Live_Traffic"]</span></button>
@@ -783,6 +778,16 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                         <option value="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</option>
                     }
                 </select>
+                <span id="hist-gps-controls" style="display:none;align-items:center;gap:4px">
+                    <label>@L["Hist_DailySummaryLabel"]</label>
+                    <input type="date" id="hist-gps-date"
+                           value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.AddMonths(-6).ToString("yyyy-MM-dd")" />
+                    <button class="hist-btn hist-btn-sec" onclick="histGpsPrev7()">@Html.UiIcon("prev")<span>@L["Live_Prev7Days"]</span></button>
+                    <button class="hist-btn hist-btn-sec" onclick="histGpsNext7()">@Html.UiIcon("next")<span>@L["Live_Next7Days"]</span></button>
+                    <button class="hist-btn hist-btn-primary" onclick="loadHistorySummary()">@Html.UiIcon("confirm")<span>@L["Common_Confirm"]</span></button>
+                </span>
                 <span id="hist-lbs-controls" style="display:none;align-items:center;gap:4px">
                     <label>@L["Live_DateLabel"]</label>
                     <input type="date" id="hist-date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
@@ -827,17 +832,16 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                     <table id="hist-detail-table" style="display:none">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>@L["Live_SeqCol"]</th>
                                 <th>@L["Live_TimeCol"]</th>
-                                <th>@L["History_Lat"]</th>
-                                <th>@L["History_Lng"]</th>
-                                <th>@L["Hist_GpsNo"]</th>
+                                <th>@L["History_LatLng"]</th>
+                                <th>@Html.UiIcon("satellite",10) @L["Hist_GpsNo"]</th>
                                 <th>HDOP</th>
-                                <th>CSQ</th>
-                                <th>@L["Hist_Voltage"]</th>
-                                <th>@L["Live_DistanceKmCol"]</th>
-                                <th>@L["Live_SpeedKmhCol"]</th>
-                                <th>@L["History_Direction"]</th>
+                                <th>@Html.UiIcon("signal",10) @L["Hist_GsmSignal"]</th>
+                                <th>@Html.UiIcon("battery",10) @L["Hist_Voltage"]</th>
+                                <th>@L["Hist_DistanceM"]</th>
+                                <th>@L["Hist_SpeedKmh"]</th>
+                                <th>@Html.UiIcon("arrow-up",10) @L["History_Direction"]</th>
                             </tr>
                         </thead>
                         <tbody id="hist-detail-tbody"></tbody>
@@ -861,6 +865,8 @@ let markers = {};        // tbKey ??google.maps.Marker
 let polylines = {};      // tbKey ??google.maps.Polyline (track)
 let historyPolyline = null;
 let historyMarkers = [];
+let historyArrowMarkers = [];   // parallel to data.logs — index matches row index
+let hoveredHistMarker = null;   // temporary highlight marker on hover
 let activeTab = 'live';
 let refreshTimer = null;
 let refreshCount = 0;
@@ -1020,18 +1026,18 @@ function onDeviceClick(tbKey) {
     selectDeviceOnMap(tbKey);
 }
 
-function toggleDevice(tbKey, checked) {
+function onDeviceHover(tbKey) {
     const m = markers[tbKey];
-    if (m) m.setVisible(checked);
-    const pl = polylines[tbKey];
-    if (pl) pl.setVisible(checked);
-}
-
-function selectAll(checked) {
-    document.querySelectorAll('.device-cb').forEach(cb => {
-        cb.checked = checked;
-        toggleDevice(parseInt(cb.dataset.tbkey), checked);
-    });
+    if (!m) return;
+    if (activeTab === 'live') {
+        map.panTo(m.getPosition());
+    }
+    const el = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
+    const imei = el?.dataset.imei;
+    if (imei) {
+        const sel = document.getElementById('hist-device-sel');
+        if (sel) sel.value = imei;
+    }
 }
 
 // ========== MAP CONTROLS ==========
@@ -1075,29 +1081,6 @@ function setMapType(road) {
     map.setMapTypeId(road ? 'roadmap' : 'satellite');
     document.getElementById('btn-map-road').classList.toggle('active', road);
     document.getElementById('btn-map-sat').classList.toggle('active', !road);
-}
-
-// ========== MULTI WINDOW ==========
-function getCheckedDeviceKeys() {
-    const keys = [];
-    document.querySelectorAll('.device-cb:checked').forEach(cb => {
-        keys.push(parseInt(cb.dataset.tbkey, 10));
-    });
-    return keys;
-}
-
-function openMultiWindow() {
-    const keys = getCheckedDeviceKeys();
-    if (keys.length === 0) {
-        alert(i18n.multiWindowSelect);
-        return;
-    }
-    if (keys.length > MAX_MULTI_WINDOWS) {
-        alert(i18n.multiWindowMax.replace('{0}', MAX_MULTI_WINDOWS));
-        return;
-    }
-    const url = '/Map/MultiWindow?tbKeys=' + keys.join(',');
-    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ========== LANDMARKS ==========
@@ -1633,7 +1616,7 @@ function refreshData() {
             }
             renderMarker(t);
             updateMarkerIcon(t.tbKey);
-            // update sidebar
+            // update sidebar row
             const item = document.querySelector(`.device-item[data-tbkey="${t.tbKey}"]`);
             if (item) {
                 const nameEl = item.querySelector('.device-name');
@@ -1643,8 +1626,7 @@ function refreshData() {
                     const status = getDeviceStatus(t.isOnline, item.dataset.powerSaving === 'true', item.dataset.serviceDays);
                     dot.className = 'status-dot ' + status;
                 }
-                if (t.isOnline) item.classList.remove('offline');
-                else item.classList.add('offline');
+                item.classList.toggle('offline', !t.isOnline);
             }
         });
         document.getElementById('device-count').textContent = data.length;
@@ -1680,11 +1662,16 @@ function switchTab(tab) {
     document.getElementById('device-popup').style.display = 'none';
 
     if (!isLive) {
+        // Hide live device markers so history map is clean
+        Object.values(markers).forEach(m => m.setMap(null));
+        Object.values(polylines).forEach(p => p.setMap(null));
         clearTracks();
         clearHistoryMap();
         clearInterval(refreshTimer);
         const isLbs = tab === 'history-lbs';
+        const gpsCtrl = document.getElementById('hist-gps-controls');
         const lbsCtrl = document.getElementById('hist-lbs-controls');
+        if (gpsCtrl) gpsCtrl.style.display = isLbs ? 'none' : 'flex';
         if (lbsCtrl) lbsCtrl.style.display = isLbs ? 'flex' : 'none';
         const backBtn = document.getElementById('hist-back-btn');
         if (backBtn) backBtn.style.display = isLbs ? 'none' : '';
@@ -1695,6 +1682,9 @@ function switchTab(tab) {
             showHistDetailView('');
         }
     } else {
+        // Restore live device markers when returning to live tab
+        Object.values(markers).forEach(m => m.setMap(map));
+        Object.values(polylines).forEach(p => p.setMap(map));
         startRefresh();
     }
     if (map) {
@@ -1708,6 +1698,26 @@ function onHistDeviceChange() {
     if (activeTab === 'history') {
         loadHistorySummary();
     }
+}
+
+function histGpsPrev7() {
+    const el = document.getElementById('hist-gps-date');
+    const d = new Date(el.value);
+    d.setDate(d.getDate() - 7);
+    const min = new Date(el.min);
+    if (d < min) d.setTime(min.getTime());
+    el.value = d.toISOString().substring(0, 10);
+    loadHistorySummary();
+}
+
+function histGpsNext7() {
+    const el = document.getElementById('hist-gps-date');
+    const d = new Date(el.value);
+    d.setDate(d.getDate() + 7);
+    const max = new Date(el.max);
+    if (d > max) d.setTime(max.getTime());
+    el.value = d.toISOString().substring(0, 10);
+    loadHistorySummary();
 }
 
 function histPrevDay() {
@@ -1724,11 +1734,14 @@ function histNextDay() {
 
 function showHistSummaryView() {
     clearHistoryMap();
+    document.getElementById('history-toolbar').style.display = '';
     document.getElementById('hist-summary-view').style.display = 'flex';
     document.getElementById('hist-detail-view').style.display = 'none';
+    if (map) setTimeout(() => google.maps.event.trigger(map, 'resize'), 50);
 }
 
 function showHistDetailView(titleText) {
+    document.getElementById('history-toolbar').style.display = 'none';
     document.getElementById('hist-summary-view').style.display = 'none';
     document.getElementById('hist-detail-view').style.display = 'flex';
     document.getElementById('hist-detail-title').textContent = titleText || '';
@@ -1743,13 +1756,14 @@ function showHistDetailView(titleText) {
 
 function loadHistorySummary() {
     const imei = document.getElementById('hist-device-sel').value;
+    const endDate = document.getElementById('hist-gps-date').value;
     if (!imei) return;
     document.getElementById('hist-loading').style.display = 'inline';
     document.getElementById('hist-summary-nodata').style.display = 'none';
     document.getElementById('hist-summary-table').style.display = 'none';
     document.getElementById('hist-summary-tbody').innerHTML = '';
 
-    $.getJSON(`/Map/HistoryDailySummary?imei=${encodeURIComponent(imei)}`, function (data) {
+    $.getJSON(`/Map/HistoryDailySummary?imei=${encodeURIComponent(imei)}&endDate=${endDate}`, function (data) {
         document.getElementById('hist-loading').style.display = 'none';
         if (!data || data.length === 0) {
             document.getElementById('hist-summary-nodata').textContent = i18n.histNoData;
@@ -1803,22 +1817,23 @@ function loadHistoryDetail(imei, date) {
 
         const tbody = document.getElementById('hist-detail-tbody');
         tbody.innerHTML = '';
-        data.logs.forEach(l => {
+        data.logs.forEach((l, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${l.seq}</td>
                 <td>${l.time}</td>
-                <td>${l.lat.toFixed(6)}</td>
-                <td>${l.lng.toFixed(6)}</td>
+                <td>${l.lat.toFixed(6)},${l.lng.toFixed(6)}</td>
                 <td>${l.gpsNo}</td>
-                <td>${l.hdop.toFixed(2)}</td>
-                <td>${l.csq}</td>
-                <td>${l.voltage}</td>
-                <td>${l.distanceKm.toFixed(3)}</td>
-                <td>${l.speed.toFixed(1)}</td>
-                <td>${l.direction}°</td>
+                <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
+                <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
+                <td>${voltageCell(l.voltageV, l.voltage)}</td>
+                <td>${l.distanceM}公尺</td>
+                <td>${l.speed.toFixed(1)}公里/時</td>
+                <td>${dirBadge(l.direction)}</td>
             `;
             tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
+            tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(idx, l, 'GPS', imei); });
+            tr.addEventListener('mouseleave', () => { tr.classList.remove('row-hover'); restoreHistMarker(); });
             tbody.appendChild(tr);
         });
         document.getElementById('hist-detail-table').style.display = '';
@@ -1852,22 +1867,23 @@ function loadLbsHistory() {
 
         const tbody = document.getElementById('hist-detail-tbody');
         tbody.innerHTML = '';
-        data.logs.forEach(l => {
+        data.logs.forEach((l, idx) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${l.seq}</td>
                 <td>${l.time}</td>
-                <td>${l.lat.toFixed(6)}</td>
-                <td>${l.lng.toFixed(6)}</td>
+                <td>${l.lat.toFixed(6)},${l.lng.toFixed(6)}</td>
                 <td>${l.gpsNo}</td>
-                <td>${l.hdop.toFixed(2)}</td>
-                <td>${l.csq}</td>
-                <td>${l.voltage}</td>
-                <td>${l.distanceKm.toFixed(3)}</td>
-                <td>${l.speed.toFixed(1)}</td>
-                <td>${l.direction}°</td>
+                <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
+                <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
+                <td>${voltageCell(l.voltageV, l.voltage)}</td>
+                <td>${l.distanceM}公尺</td>
+                <td>${l.speed.toFixed(1)}公里/時</td>
+                <td>${dirBadge(l.direction)}</td>
             `;
             tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
+            tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(idx, l, 'LBS', imei); });
+            tr.addEventListener('mouseleave', () => { tr.classList.remove('row-hover'); restoreHistMarker(); });
             tbody.appendChild(tr);
         });
         document.getElementById('hist-detail-table').style.display = '';
@@ -1878,8 +1894,73 @@ function loadLbsHistory() {
     });
 }
 
+// CSQ signal bars (0-31): render ▁▃▅▇ style Unicode bars
+function csqBars(csq) {
+    const pct = Math.min(csq / 31, 1);
+    const filled = Math.round(pct * 4);
+    const bars = ['▁','▃','▅','▇'];
+    return '<span style="letter-spacing:-1px;color:#64748b">' +
+        bars.map((b, i) => `<span style="color:${i < filled ? '#22c55e' : '#cbd5e1'}">${b}</span>`).join('') +
+        '</span>';
+}
+
+// Voltage: render battery bar + raw voltage string (e.g. "4.14V")
+function voltageBars(pct) {
+    const fill = Math.max(0, Math.min(100, pct));
+    const color = fill > 50 ? '#22c55e' : fill > 20 ? '#f59e0b' : '#ef4444';
+    return `<span style="display:inline-block;width:18px;height:9px;border:1px solid #94a3b8;border-radius:2px;vertical-align:middle;position:relative;background:#e2e8f0">` +
+        `<span style="display:block;width:${fill}%;height:100%;background:${color};border-radius:1px"></span>` +
+        `</span>`;
+}
+
+// Direction badge: rotating arrow + "GPS" label (matches old system style)
+function dirBadge(direction) {
+    return `<span style="display:inline-flex;align-items:center;gap:1px;background:#2563eb;color:#fff;` +
+        `border-radius:2px;padding:1px 4px;font-size:8px;white-space:nowrap">` +
+        `<span style="display:inline-block;transform:rotate(${direction}deg);font-size:10px;line-height:1">↑</span>` +
+        `GPS</span>`;
+}
+
+function voltageCell(voltageV, pct) {
+    const bar = voltageBars(pct);
+    const label = voltageV && voltageV !== '' ? voltageV : (pct > 0 ? pct + '%' : '—');
+    return bar + ' ' + label;
+}
+
+// Highlight the arrow marker corresponding to hovered row
+function highlightHistMarker(idx, l, type, imei) {
+    restoreHistMarker();
+    if (!map) return;
+    const deviceMarker = Object.values(markers).find(m => m.markerData?.imei === imei);
+    const iconFile = deviceMarker?.markerData?.iconFile || 'A';
+    hoveredHistMarker = new google.maps.Marker({
+        position: { lat: l.lat, lng: l.lng },
+        map: map,
+        zIndex: 9999,
+        icon: makeIcon(l.direction, true, iconFile),
+        title: `${l.time} ${l.speed !== undefined ? l.speed.toFixed(1) : ''}km/h`
+    });
+}
+
+function restoreHistMarker() {
+    if (hoveredHistMarker) { hoveredHistMarker.setMap(null); hoveredHistMarker = null; }
+}
+
+function makeHistArrowIcon(direction, type) {
+    return {
+        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+        scale: 3,
+        rotation: direction,
+        fillColor: type === 'LBS' ? '#f59e0b' : '#2563eb',
+        fillOpacity: 0.85,
+        strokeColor: '#fff',
+        strokeWeight: 1
+    };
+}
+
 function renderHistoryOnMap(data, type) {
     if (!map) return;
+    historyArrowMarkers = [];
     const path = data.logs.map(l => ({ lat: l.lat, lng: l.lng }));
     historyPolyline = new google.maps.Polyline({
         path: path,
@@ -1895,20 +1976,13 @@ function renderHistoryOnMap(data, type) {
         const arrowMarker = new google.maps.Marker({
             position: { lat: l.lat, lng: l.lng },
             map: map,
-            icon: {
-                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-                scale: 3,
-                rotation: l.direction,
-                fillColor: type === 'LBS' ? '#f59e0b' : '#2563eb',
-                fillOpacity: 0.85,
-                strokeColor: '#fff',
-                strokeWeight: 1
-            },
+            icon: makeHistArrowIcon(l.direction, type),
             title: `${l.time} ${l.speed.toFixed(1)}km/h`
         });
         arrowMarker.addListener('click', () => {
             if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); }
         });
+        historyArrowMarkers.push(arrowMarker);
         historyMarkers.push(arrowMarker);
     });
 
@@ -1931,9 +2005,11 @@ function renderHistoryOnMap(data, type) {
 }
 
 function clearHistoryMap() {
+    if (hoveredHistMarker) { hoveredHistMarker.setMap(null); hoveredHistMarker = null; }
     if (historyPolyline) { historyPolyline.setMap(null); historyPolyline = null; }
     historyMarkers.forEach(m => m.setMap(null));
     historyMarkers = [];
+    historyArrowMarkers = [];
 }
 
 // ========== INIT ==========
