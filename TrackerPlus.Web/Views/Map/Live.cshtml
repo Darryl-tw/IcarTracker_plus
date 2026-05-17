@@ -771,13 +771,8 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
         <!-- HISTORY PANEL -->
         <div id="history-panel">
             <div id="history-toolbar">
-                <label>@L["History_Device"]</label>
-                <select id="hist-device-sel" style="min-width:120px" onchange="onHistDeviceChange()">
-                    @foreach (var t in Model)
-                    {
-                        <option value="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</option>
-                    }
-                </select>
+                <input type="hidden" id="hist-device-sel" value="@(Model.FirstOrDefault()?.IMEICODE ?? "")" />
+                <span id="hist-device-label" style="font-size:10px;font-weight:600;color:#1e3a5f;padding:2px 7px;background:#dbeafe;border:1px solid #93c5fd;border-radius:3px;white-space:nowrap">@(string.IsNullOrEmpty(Model.FirstOrDefault()?.CName) ? Model.FirstOrDefault()?.IMEICODE ?? "—" : Model.FirstOrDefault()?.CName)</span>
                 <span id="hist-gps-controls" style="display:none;align-items:center;gap:4px">
                     <label>@L["Hist_DailySummaryLabel"]</label>
                     <input type="date" id="hist-gps-date"
@@ -1019,6 +1014,9 @@ function selectDeviceOnMap(tbKey) {
         document.getElementById('menu-hist-gps').href = `/History/Index?imei=${imei}`;
         document.getElementById('menu-hist-lbs').href = `/History/Index?imei=${imei}&type=LBS`;
         document.getElementById('hist-device-sel').value = imei;
+        const nameEl = el?.querySelector('.device-name');
+        const histLabel = document.getElementById('hist-device-label');
+        if (histLabel && nameEl) histLabel.textContent = nameEl.textContent.trim();
     }
 }
 
@@ -1037,6 +1035,9 @@ function onDeviceHover(tbKey) {
     if (imei) {
         const sel = document.getElementById('hist-device-sel');
         if (sel) sel.value = imei;
+        const nameEl = el?.querySelector('.device-name');
+        const histLabel = document.getElementById('hist-device-label');
+        if (histLabel && nameEl) histLabel.textContent = nameEl.textContent.trim();
     }
 }
 
@@ -1693,12 +1694,6 @@ function switchTab(tab) {
 }
 
 // ========== HISTORY ==========
-
-function onHistDeviceChange() {
-    if (activeTab === 'history') {
-        loadHistorySummary();
-    }
-}
 
 function histGpsPrev7() {
     const el = document.getElementById('hist-gps-date');
