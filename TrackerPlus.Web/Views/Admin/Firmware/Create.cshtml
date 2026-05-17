@@ -1,0 +1,26 @@
+﻿@model TrackerPlus.Core.Models.FirmwareVersion
+@{ ViewData["Title"] = L["Admin_Firmware_CreateTitle"].Value; }
+<h2>@L["Admin_Firmware_CreateTitle"]</h2>
+@if (ViewBag.Error != null) { <div class="alert alert-danger">@ViewBag.Error</div> }
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="mb-3">
+        <label class="form-label">FWVERSION</label>
+        <input asp-for="FWVERSION" class="form-control" required />
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_FtpHost"]</label><input asp-for="FtpServer" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_FtpDir"]</label><input asp-for="FtpDir" class="form-control" /></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_FtpUser"]</label><input asp-for="FtpUsername" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_FtpPass"]</label><input asp-for="FtpPassword" class="form-control" /></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_FileName"]</label><input asp-for="FileName" class="form-control" /></div>
+        <div class="col-md-6 mb-3"><label class="form-label">@L["Admin_Firmware_Size"]</label><input asp-for="FileSize" class="form-control" /></div>
+    </div>
+    <div class="mb-3"><label class="form-label">@L["Admin_Firmware_Desc"]</label><input asp-for="NewFwVersion" class="form-control" /></div>
+    <button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("save")<span>@L["Common_Save"]</span></button>
+    <a asp-action="Index" class="btn btn-secondary btn-with-icon">@Html.UiIcon("cancel")<span>@L["Common_Cancel"]</span></a>
+</form>

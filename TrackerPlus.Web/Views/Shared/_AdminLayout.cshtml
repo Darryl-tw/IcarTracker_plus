@@ -1,0 +1,48 @@
+@using System.Globalization
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @L["AdminTitle"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">@L["AdminTitle"]</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" asp-controller="Tracker" asp-action="Index">@L["Nav_Admin_Devices"]</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Member" asp-action="Index">@L["Nav_Admin_Members"]</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="IMEI" asp-action="Index">@L["Nav_Admin_IMEI"]</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="PayLog" asp-action="Index">@L["Nav_Admin_PayLog"]</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Firmware" asp-action="Index">@L["Nav_Admin_Firmware"]</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="WebServiceIP" asp-action="Index">@L["Nav_Admin_IP"]</a></li>
+            </ul>
+            <ul class="navbar-nav align-items-center gap-2">
+                <li class="nav-item"><partial name="_LanguageSwitcher" /></li>
+                <li class="nav-item">
+                    <span class="nav-link text-light">@ViewBag.AdminAccount</span>
+                </li>
+                <li class="nav-item">
+                    <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-link nav-link text-danger btn-with-icon">@Html.UiIcon("logout")<span>@L["Nav_Logout"]</span></button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container-fluid mt-3">
+    @RenderBody()
+</div>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

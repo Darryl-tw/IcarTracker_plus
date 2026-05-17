@@ -1,0 +1,71 @@
+@import url('btn-icons.css');
+
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.language-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+}
+
+.language-pill {
+  padding: 0.25rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  transition: background 0.15s, color 0.15s;
+}
+
+.language-pill:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.language-pill.active {
+  color: #1d4ed8;
+  background: #fff;
+  border-color: #fff;
+  font-weight: 600;
+}
+
+.language-pills--light .language-pill {
+  color: #475569;
+  border-color: #cbd5e1;
+  background: #fff;
+}
+
+.language-pills--light .language-pill:hover {
+  color: #1e293b;
+  background: #f1f5f9;
+}
+
+.language-pills--light .language-pill.active {
+  color: #fff;
+  background: #2563eb;
+  border-color: #2563eb;
+}

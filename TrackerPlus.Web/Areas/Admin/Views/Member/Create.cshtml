@@ -1,0 +1,68 @@
+﻿@model TrackerPlus.Core.Models.Member
+@{
+    ViewData["Title"] = L["Admin_Member_CreateTitle"].Value;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_Member_CreateTitle"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.Error as string))
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<div class="card" style="max-width:600px">
+    <div class="card-body">
+        <form asp-action="Create" asp-area="Admin" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_Member_Account"] *</label>
+                    <input type="text" name="ID" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Login_Password"] *</label>
+                    <input type="password" name="password" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_Member_Name"] *</label>
+                    <input type="text" name="CName" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email *</label>
+                    <input type="email" name="Email" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_Member_Phone"]</label>
+                    <input type="text" name="Tel" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Field_Language"]</label>
+                    <select name="UserLanguage" class="form-select">
+                        <option value="CHT">@L["Lang_CHT"]</option>
+                        <option value="CHS">@L["Lang_CHS"]</option>
+                        <option value="ENG">@L["Lang_ENG"]</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_Member_Unit"]</label>
+                    <select name="UserUnit" class="form-select">
+                        <option value="K">@L["Unit_Km"]</option>
+                        <option value="M">@L["Unit_Mile"]</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_Member_Timezone"]</label>
+                    <input type="number" name="Timezoom" value="480" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Common_Status"]</label>
+                    <select name="MemberStatus" class="form-select">
+                        <option value="Y">@L["Common_Active"]</option>
+                        <option value="N">@L["Common_Inactive"]</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success mt-3 btn-with-icon">@Html.UiIcon("add")<span>@L["Admin_Member_CreateBtn"]</span></button>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+@using System.Globalization
+@{
+    Layout = null;
+    ViewData["Title"] = L["AdminLogin_Title"].Value;
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@L["AdminLogin_Title"] - @L["AppName"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-dark">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header bg-dark text-white text-center">
+                    <h4>@L["AdminLogin_Heading"]</h4>
+                    @{
+                        ViewData["LangSwitcherVariant"] = "pills";
+                    }
+                    <partial name="~/Views/Shared/_LanguageSwitcher.cshtml" />
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+                    <form method="post" asp-area="Admin" asp-controller="Account" asp-action="Login">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                        <div class="mb-3">
+                            <label class="form-label">@L["Login_Account"]</label>
+                            <input type="text" name="account" class="form-control" required autofocus />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@L["Login_Password"]</label>
+                            <input type="password" name="password" class="form-control" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 btn-with-icon">@Html.UiIcon("login")<span>@L["Login_Submit"]</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,94 @@
+@using TrackerPlus.Core.Common
+@model PagedResult<TrackerPlus.Core.Models.FirmwareVersion>
+@{
+    ViewData["Title"] = L["Admin_Firmware_Title"].Value;
+    var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_Firmware_Title"] (FWCONROL)</h2>
+    <a asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_Firmware_AddVersion"]</span></a>
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_Firmware_SearchPh"]" />
+    </div>
+    <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
+</form>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="card mb-3">
+    <div class="card-header">@L["Admin_Firmware_Batch"]</div>
+    <div class="card-body">
+        <form asp-action="BatchQueue" method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-md-4">
+                <select name="targetFwVersion" class="form-select" required>
+                    <option value="">@L["Admin_Firmware_SelectVersion"]</option>
+                    @foreach (var f in Model.Items)
+                    {
+                        <option value="@f.FWVERSION">@f.FWVERSION</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <textarea name="imeiList" class="form-control" rows="2" placeholder="@L["Admin_Firmware_ImeiList"]" required></textarea>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-warning w-100 btn-with-icon">@Html.UiIcon("schedule")<span>@L["Admin_Firmware_Schedule"]</span></button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>@L["Admin_Firmware_VersionCol"]</th>
+                <th>@L["Admin_Firmware_FtpCol"]</th>
+                <th>@L["Admin_Firmware_FileName"]</th>
+                <th>@L["Admin_Firmware_Desc"]</th>
+                <th>@L["Admin_Firmware_CreatedCol"]</th>
+                <th>@L["Common_Operation"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var f in Model.Items)
+            {
+                <tr>
+                    <td><code>@f.FWVERSION</code></td>
+                    <td class="small">@f.FtpServer</td>
+                    <td class="small">@f.FileName</td>
+                    <td class="small">@f.NewFwVersion</td>
+                    <td>@f.CDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-fwVersion="@f.FWVERSION" class="btn btn-sm btn-outline-primary btn-with-icon">@Html.UiIcon("edit")<span>@L["Common_Edit"]</span></a>
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('@L["Common_ConfirmDelete"]')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="fwVersion" value="@f.FWVERSION" />
+                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)</span>
+    <div>
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+        }
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+        }
+    </div>
+</div>

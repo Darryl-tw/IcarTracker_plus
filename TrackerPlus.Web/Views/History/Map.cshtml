@@ -1,0 +1,252 @@
+@model TrackerPlus.Core.Models.TrackingHistoryResult
+@using System.Globalization
+@using System.Text.Json
+@{
+    Layout = null;
+    ViewData["Title"] = L["HistoryMap_Title"].Value;
+    var googleApiJs = ViewBag.GoogleApiJs as string ?? "";
+    var imei = ViewBag.Imei as string ?? "";
+    var startDate = ViewBag.StartDate as string ?? "";
+    var endDate = ViewBag.EndDate as string ?? "";
+    var type = ViewBag.Type as string ?? "GPS";
+    var logsJson = ViewBag.LogsJson as string ?? "[]";
+    var histMapI18nJson = JsonSerializer.Serialize(new
+    {
+        noTrackData = L["HistoryMap_NoTrackData"].Value,
+        mapNotConfigured = L["Live_MapApiNotConfigured"].Value,
+        mapConfigHint = L["Live_MapApiConfigHint"].Value,
+        play = L["HistoryMap_Play"].Value,
+        pause = L["HistoryMap_Pause"].Value,
+        reset = L["HistoryMap_Reset"].Value,
+        playHint = L["HistoryMap_PlayHint"].Value,
+        startTitle = L["HistoryMap_StartTitle"].Value,
+        endTitle = L["HistoryMap_EndTitle"].Value,
+        playheadSpeed = L["HistoryMap_PlayheadSpeed"].Value
+    });
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@L["HistoryMap_Title"] - @L["AppName"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+        #map { position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+        .map-topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+            background: rgba(15,23,42,0.90); backdrop-filter: blur(6px);
+            color: #fff; padding: 0.5rem 1.25rem;
+            display: flex; align-items: center; gap: 1.5rem;
+        }
+        .map-topbar a { color: #93c5fd; text-decoration: none; font-size: 0.85rem; }
+        .map-info {
+            position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%);
+            background: rgba(15,23,42,0.85); backdrop-filter: blur(4px);
+            color: #fff; border-radius: 24px; padding: 0.4rem 1.2rem;
+            font-size: 0.8rem; display: flex; gap: 1.5rem; z-index: 20;
+            white-space: nowrap;
+        }
+        .control-panel {
+            position: fixed; top: 52px; right: 1rem; z-index: 20;
+            background: #fff; border-radius: 8px; padding: 0.75rem 1rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2); min-width: 180px;
+        }
+        .playhead-info {
+            font-size: 0.78rem; color: #334155; margin-top: 0.5rem;
+            min-height: 2.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="map-topbar">
+    <a href="/History/Index?imei=@imei&startDate=@startDate&endDate=@endDate&type=@type">@L["HistoryMap_BackList"]</a>
+    <span class="fw-semibold">@L["HistoryMap_Title"]</span>
+    <span class="text-secondary small">@imei | @startDate ~ @endDate | @type</span>
+    <span class="badge bg-primary ms-auto">@string.Format(L["HistoryMap_RecordCount"].Value, Model.TotalCount)</span>
+</div>
+
+<div id="map"></div>
+
+@if (Model.TotalCount > 0)
+{
+    <div class="control-panel">
+        <div class="fw-semibold small mb-2">@L["HistoryMap_PlayControl"]</div>
+        <div class="d-flex gap-1 mb-2">
+            <button class="btn btn-sm btn-primary flex-fill btn-with-icon" id="btn-play" onclick="playTrack()">@Html.UiIcon("play")<span>@L["HistoryMap_Play"]</span></button>
+            <button class="btn btn-sm btn-secondary flex-fill btn-with-icon" onclick="resetPlay()">@Html.UiIcon("reset")<span>@L["HistoryMap_Reset"]</span></button>
+        </div>
+        <input type="range" class="form-range" id="play-slider" min="0" max="@(Model.TotalCount - 1)" value="0" oninput="seekTo(this.value)" />
+        <div class="playhead-info" id="playhead-info">
+            <div>@L["HistoryMap_PlayHint"]</div>
+        </div>
+    </div>
+}
+
+<div class="map-info">
+    <span>@L["HistoryMap_TotalDistanceBar"] <strong>@Model.TotalDistance.ToString("F1") km</strong></span>
+    <span>@L["HistoryMap_MaxSpeedBar"] <strong>@Model.MaxSpeed.ToString("F0") km/h</strong></span>
+    <span>@L["HistoryMap_AvgSpeedBar"] <strong>@Model.AvgSpeed.ToString("F0") km/h</strong></span>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    const logs = @Html.Raw(logsJson);
+    const i18n = @Html.Raw(histMapI18nJson);
+    let map, polyline, startMarker, endMarker, playMarker;
+    let playTimer = null, playIndex = 0, isPlaying = false;
+
+    function initMap() {
+        if (!logs || logs.length === 0) {
+            document.getElementById('map').innerHTML =
+                '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f0f4f8;padding-top:50px;">' +
+                '<div class="text-center"><h4 class="text-muted">' + i18n.noTrackData + '</h4></div></div>';
+            return;
+        }
+
+        const first = logs[0];
+        const last = logs[logs.length - 1];
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 14,
+            center: { lat: first.lat, lng: first.lng },
+            mapTypeId: 'roadmap',
+            gestureHandling: 'greedy'
+        });
+
+        const path = logs.map(function (l) { return { lat: l.lat, lng: l.lng }; });
+        polyline = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#2563eb',
+            strokeOpacity: 0.85,
+            strokeWeight: 3,
+            map: map
+        });
+
+        startMarker = new google.maps.Marker({
+            position: { lat: first.lat, lng: first.lng },
+            map: map,
+            title: i18n.startTitle.replace('{0}', first.localTime),
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#22c55e',
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: '#fff'
+            },
+            zIndex: 10
+        });
+
+        endMarker = new google.maps.Marker({
+            position: { lat: last.lat, lng: last.lng },
+            map: map,
+            title: i18n.endTitle.replace('{0}', last.localTime),
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#ef4444',
+                fillOpacity: 1,
+                strokeWeight: 2,
+                strokeColor: '#fff'
+            },
+            zIndex: 10
+        });
+
+        const bounds = new google.maps.LatLngBounds();
+        path.forEach(function (p) { bounds.extend(p); });
+        map.fitBounds(bounds);
+
+        updatePlayhead(0);
+    }
+
+    function updatePlayhead(idx) {
+        if (!logs || logs.length === 0) return;
+        const log = logs[idx];
+        const slider = document.getElementById('play-slider');
+        const info = document.getElementById('playhead-info');
+        if (slider) slider.value = idx;
+        if (info) {
+            info.innerHTML =
+                '<div><strong>' + log.localTime + '</strong></div>' +
+                '<div>' + i18n.playheadSpeed.replace('{0}', log.speed.toFixed(1)).replace('{1}', log.direction) + '</div>';
+        }
+
+        if (playMarker) {
+            playMarker.setPosition({ lat: log.lat, lng: log.lng });
+        } else {
+            playMarker = new google.maps.Marker({
+                position: { lat: log.lat, lng: log.lng },
+                map: map,
+                icon: {
+                    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                    scale: 5,
+                    rotation: log.direction,
+                    fillColor: '#f59e0b',
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: '#fff'
+                },
+                zIndex: 20
+            });
+        }
+    }
+
+    function seekTo(idx) {
+        playIndex = parseInt(idx);
+        updatePlayhead(playIndex);
+    }
+
+    function playTrack() {
+        if (isPlaying) {
+            isPlaying = false;
+            clearInterval(playTimer);
+            document.getElementById('btn-play').textContent = i18n.play;
+            return;
+        }
+        if (playIndex >= logs.length - 1) playIndex = 0;
+        isPlaying = true;
+        document.getElementById('btn-play').textContent = i18n.pause;
+        playTimer = setInterval(function () {
+            if (playIndex >= logs.length - 1) {
+                isPlaying = false;
+                clearInterval(playTimer);
+                document.getElementById('btn-play').textContent = i18n.play;
+                return;
+            }
+            playIndex++;
+            updatePlayhead(playIndex);
+        }, 200);
+    }
+
+    function resetPlay() {
+        isPlaying = false;
+        clearInterval(playTimer);
+        playIndex = 0;
+        document.getElementById('btn-play').textContent = i18n.play;
+        if (logs && logs.length > 0) updatePlayhead(0);
+    }
+
+    window.initMap = initMap;
+</script>
+@if (!string.IsNullOrEmpty(googleApiJs))
+{
+    <script src="@googleApiJs&callback=initMap" async defer></script>
+}
+else
+{
+    <script>
+        document.getElementById('map').innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f0f4f8;padding-top:50px;">' +
+            '<div class="text-center"><h4 class="text-muted">' + i18n.mapNotConfigured + '</h4>' +
+            '<p class="text-muted">' + i18n.mapConfigHint + '</p></div></div>';
+    </script>
+}
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+

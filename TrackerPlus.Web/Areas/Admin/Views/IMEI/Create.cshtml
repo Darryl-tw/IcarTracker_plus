@@ -1,0 +1,18 @@
+﻿@model TrackerPlus.Core.Models.IMEIDevice
+@{ ViewData["Title"] = L["Admin_IMEI_CreateTitle"].Value; }
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_IMEI_CreateTitle"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.Error as string)) { <div class="alert alert-danger">@ViewBag.Error</div> }
+<div class="card" style="max-width:500px"><div class="card-body">
+<form asp-action="Create" asp-area="Admin" method="post">
+@Html.AntiForgeryToken()
+<div class="mb-3"><label class="form-label">@L["Admin_IMEI_ImeiPlaceholder"] *</label>
+<input type="text" name="IMEICODE" class="form-control" maxlength="15" pattern="\d{15}" required /></div>
+<div class="mb-3"><label class="form-label">@L["Admin_IMEI_Model"]</label><input type="text" name="ModelName" class="form-control" /></div>
+<div class="mb-3"><label class="form-label">@L["Detail_Firmware"]</label><input type="text" name="FirmwareVersion" class="form-control" /></div>
+<div class="mb-3"><label class="form-label">@L["Detail_Memo"]</label><input type="text" name="Memo" class="form-control" /></div>
+<input type="hidden" name="Status" value="N" /><input type="hidden" name="OBM_TbKey" value="0" />
+<button type="submit" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>@L["Common_Create"]</span></button>
+</form></div></div>

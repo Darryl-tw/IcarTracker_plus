@@ -1,0 +1,162 @@
+@model IEnumerable<Tracker>
+@using System.Globalization
+@using System.Text.Json
+@{
+    Layout = null;
+    ViewData["Title"] = L["TrackerMap_Title"].Value;
+    var googleApiJs = ViewBag.GoogleApiJs as string ?? "";
+    var timezoom = int.TryParse(User.FindFirst("Timezoom")?.Value, out var tz) ? tz : 480;
+    var mapI18nJson = JsonSerializer.Serialize(new
+    {
+        unknown = L["Live_Unknown"].Value,
+        mapNotConfigured = L["Live_MapApiNotConfigured"].Value,
+        mapConfigHint = L["Live_MapApiConfigHint"].Value
+    });
+    var trackersJson = JsonSerializer.Serialize(Model.Select(t => new
+    {
+        tbKey = t.TbKey,
+        imei = t.IMEICODE,
+        cname = string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName,
+        lat = t.Lat,
+        lng = t.Lng,
+        speed = t.Speed,
+        direction = t.Direction,
+        lastReportTime = t.LastReportTime.HasValue
+            ? t.LastReportTime.Value.AddMinutes(timezoom).ToString("yyyy-MM-dd HH:mm:ss")
+            : "",
+        voltage = t.Voltage,
+        gpsNo = t.GPSNo
+    }));
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@L["TrackerMap_Title"] - @L["AppName"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #map { height: 100vh; width: 100%; }
+        .map-topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+            background: rgba(30,41,59,0.92); backdrop-filter: blur(4px);
+            color: #fff; padding: 0.5rem 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .map-topbar a { color: #93c5fd; text-decoration: none; font-size: 0.85rem; }
+        .info-panel {
+            position: fixed; bottom: 1rem; left: 1rem;
+            background: #fff; border-radius: 8px; padding: 0.75rem 1rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            font-size: 0.85rem; min-width: 200px; max-width: 260px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="map-topbar">
+    <div>
+        <a asp-controller="Tracker" asp-action="Index">@L["TrackerMap_BackList"]</a>
+        <span class="ms-3 fw-semibold">@L["TrackerMap_Title"]</span>
+    </div>
+    <div>
+        <span id="tracker-count" class="badge bg-primary">@string.Format(L["TrackerMap_DeviceCount"].Value, Model.Count())</span>
+    </div>
+</div>
+<div id="map"></div>
+<div class="info-panel" id="info-panel">
+    <div class="fw-semibold mb-1" id="panel-name"></div>
+    <div class="text-muted small" id="panel-time"></div>
+    <div class="mt-1 small">
+        @L["TrackerMap_SpeedLabel"]<span id="panel-speed"></span> km/h |
+        @L["TrackerMap_VoltageLabel"]<span id="panel-voltage"></span>%
+    </div>
+    <div class="mt-2">
+        <a id="panel-history" class="btn btn-xs btn-outline-secondary btn-sm btn-with-icon" href="#">@Html.UiIcon("history")<span>@L["Detail_HistoryLink"]</span></a>
+    </div>
+</div>
+
+<script>
+    const trackers = @Html.Raw(trackersJson);
+    const i18n = @Html.Raw(mapI18nJson);
+    let map, markers = [];
+
+    function initMap() {
+        const defaultCenter = trackers.length > 0 && trackers[0].lat !== 0
+            ? { lat: trackers[0].lat, lng: trackers[0].lng }
+            : { lat: 25.0330, lng: 121.5654 };
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 13,
+            center: defaultCenter,
+            mapTypeId: 'roadmap',
+            mapTypeControl: true,
+            fullscreenControl: true
+        });
+
+        trackers.forEach(function (t) {
+            if (t.lat === 0 && t.lng === 0) return;
+
+            const marker = new google.maps.Marker({
+                position: { lat: t.lat, lng: t.lng },
+                map: map,
+                title: t.cname,
+                label: {
+                    text: t.cname.substring(0, 1) || '?',
+                    color: '#fff',
+                    fontSize: '13px',
+                    fontWeight: 'bold'
+                },
+                icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 18,
+                    fillColor: '#2563eb',
+                    fillOpacity: 1,
+                    strokeWeight: 2,
+                    strokeColor: '#fff'
+                }
+            });
+
+            marker.addListener('click', function () {
+                const panel = document.getElementById('info-panel');
+                document.getElementById('panel-name').textContent = t.cname;
+                document.getElementById('panel-time').textContent = t.lastReportTime || i18n.unknown;
+                document.getElementById('panel-speed').textContent = t.speed.toFixed(1);
+                document.getElementById('panel-voltage').textContent = t.voltage;
+                document.getElementById('panel-history').href = '/History/Index?imei=' + t.imei;
+                panel.style.display = 'block';
+            });
+
+            markers.push(marker);
+        });
+
+        if (markers.length > 1) {
+            const bounds = new google.maps.LatLngBounds();
+            markers.forEach(function (m) { bounds.extend(m.getPosition()); });
+            map.fitBounds(bounds);
+        }
+
+        map.addListener('click', function () {
+            document.getElementById('info-panel').style.display = 'none';
+        });
+    }
+
+    window.initMap = initMap;
+</script>
+@if (!string.IsNullOrEmpty(googleApiJs))
+{
+    <script src="@googleApiJs&callback=initMap" async defer></script>
+}
+else
+{
+    <script>
+        document.getElementById('map').innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;height:100%;background:#f0f4f8;">' +
+            '<div class="text-center"><h4 class="text-muted">' + i18n.mapNotConfigured + '</h4>' +
+            '<p class="text-muted">' + i18n.mapConfigHint + '</p></div></div>';
+    </script>
+}
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

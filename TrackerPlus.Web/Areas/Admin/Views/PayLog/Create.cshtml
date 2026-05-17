@@ -1,0 +1,67 @@
+﻿@model TrackerPlus.Core.Models.PayLog
+@{
+    ViewData["Title"] = L["Admin_PayLog_AddTitle"].Value;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_PayLog_AddTitle"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.Error as string))
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<div class="card" style="max-width:600px">
+    <div class="card-body">
+        <form asp-action="Create" asp-area="Admin" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">IMEI *</label>
+                    <input type="text" name="IMEICODE" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_MemberTbKey"] *</label>
+                    <input type="number" name="Member_TbKey" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_Amount"]</label>
+                    <input type="number" name="Amount" value="0" class="form-control" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_Commission"]</label>
+                    <input type="number" name="Commission" value="0" class="form-control" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_SaleModel"]</label>
+                    <select name="SaleModel" class="form-select">
+                        <option value="1">@L["SaleModel_Renew"]</option>
+                        <option value="4">@L["SaleModel_International"]</option>
+                        <option value="5">@L["SaleModel_Special"]</option>
+                        <option value="6">@L["SaleModel_Refund"]</option>
+                        <option value="7">@L["SaleModel_AutoEnable"]</option>
+                        <option value="21">@L["SaleModel_MultiMonth"]</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_ServiceStart"]</label>
+                    <input type="date" name="SDate" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_ServiceEnd"]</label>
+                    <input type="date" name="EDate" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_Operator"]</label>
+                    <input type="text" name="Operator" class="form-control" />
+                </div>
+                <div class="col-12">
+                    <label class="form-label">@L["Detail_Memo"]</label>
+                    <input type="text" name="Memo" class="form-control" />
+                </div>
+            </div>
+            <input type="hidden" name="OBM_TbKey" value="0" />
+            <input type="hidden" name="Status" value="Y" />
+            <button type="submit" class="btn btn-success mt-3 btn-with-icon">@Html.UiIcon("add")<span>@L["Common_Create"]</span></button>
+        </form>
+    </div>
+</div>

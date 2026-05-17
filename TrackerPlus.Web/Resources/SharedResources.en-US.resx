@@ -1,0 +1,1783 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  
+  
+  <resheader name="resmimetype">
+    
+    
+    <value>text/microsoft-resx</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="version">
+    
+    
+    <value>2.0</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="reader">
+    
+    
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="writer">
+    
+    
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    
+  
+  </resheader>
+  
+  
+  <data name="AccessDenied_Title" xml:space="preserve">
+    
+    
+    <value>Access Denied</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminLogin_Heading" xml:space="preserve">
+    
+    
+    <value>TrackerPlus Admin</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminLogin_Title" xml:space="preserve">
+    
+    
+    <value>Admin Sign In</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminTitle" xml:space="preserve">
+    
+    
+    <value>TrackerPlus Admin</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Dashboard_Title" xml:space="preserve">
+    
+    
+    <value>Dashboard</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Batch" xml:space="preserve">
+    
+    
+    <value>Batch upgrade</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_ImeiList" xml:space="preserve">
+    
+    
+    <value>IMEI list</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Schedule" xml:space="preserve">
+    
+    
+    <value>Schedule</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_SelectVersion" xml:space="preserve">
+    
+    
+    <value>Select firmware version</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Title" xml:space="preserve">
+    
+    
+    <value>Firmware</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Add" xml:space="preserve">
+    
+    
+    <value>Add IMEI</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_DeleteHistory" xml:space="preserve">
+    
+    
+    <value>Delete history</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_FullReset" xml:space="preserve">
+    
+    
+    <value>Full reset</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetModalDesc" xml:space="preserve">
+    
+    
+    <value>Deletes tracker data and recreates device.</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetModalTitle" xml:space="preserve">
+    
+    
+    <value>IMEI full reset</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetPayLog" xml:space="preserve">
+    
+    
+    <value>Reset PayLog</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Title" xml:space="preserve">
+    
+    
+    <value>IMEI Management</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Unbind" xml:space="preserve">
+    
+    
+    <value>Unbind</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Member_Title" xml:space="preserve">
+    
+    
+    <value>Members</value>
+    
+  
+  </data>
+  
+  
+  <data name="AppName" xml:space="preserve">
+    
+    
+    <value>TrackerPlus</value>
+    
+  
+  </data>
+  
+  
+  <data name="AppSubtitle" xml:space="preserve">
+    
+    
+    <value>GPS Tracking Platform</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_All" xml:space="preserve">
+    
+    
+    <value>All</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Back" xml:space="preserve">
+    
+    
+    <value>Back</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Cancel" xml:space="preserve">
+    
+    
+    <value>Cancel</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Confirm" xml:space="preserve">
+    
+    
+    <value>Confirm</value>
+    
+  
+  </data>
+  <data name="Common_Close" xml:space="preserve"><value>Close</value></data>
+  
+  
+  <data name="Common_Create" xml:space="preserve">
+    
+    
+    <value>Create</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Delete" xml:space="preserve">
+    
+    
+    <value>Delete</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Edit" xml:space="preserve">
+    
+    
+    <value>Edit</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_NextPage" xml:space="preserve">
+    
+    
+    <value>Next</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_No" xml:space="preserve">
+    
+    
+    <value>No</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Operation" xml:space="preserve">
+    
+    
+    <value>Actions</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_PageInfo" xml:space="preserve">
+    
+    
+    <value>Page {0} / {1}</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_PreviousPage" xml:space="preserve">
+    
+    
+    <value>Previous</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Save" xml:space="preserve">
+    
+    
+    <value>Save</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Search" xml:space="preserve">
+    
+    
+    <value>Search</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Status" xml:space="preserve">
+    
+    
+    <value>Status</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_TotalRecords" xml:space="preserve">
+    
+    
+    <value>{0} record(s)</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Yes" xml:space="preserve">
+    
+    
+    <value>Yes</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_AddLabel" xml:space="preserve">
+    
+    
+    <value>Add</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Advanced" xml:space="preserve">
+    
+    
+    <value>Advanced</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_BackList" xml:space="preserve">
+    
+    
+    <value>Back to list</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_BasicInfo" xml:space="preserve">
+    
+    
+    <value>Basic Info</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Firmware" xml:space="preserve">
+    
+    
+    <value>Firmware</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Imei" xml:space="preserve">
+    
+    
+    <value>IMEI</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Labels" xml:space="preserve">
+    
+    
+    <value>Labels / Groups</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Memo" xml:space="preserve">
+    
+    
+    <value>Memo</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_NewLabel" xml:space="preserve">
+    
+    
+    <value>New label</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_NoLabels" xml:space="preserve">
+    
+    
+    <value>No labels yet.</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSaving" xml:space="preserve">
+    
+    
+    <value>Power Saving</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingHint" xml:space="preserve">
+    
+    
+    <value>Reporting interval is reduced in power saving mode.</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingOff" xml:space="preserve">
+    
+    
+    <value>Off</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingOn" xml:space="preserve">
+    
+    
+    <value>On</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveAdvanced" xml:space="preserve">
+    
+    
+    <value>Save Advanced</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveBasic" xml:space="preserve">
+    
+    
+    <value>Save Basic Info</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveLabels" xml:space="preserve">
+    
+    
+    <value>Save Labels</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_ServiceEnd" xml:space="preserve">
+    
+    
+    <value>Service End</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Sos" xml:space="preserve">
+    
+    
+    <value>SOS Number</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Status" xml:space="preserve">
+    
+    
+    <value>Status</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Title" xml:space="preserve">
+    
+    
+    <value>Device Settings</value>
+    
+  
+  </data>
+  
+  
+  <data name="DeviceList_Title" xml:space="preserve">
+    
+    
+    <value>Device List</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Battery" xml:space="preserve">
+    
+    
+    <value>Battery</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_GpsSignal" xml:space="preserve">
+    
+    
+    <value>GPS Signal</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_History" xml:space="preserve">
+    
+    
+    <value>History</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_LastReport" xml:space="preserve">
+    
+    
+    <value>Last Report</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Map" xml:space="preserve">
+    
+    
+    <value>Map</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Name" xml:space="preserve">
+    
+    
+    <value>Name</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_NoDevices" xml:space="preserve">
+    
+    
+    <value>No devices. Contact admin to bind IMEI.</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Offline" xml:space="preserve">
+    
+    
+    <value>Offline</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Online" xml:space="preserve">
+    
+    
+    <value>Online</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Settings" xml:space="preserve">
+    
+    
+    <value>Settings</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Speed" xml:space="preserve">
+    
+    
+    <value>Speed</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Unnamed" xml:space="preserve">
+    
+    
+    <value>Unnamed</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_EmailRequired" xml:space="preserve">
+    
+    
+    <value>Please enter email</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_Sent" xml:space="preserve">
+    
+    
+    <value>If registered, a reset email has been sent.</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_Title" xml:space="preserve">
+    
+    
+    <value>Forgot Password</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_AvgSpeed" xml:space="preserve">
+    
+    
+    <value>Avg speed</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_ConfirmDelete" xml:space="preserve">
+    
+    
+    <value>Confirm delete</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeletePeriod" xml:space="preserve">
+    
+    
+    <value>Delete history in range</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeleteSuccess" xml:space="preserve">
+    
+    
+    <value>History deleted</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeleteWarning" xml:space="preserve">
+    
+    
+    <value>Delete all history for {0} from {1} to {2}? This cannot be undone.</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Device" xml:space="preserve">
+    
+    
+    <value>Device</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Direction" xml:space="preserve">
+    
+    
+    <value>Direction</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_EndDate" xml:space="preserve">
+    
+    
+    <value>End date</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Lat" xml:space="preserve">
+    
+    
+    <value>Latitude</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Lng" xml:space="preserve">
+    
+    
+    <value>Longitude</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_LocalTime" xml:space="preserve">
+    
+    
+    <value>Local time</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_LocationType" xml:space="preserve">
+    
+    
+    <value>Type</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_MapView" xml:space="preserve">
+    
+    
+    <value>Map</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_MaxSpeed" xml:space="preserve">
+    
+    
+    <value>Max speed</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Query" xml:space="preserve">
+    
+    
+    <value>Search</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_QueryTitle" xml:space="preserve">
+    
+    
+    <value>History Query</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_SelectDevice" xml:space="preserve">
+    
+    
+    <value>-- Select device --</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_StartDate" xml:space="preserve">
+    
+    
+    <value>Start date</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Title" xml:space="preserve">
+    
+    
+    <value>History</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_TotalCount" xml:space="preserve">
+    
+    
+    <value>{0} record(s)</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_TotalDistance" xml:space="preserve">
+    
+    
+    <value>Distance</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Type_LBS" xml:space="preserve">
+    
+    
+    <value>LBS</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_CHS" xml:space="preserve">
+    
+    
+    <value>Simplified Chinese</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_CHT" xml:space="preserve">
+    
+    
+    <value>Traditional Chinese</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_ENG" xml:space="preserve">
+    
+    
+    <value>English</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_Switch" xml:space="preserve">
+    
+    
+    <value>Language</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Account" xml:space="preserve">
+    
+    
+    <value>Account</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_ForgotPassword" xml:space="preserve">
+    
+    
+    <value>Forgot password?</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_NoAccount" xml:space="preserve">
+    
+    
+    <value>Register</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Password" xml:space="preserve">
+    
+    
+    <value>Password</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_PlaceholderAccount" xml:space="preserve">
+    
+    
+    <value>Enter account</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_PlaceholderPassword" xml:space="preserve">
+    
+    
+    <value>Enter password</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Submit" xml:space="preserve">
+    
+    
+    <value>Sign In</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Title" xml:space="preserve">
+    
+    
+    <value>Sign In</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_AdvancedUpdated" xml:space="preserve">
+    
+    
+    <value>Advanced settings updated</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_BasicInfoUpdated" xml:space="preserve">
+    
+    
+    <value>Basic info updated</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_LabelsUpdated" xml:space="preserve">
+    
+    
+    <value>Labels updated</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_SaveSuccess" xml:space="preserve">
+    
+    
+    <value>Saved</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_UpdateSuccess" xml:space="preserve">
+    
+    
+    <value>Updated</value>
+    
+  
+  </data>
+  
+  
+  <data name="MyDevices_Title" xml:space="preserve">
+    
+    
+    <value>My Devices</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Devices" xml:space="preserve">
+    
+    
+    <value>Devices</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Firmware" xml:space="preserve">
+    
+    
+    <value>Firmware</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_IMEI" xml:space="preserve">
+    
+    
+    <value>IMEI</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_IP" xml:space="preserve">
+    
+    
+    <value>IP Whitelist</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Members" xml:space="preserve">
+    
+    
+    <value>Members</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_PayLog" xml:space="preserve">
+    
+    
+    <value>Payments</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_DeviceList" xml:space="preserve">
+    
+    
+    <value>Devices</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_History" xml:space="preserve">
+    
+    
+    <value>History</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_HistorySection" xml:space="preserve">
+    
+    
+    <value>History</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_LiveMap" xml:space="preserve">
+    
+    
+    <value>Live Map</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Logout" xml:space="preserve">
+    
+    
+    <value>Logout</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_MainMenu" xml:space="preserve">
+    
+    
+    <value>Main Menu</value>
+    
+  
+  </data>
+  
+  
+  <data name="Register_Success" xml:space="preserve">
+    
+    
+    <value>Registration successful. Please wait for account approval.</value>
+    
+  
+  </data>
+  
+  
+  <data name="Register_Title" xml:space="preserve">
+    
+    
+    <value>Register</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_None" xml:space="preserve">
+    
+    
+    <value>None</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_Strong" xml:space="preserve">
+    
+    
+    <value>Strong</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_Weak" xml:space="preserve">
+    
+    
+    <value>Weak</value>
+    
+  
+  </data>
+  
+
+  <data name="Admin_Dashboard_IMEIStock" xml:space="preserve">
+    <value>IMEI inventory</value>
+  </data>
+  <data name="Admin_Dashboard_MemberCount" xml:space="preserve">
+    <value>Total members</value>
+  </data>
+  <data name="Admin_Dashboard_TrackerCount" xml:space="preserve">
+    <value>Total trackers</value>
+  </data>
+  <data name="Admin_Firmware_AddVersion" xml:space="preserve">
+    <value>Add version</value>
+  </data>
+  <data name="Admin_Firmware_CreateTitle" xml:space="preserve">
+    <value>Add firmware</value>
+  </data>
+  <data name="Admin_Firmware_CreatedCol" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Admin_Firmware_Desc" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Admin_Firmware_EditTitle" xml:space="preserve">
+    <value>Edit firmware</value>
+  </data>
+  <data name="Admin_Firmware_FileName" xml:space="preserve">
+    <value>File name</value>
+  </data>
+  <data name="Admin_Firmware_FtpCol" xml:space="preserve">
+    <value>FTP</value>
+  </data>
+  <data name="Admin_Firmware_FtpDir" xml:space="preserve">
+    <value>FTP directory</value>
+  </data>
+  <data name="Admin_Firmware_FtpHost" xml:space="preserve">
+    <value>FTP host</value>
+  </data>
+  <data name="Admin_Firmware_FtpPass" xml:space="preserve">
+    <value>FTP password</value>
+  </data>
+  <data name="Admin_Firmware_FtpUser" xml:space="preserve">
+    <value>FTP username</value>
+  </data>
+  <data name="Admin_Firmware_SearchPh" xml:space="preserve">
+    <value>Version / file / notes</value>
+  </data>
+  <data name="Admin_Firmware_Size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="Admin_Firmware_VersionCol" xml:space="preserve">
+    <value>Firmware</value>
+  </data>
+  <data name="Admin_IMEI_CreateTitle" xml:space="preserve">
+    <value>Add IMEI</value>
+  </data>
+  <data name="Admin_IMEI_CreatedDate" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Admin_IMEI_ImeiPlaceholder" xml:space="preserve">
+    <value>IMEI (15 digits)</value>
+  </data>
+  <data name="Admin_IMEI_Member" xml:space="preserve">
+    <value>Member</value>
+  </data>
+  <data name="Admin_IMEI_Model" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="Admin_IMEI_SearchPh" xml:space="preserve">
+    <value>IMEI / member</value>
+  </data>
+  <data name="Admin_IMEI_StatusAll" xml:space="preserve">
+    <value>All statuses</value>
+  </data>
+  <data name="Admin_IMEI_StatusN" xml:space="preserve">
+    <value>Inactive (N)</value>
+  </data>
+  <data name="Admin_IMEI_StatusY" xml:space="preserve">
+    <value>Active (Y)</value>
+  </data>
+  <data name="Admin_IP_Add" xml:space="preserve">
+    <value>Add IP</value>
+  </data>
+  <data name="Admin_IP_Address" xml:space="preserve">
+    <value>IP address</value>
+  </data>
+  <data name="Admin_IP_CreateTitle" xml:space="preserve">
+    <value>Add IP whitelist</value>
+  </data>
+  <data name="Admin_IP_Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Admin_IP_Placeholder" xml:space="preserve">
+    <value>e.g. 192.168.1.1</value>
+  </data>
+  <data name="Admin_IP_SearchPh" xml:space="preserve">
+    <value>IP / description</value>
+  </data>
+  <data name="Admin_IP_Title" xml:space="preserve">
+    <value>WebService IP whitelist</value>
+  </data>
+  <data name="Admin_Member_Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Admin_Member_AccountInfo" xml:space="preserve">
+    <value>Account info</value>
+  </data>
+  <data name="Admin_Member_Add" xml:space="preserve">
+    <value>Add member</value>
+  </data>
+  <data name="Admin_Member_Address" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Admin_Member_CreateBtn" xml:space="preserve">
+    <value>Create member</value>
+  </data>
+  <data name="Admin_Member_CreateTitle" xml:space="preserve">
+    <value>Add member</value>
+  </data>
+  <data name="Admin_Member_Detail" xml:space="preserve">
+    <value>Member details</value>
+  </data>
+  <data name="Admin_Member_EditProfile" xml:space="preserve">
+    <value>Edit profile</value>
+  </data>
+  <data name="Admin_Member_Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Admin_Member_Phone" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="Admin_Member_Push" xml:space="preserve">
+    <value>Push notifications</value>
+  </data>
+  <data name="Admin_Member_SearchPh" xml:space="preserve">
+    <value>Account / name / email</value>
+  </data>
+  <data name="Admin_Member_SendEmail" xml:space="preserve">
+    <value>Send email</value>
+  </data>
+  <data name="Admin_Member_SetActive" xml:space="preserve">
+    <value>Set active</value>
+  </data>
+  <data name="Admin_Member_SetDisabled" xml:space="preserve">
+    <value>Set disabled</value>
+  </data>
+  <data name="Admin_Member_SetPaused" xml:space="preserve">
+    <value>Set paused</value>
+  </data>
+  <data name="Admin_Member_Timezone" xml:space="preserve">
+    <value>Timezone (min)</value>
+  </data>
+  <data name="Admin_Member_Unit" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="Admin_PayLog_Add" xml:space="preserve">
+    <value>Add record</value>
+  </data>
+  <data name="Admin_PayLog_AddTitle" xml:space="preserve">
+    <value>Add payment</value>
+  </data>
+  <data name="Admin_PayLog_Amount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Admin_PayLog_Commission" xml:space="preserve">
+    <value>Commission</value>
+  </data>
+  <data name="Admin_PayLog_Detail" xml:space="preserve">
+    <value>Payment details</value>
+  </data>
+  <data name="Admin_PayLog_Member" xml:space="preserve">
+    <value>Member</value>
+  </data>
+  <data name="Admin_PayLog_MemberTbKey" xml:space="preserve">
+    <value>Member TbKey</value>
+  </data>
+  <data name="Admin_PayLog_Operator" xml:space="preserve">
+    <value>Operator</value>
+  </data>
+  <data name="Admin_PayLog_OrderNo" xml:space="preserve">
+    <value>Order no.</value>
+  </data>
+  <data name="Admin_PayLog_SaleModel" xml:space="preserve">
+    <value>Sale model</value>
+  </data>
+  <data name="Admin_PayLog_SearchPh" xml:space="preserve">
+    <value>IMEI / member / order</value>
+  </data>
+  <data name="Admin_PayLog_ServiceEnd" xml:space="preserve">
+    <value>Service end</value>
+  </data>
+  <data name="Admin_PayLog_ServiceFrom" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Admin_PayLog_ServiceStart" xml:space="preserve">
+    <value>Service start</value>
+  </data>
+  <data name="Admin_PayLog_ServiceTo" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Admin_PayLog_Title" xml:space="preserve">
+    <value>Payment records</value>
+  </data>
+  <data name="Admin_Tracker_BasicInfo" xml:space="preserve">
+    <value>Basic info</value>
+  </data>
+  <data name="Admin_Tracker_Detail" xml:space="preserve">
+    <value>Device details</value>
+  </data>
+  <data name="Admin_Tracker_EditInfo" xml:space="preserve">
+    <value>Edit info</value>
+  </data>
+  <data name="Admin_Tracker_LastReport" xml:space="preserve">
+    <value>Last report</value>
+  </data>
+  <data name="Admin_Tracker_Options" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="Admin_Tracker_PowerSaving" xml:space="preserve">
+    <value>Power saving</value>
+  </data>
+  <data name="Admin_Tracker_SaveInfo" xml:space="preserve">
+    <value>Save info</value>
+  </data>
+  <data name="Admin_Tracker_SaveOptions" xml:space="preserve">
+    <value>Save options</value>
+  </data>
+  <data name="Admin_Tracker_SearchPh" xml:space="preserve">
+    <value>IMEI / device name</value>
+  </data>
+  <data name="Admin_Tracker_Sos" xml:space="preserve">
+    <value>SOS number</value>
+  </data>
+  <data name="Admin_Tracker_Title" xml:space="preserve">
+    <value>Device management</value>
+  </data>
+  <data name="Common_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Common_ConfirmDelete" xml:space="preserve">
+    <value>Delete?</value>
+  </data>
+  <data name="Common_ConfirmDeleteItem" xml:space="preserve">
+    <value>Delete {0}?</value>
+  </data>
+  <data name="Common_CreateRecord" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Common_Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Common_Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="Common_Enabled" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="Common_Inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="Common_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="Common_NotActive" xml:space="preserve">
+    <value>Not active</value>
+  </data>
+  <data name="Common_Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Common_On" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Common_Paused" xml:space="preserve">
+    <value>Paused</value>
+  </data>
+  <data name="Common_ViewDetails" xml:space="preserve">
+    <value>View details →</value>
+  </data>
+  <data name="Detail_Csq" xml:space="preserve">
+    <value>Signal (CSQ)</value>
+  </data>
+  <data name="Detail_DeviceName" xml:space="preserve">
+    <value>Device name</value>
+  </data>
+  <data name="Detail_GpsSatellites" xml:space="preserve">
+    <value>GPS satellites</value>
+  </data>
+  <data name="Detail_HistoryLink" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Detail_LabelField" xml:space="preserve">
+    <value>Labels</value>
+  </data>
+  <data name="Detail_LastReport" xml:space="preserve">
+    <value>Last report</value>
+  </data>
+  <data name="Detail_LiveMapLink" xml:space="preserve">
+    <value>Live map</value>
+  </data>
+  <data name="Detail_PowerSavingEco" xml:space="preserve">
+    <value>On (power saving)</value>
+  </data>
+  <data name="Detail_PowerSavingNormal" xml:space="preserve">
+    <value>Off (normal)</value>
+  </data>
+  <data name="Detail_SosPlaceholder" xml:space="preserve">
+    <value>Emergency phone number</value>
+  </data>
+  <data name="Field_CreatedDate" xml:space="preserve">
+    <value>Created</value>
+  </data>
+  <data name="Field_ExpiryDate" xml:space="preserve">
+    <value>Expiry</value>
+  </data>
+  <data name="Field_Group" xml:space="preserve">
+    <value>Group</value>
+  </data>
+  <data name="Field_Label" xml:space="preserve">
+    <value>Label</value>
+  </data>
+  <data name="Field_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Field_Latitude" xml:space="preserve">
+    <value>Latitude</value>
+  </data>
+  <data name="Field_Longitude" xml:space="preserve">
+    <value>Longitude</value>
+  </data>
+  <data name="Field_Model" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="SaleModel_AutoEnable" xml:space="preserve">
+    <value>Auto enable</value>
+  </data>
+  <data name="SaleModel_International" xml:space="preserve">
+    <value>International</value>
+  </data>
+  <data name="SaleModel_MultiMonth" xml:space="preserve">
+    <value>Multi-month</value>
+  </data>
+  <data name="SaleModel_Refund" xml:space="preserve">
+    <value>Refund</value>
+  </data>
+  <data name="SaleModel_Renew" xml:space="preserve">
+    <value>Renewal</value>
+  </data>
+  <data name="SaleModel_Special" xml:space="preserve">
+    <value>Special</value>
+  </data>
+  <data name="Unit_Km" xml:space="preserve">
+    <value>Kilometers</value>
+  </data>
+  <data name="Unit_Mile" xml:space="preserve">
+    <value>Miles</value>
+  </data>
+  <data name="Live_Title" xml:space="preserve"><value>iCar Fleet Tracking</value></data>
+  <data name="Live_Brand" xml:space="preserve"><value>iCar Tracking</value></data>
+  <data name="Live_Menu_System" xml:space="preserve"><value>System Settings</value></data>
+  <data name="Live_Menu_AfterSelectDevice" xml:space="preserve"><value>Device actions</value></data>
+  <data name="Live_Menu_Geofence" xml:space="preserve"><value>Geofence</value></data>
+  <data name="Live_Menu_ChangePassword" xml:space="preserve"><value>Change Password</value></data>
+  <data name="Live_Menu_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Live_Menu_HistGps" xml:space="preserve"><value>Trip History (GPS)</value></data>
+  <data name="Live_Menu_HistLbs" xml:space="preserve"><value>Trip History (LBS)</value></data>
+  <data name="Live_Menu_Help" xml:space="preserve"><value>Help</value></data>
+  <data name="Live_Menu_Manual" xml:space="preserve"><value>User Manual</value></data>
+  <data name="Live_Menu_Privacy" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="Live_LogoutSystem" xml:space="preserve"><value>Log out</value></data>
+  <data name="Live_TrackerList" xml:space="preserve"><value>Tracker list</value></data>
+  <data name="Live_SelectAll" xml:space="preserve"><value>Select all</value></data>
+  <data name="Live_FitAll" xml:space="preserve"><value>Fit all</value></data>
+  <data name="Live_Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Live_Group" xml:space="preserve"><value>Group</value></data>
+  <data name="Live_ServiceDays" xml:space="preserve"><value>{0} days</value></data>
+  <data name="Live_Tab_LiveMap" xml:space="preserve"><value>Device map</value></data>
+  <data name="Live_Tab_History" xml:space="preserve"><value>Trip history</value></data>
+  <data name="Live_Tab_HistoryLbs" xml:space="preserve"><value>Trip history (incl. LBS)</value></data>
+  <data name="Live_RefreshLive" xml:space="preserve"><value>Live refresh</value></data>
+  <data name="Live_ClearTrack" xml:space="preserve"><value>Clear track</value></data>
+  <data name="Live_Traffic" xml:space="preserve"><value>Traffic</value></data>
+  <data name="Live_TrafficOn" xml:space="preserve"><value>Traffic ✓</value></data>
+  <data name="Live_SatelliteView" xml:space="preserve"><value>Satellite</value></data>
+  <data name="Live_RoadMap" xml:space="preserve"><value>Road map</value></data>
+  <data name="Live_ReportTime" xml:space="preserve"><value>Report time</value></data>
+  <data name="Live_MapApiNotConfigured" xml:space="preserve"><value>Google Maps API not configured</value></data>
+  <data name="Live_MapApiConfigHint" xml:space="preserve"><value>Configure AppSettings.GoogleApi.JS in appsettings.json</value></data>
+  <data name="Live_DateLabel" xml:space="preserve"><value>Date</value></data>
+  <data name="Live_Prev7Days" xml:space="preserve"><value>◀ Prev 7 days</value></data>
+  <data name="Live_Next7Days" xml:space="preserve"><value>Next 7 days ▶</value></data>
+  <data name="Live_ClearMap" xml:space="preserve"><value>Clear map</value></data>
+  <data name="Live_Loading" xml:space="preserve"><value>Loading...</value></data>
+  <data name="Live_TotalDistance" xml:space="preserve"><value>Total distance</value></data>
+  <data name="Live_TotalCount" xml:space="preserve"><value>Total records</value></data>
+  <data name="Live_Hist_SelectPrompt" xml:space="preserve"><value>Select device and date, then query</value></data>
+  <data name="Live_Hist_NoData" xml:space="preserve"><value>No data for selected date</value></data>
+  <data name="Live_Hist_QueryFailed" xml:space="preserve"><value>Query failed. Please try again later.</value></data>
+  <data name="Live_TimeCol" xml:space="preserve"><value>Time</value></data>
+  <data name="Live_SpeedKmhCol" xml:space="preserve"><value>Speed (km/h)</value></data>
+  <data name="Live_DistanceKmCol" xml:space="preserve"><value>Distance (km)</value></data>
+  <data name="Live_StartPoint" xml:space="preserve"><value>Start</value></data>
+  <data name="Live_EndPoint" xml:space="preserve"><value>End</value></data>
+  <data name="Live_GpsSatellitesCount" xml:space="preserve"><value>{0} sats</value></data>
+  <data name="Live_RefreshUpdated" xml:space="preserve"><value>Updated {0}</value></data>
+  <data name="Live_MapLoadFailed" xml:space="preserve"><value>Map initialization failed: {0}</value></data>
+  <data name="Live_MapAuthFailed" xml:space="preserve"><value>API key validation failed. Check GoogleApi settings and Google Cloud Console.</value></data>
+  <data name="Live_MapLoadErrorTitle" xml:space="preserve"><value>Unable to load Google Maps</value></data>
+  <data name="Live_BatteryTitle" xml:space="preserve"><value>Battery</value></data>
+  <data name="Live_GpsSatellitesTitle" xml:space="preserve"><value>GPS satellites</value></data>
+  <data name="Live_ServiceDaysTitle" xml:space="preserve"><value>Service days left</value></data>
+  <data name="Live_Col_DeviceName" xml:space="preserve"><value>Device name</value></data>
+  <data name="Live_Col_Group" xml:space="preserve"><value>Group</value></data>
+  <data name="Live_Col_ValidDays" xml:space="preserve"><value>Valid days</value></data>
+  <data name="Live_Col_WebPlatform" xml:space="preserve"><value>Web platform</value></data>
+  <data name="TrackerMap_Title" xml:space="preserve"><value>Device map</value></data>
+  <data name="TrackerMap_BackList" xml:space="preserve"><value>← Back to list</value></data>
+  <data name="TrackerMap_DeviceCount" xml:space="preserve"><value>{0} devices</value></data>
+  <data name="TrackerMap_SpeedLabel" xml:space="preserve"><value>Speed: </value></data>
+  <data name="TrackerMap_VoltageLabel" xml:space="preserve"><value>Battery: </value></data>
+  <data name="HistoryMap_Title" xml:space="preserve"><value>History map</value></data>
+  <data name="HistoryMap_BackList" xml:space="preserve"><value>← Back to list</value></data>
+  <data name="HistoryMap_RecordCount" xml:space="preserve"><value>{0} records</value></data>
+  <data name="HistoryMap_PlayControl" xml:space="preserve"><value>Playback</value></data>
+  <data name="HistoryMap_Play" xml:space="preserve"><value>Play</value></data>
+  <data name="HistoryMap_Pause" xml:space="preserve"><value>Pause</value></data>
+  <data name="HistoryMap_Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="HistoryMap_PlayHint" xml:space="preserve"><value>Click Play to replay the track</value></data>
+  <data name="HistoryMap_NoTrackData" xml:space="preserve"><value>No track data for this period</value></data>
+  <data name="HistoryMap_StartTitle" xml:space="preserve"><value>Start: {0}</value></data>
+  <data name="HistoryMap_EndTitle" xml:space="preserve"><value>End: {0}</value></data>
+  <data name="HistoryMap_TotalDistanceBar" xml:space="preserve"><value>Total distance</value></data>
+  <data name="HistoryMap_MaxSpeedBar" xml:space="preserve"><value>Max speed</value></data>
+  <data name="HistoryMap_AvgSpeedBar" xml:space="preserve"><value>Avg speed</value></data>
+  <data name="HistoryMap_PlayheadSpeed" xml:space="preserve"><value>Speed: {0} km/h | Direction: {1}°</value></data>
+  <data name="Register_PageTitle" xml:space="preserve"><value>Register</value></data>
+  <data name="Register_Heading" xml:space="preserve"><value>Create account</value></data>
+  <data name="Register_Subtitle" xml:space="preserve"><value>TrackerPlus member registration</value></data>
+  <data name="Register_BackLogin" xml:space="preserve"><value>Back to login</value></data>
+  <data name="Register_Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Register_AccountPh" xml:space="preserve"><value>Enter account (alphanumeric)</value></data>
+  <data name="Register_PasswordPh" xml:space="preserve"><value>Enter password (min. 8 characters)</value></data>
+  <data name="Register_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Register_NamePh" xml:space="preserve"><value>Enter your name</value></data>
+  <data name="Register_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Register_EmailPh" xml:space="preserve"><value>Enter email</value></data>
+  <data name="Register_Phone" xml:space="preserve"><value>Phone</value></data>
+  <data name="Register_PhonePh" xml:space="preserve"><value>Enter phone number</value></data>
+  <data name="Register_Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Register_Submit" xml:space="preserve"><value>Register now</value></data>
+  <data name="Register_HasAccount" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="ForgotPassword_EmailLabel" xml:space="preserve"><value>Email</value></data>
+  <data name="ForgotPassword_EmailPh" xml:space="preserve"><value>Enter your registered email</value></data>
+  <data name="ForgotPassword_Submit" xml:space="preserve"><value>Send reset email</value></data>
+  <data name="ForgotPassword_BackLogin" xml:space="preserve"><value>Back to login</value></data>
+  <data name="ForgotPassword_Subtitle" xml:space="preserve"><value>Enter your email to reset your password</value></data>
+  <data name="DeviceSettings_Title" xml:space="preserve"><value>Device Settings</value></data>
+  <data name="DeviceSettings_Tab_Info" xml:space="preserve"><value>Device Info</value></data>
+  <data name="DeviceSettings_Tab_Option" xml:space="preserve"><value>Device Options</value></data>
+  <data name="DeviceSettings_Tab_Alert" xml:space="preserve"><value>Alarm Settings</value></data>
+  <data name="DeviceSettings_Tab_PayLog" xml:space="preserve"><value>Service Period</value></data>
+  <data name="DeviceSettings_GpsInterval" xml:space="preserve"><value>Report interval</value></data>
+  <data name="DeviceSettings_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="DeviceSettings_ShockSection" xml:space="preserve"><value>Vibration sensor</value></data>
+  <data name="DeviceSettings_VehicleType" xml:space="preserve"><value>Vehicle type</value></data>
+  <data name="DeviceSettings_ShockSensitivity" xml:space="preserve"><value>Sensitivity</value></data>
+  <data name="DeviceSettings_IdleModule" xml:space="preserve"><value>Idle timeout</value></data>
+  <data name="DeviceSettings_IdleWhen" xml:space="preserve"><value>When idle exceeds</value></data>
+  <data name="DeviceSettings_IdleReport" xml:space="preserve"><value>minutes, report location.</value></data>
+  <data name="DeviceSettings_SpeedModule" xml:space="preserve"><value>Overspeed alert</value></data>
+  <data name="DeviceSettings_SpeedWhen" xml:space="preserve"><value>When speed exceeds</value></data>
+  <data name="DeviceSettings_SpeedAlarm" xml:space="preserve"><value>km/h, send alarm.</value></data>
+  <data name="DeviceSettings_CustomMsg" xml:space="preserve"><value>Custom message:</value></data>
+  <data name="DeviceSettings_SharePwd" xml:space="preserve"><value>Share PIN (4 digits)</value></data>
+  <data name="DeviceSettings_ShareEnable" xml:space="preserve"><value>Enable sharing</value></data>
+  <data name="DeviceSettings_AlertMode" xml:space="preserve"><value>Alarm mode</value></data>
+  <data name="DeviceSettings_Closed" xml:space="preserve"><value>-Off-</value></data>
+  <data name="DeviceSettings_AlertSingle" xml:space="preserve"><value>Once</value></data>
+  <data name="DeviceSettings_AlertRepeat" xml:space="preserve"><value>Repeat</value></data>
+  <data name="DeviceSettings_AssignedGroup" xml:space="preserve"><value>Assigned groups</value></data>
+  <data name="DeviceSettings_VehicleCar" xml:space="preserve"><value>Car</value></data>
+  <data name="DeviceSettings_VehicleTruck" xml:space="preserve"><value>Truck</value></data>
+  <data name="DeviceSettings_Gps15s" xml:space="preserve"><value>15 sec</value></data>
+  <data name="DeviceSettings_Gps30s" xml:space="preserve"><value>30 sec</value></data>
+  <data name="DeviceSettings_Gps10m" xml:space="preserve"><value>10 min</value></data>
+  <data name="DeviceSettings_Gps30m" xml:space="preserve"><value>30 min</value></data>
+  <data name="DeviceSettings_Gps60m" xml:space="preserve"><value>60 min</value></data>
+  <data name="DeviceSettings_Gps120m" xml:space="preserve"><value>120 min</value></data>
+  <data name="Live_Detail_Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="Live_Detail_Online" xml:space="preserve"><value>Online</value></data>
+  <data name="Live_Detail_LastLogin" xml:space="preserve"><value>Last login</value></data>
+  <data name="Live_Detail_LastGps" xml:space="preserve"><value>Last GPS fix</value></data>
+  <data name="Live_Detail_LastConnect" xml:space="preserve"><value>Last connection</value></data>
+  <data name="Live_Detail_TravelSpeed" xml:space="preserve"><value>Speed</value></data>
+  <data name="Live_Detail_Distance" xml:space="preserve"><value>Distance</value></data>
+  <data name="Live_Detail_Coords" xml:space="preserve"><value>Coordinates</value></data>
+  <data name="Live_Detail_Address" xml:space="preserve"><value>Address</value></data>
+  <data name="Live_Detail_Direction" xml:space="preserve"><value>Direction</value></data>
+  <data name="Live_Detail_LithiumBattery" xml:space="preserve"><value>Battery</value></data>
+  <data name="Live_Detail_Satellites" xml:space="preserve"><value>Satellites</value></data>
+  <data name="DeviceSettings_Hint" xml:space="preserve"><value>Select the fields to change: [{0}]</value></data>
+  <data name="DeviceSettings_Icons" xml:space="preserve"><value>Device icon</value></data>
+  <data name="DeviceSettings_Saved" xml:space="preserve"><value>Device settings saved</value></data>
+  <data name="DeviceSettings_SaveFailed" xml:space="preserve"><value>Save failed</value></data>
+  <data name="DeviceSettings_LoadFailed" xml:space="preserve"><value>Could not load device settings. Please try again.</value></data>
+  <data name="DeviceIcon_A" xml:space="preserve"><value>Car</value></data>
+  <data name="DeviceIcon_B" xml:space="preserve"><value>Truck</value></data>
+  <data name="DeviceIcon_C" xml:space="preserve"><value>Work vehicle</value></data>
+  <data name="DeviceIcon_D" xml:space="preserve"><value>Bus</value></data>
+  <data name="DeviceIcon_E" xml:space="preserve"><value>Motorcycle</value></data>
+  <data name="DeviceIcon_F" xml:space="preserve"><value>Bicycle</value></data>
+  <data name="DeviceIcon_G" xml:space="preserve"><value>Person</value></data>
+  <data name="DeviceIcon_H" xml:space="preserve"><value>Pet</value></data>
+  <data name="Common_Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="Live_UpdateNow" xml:space="preserve"><value>Update now</value></data>
+  <data name="Live_MultiWindow" xml:space="preserve"><value>Multi-window</value></data>
+  <data name="Live_CustomLandmark" xml:space="preserve"><value>Custom landmarks</value></data>
+  <data name="Live_MapTypeRoad" xml:space="preserve"><value>Map</value></data>
+  <data name="Live_MultiWindowSelect" xml:space="preserve"><value>Select at least one device</value></data>
+  <data name="Live_MultiWindowMax" xml:space="preserve"><value>Up to {0} windows allowed. Uncheck extra devices.</value></data>
+  <data name="Live_LandmarkTitle" xml:space="preserve"><value>Custom landmarks</value></data>
+  <data name="Live_LandmarkName" xml:space="preserve"><value>Label</value></data>
+  <data name="Live_LandmarkAddress" xml:space="preserve"><value>Address or coordinates</value></data>
+  <data name="Live_LandmarkAddressPh" xml:space="preserve"><value>Address or lat,lng</value></data>
+  <data name="Live_LandmarkAdd" xml:space="preserve"><value>Add landmark</value></data>
+  <data name="Live_LandmarkPickOnMap" xml:space="preserve"><value>Pick on map</value></data>
+  <data name="Live_LandmarkLimit" xml:space="preserve"><value>Landmark limit reached (500)</value></data>
+  <data name="Live_LandmarkMemoRequired" xml:space="preserve"><value>Enter a landmark name</value></data>
+  <data name="Live_LandmarkAdded" xml:space="preserve"><value>Landmark added</value></data>
+  <data name="Live_LandmarkDeleted" xml:space="preserve"><value>Landmark deleted</value></data>
+  <data name="Live_LandmarkQuickAdd" xml:space="preserve"><value>Add landmark</value></data>
+  <data name="Live_LandmarkCoords" xml:space="preserve"><value>Coordinates</value></data>
+  <data name="AccessDenied_Message" xml:space="preserve"><value>You do not have permission to access this page.</value></data>
+  <data name="AccessDenied_BackDevices" xml:space="preserve"><value>Back to devices</value></data>
+  <data name="AccessDenied_Relogin" xml:space="preserve"><value>Sign in again</value></data>
+  <data name="Home_Title" xml:space="preserve"><value>Home</value></data>
+  <data name="Home_Welcome" xml:space="preserve"><value>Welcome</value></data>
+  <data name="Home_Learn" xml:space="preserve"><value>Learn about building Web apps with ASP.NET Core.</value></data>
+  <data name="Privacy_Title" xml:space="preserve"><value>Privacy Policy</value></data>
+  <data name="Privacy_Body" xml:space="preserve"><value>Use this page to detail your site's privacy policy.</value></data>
+  <data name="Error_Title" xml:space="preserve"><value>Error</value></data>
+  <data name="Error_Message" xml:space="preserve"><value>An error occurred while processing your request.</value></data>
+  <data name="Error_DevMode" xml:space="preserve"><value>Development Mode</value></data>
+  <data name="Nav_Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav_Privacy" xml:space="preserve"><value>Privacy</value></data>
+  <data name="Layout_ToggleNav" xml:space="preserve"><value>Toggle navigation</value></data>
+  <data name="Common_Required" xml:space="preserve"><value>*</value></data>
+  <data name="Hist_Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Hist_FirstGPS" xml:space="preserve"><value>First GPS</value></data>
+  <data name="Hist_LastGPS" xml:space="preserve"><value>Last GPS</value></data>
+  <data name="Hist_Duration" xml:space="preserve"><value>Duration</value></data>
+  <data name="Hist_RecordCount" xml:space="preserve"><value>Records</value></data>
+  <data name="Hist_TotalKm" xml:space="preserve"><value>Total km</value></data>
+  <data name="Hist_BackToSummary" xml:space="preserve"><value>Back to list</value></data>
+  <data name="Hist_GpsNo" xml:space="preserve"><value>GPS satellites</value></data>
+  <data name="Hist_Voltage" xml:space="preserve"><value>Voltage</value></data>
+</root>

@@ -1,0 +1,35 @@
+/* 按鈕內圖示 + 多語系文字 */
+.btn-with-icon,
+.logout-btn,
+.ctrl-btn,
+.map-tool-btn,
+.hist-btn,
+.nav-btn,
+.dsm-close-btn-footer {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+}
+
+.btn-with-icon .ui-icon,
+.logout-btn .ui-icon,
+.ctrl-btn .ui-icon,
+.map-tool-btn .ui-icon,
+.hist-btn .ui-icon,
+.nav-btn .ui-icon,
+.dsm-close-btn-footer .ui-icon {
+    width: 1.05em;
+    height: 1.05em;
+    flex-shrink: 0;
+}
+
+a.btn-with-icon {
+    text-decoration: none;
+}
+
+#map-type-switch button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+}

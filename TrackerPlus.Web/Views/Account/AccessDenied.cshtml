@@ -1,0 +1,16 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = L["AccessDenied_Title"].Value;
+}
+
+<div class="container py-5 text-center">
+    <div class="mb-4">
+        <span style="font-size: 5rem;">🚫</span>
+    </div>
+    <h2 class="fw-bold text-danger">@L["AccessDenied_Title"]</h2>
+    <p class="text-muted mt-3">@L["AccessDenied_Message"]</p>
+    <div class="mt-4">
+        <a asp-controller="Tracker" asp-action="Index" class="btn btn-primary me-2 btn-with-icon">@Html.UiIcon("back")<span>@L["AccessDenied_BackDevices"]</span></a>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-secondary btn-with-icon">@Html.UiIcon("login")<span>@L["AccessDenied_Relogin"]</span></a>
+    </div>
+</div>

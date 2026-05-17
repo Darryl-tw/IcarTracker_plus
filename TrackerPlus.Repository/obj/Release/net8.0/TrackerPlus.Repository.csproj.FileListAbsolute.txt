@@ -1,0 +1,16 @@
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\bin\Release\net8.0\TrackerPlus.Repository.deps.json
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\bin\Release\net8.0\TrackerPlus.Repository.dll
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\bin\Release\net8.0\TrackerPlus.Repository.pdb
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\bin\Release\net8.0\TrackerPlus.Core.dll
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\bin\Release\net8.0\TrackerPlus.Core.pdb
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.csproj.AssemblyReference.cache
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.GeneratedMSBuildEditorConfig.editorconfig
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.AssemblyInfoInputs.cache
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.AssemblyInfo.cs
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.csproj.CoreCompileInputs.cache
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.sourcelink.json
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerP.4C5B5A74.Up2Date
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.dll
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\refint\TrackerPlus.Repository.dll
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\TrackerPlus.Repository.pdb
+D:\Working\Tracker_Git\Server_Web\iCar\TrackerPlus\TrackerPlus.Repository\obj\Release\net8.0\ref\TrackerPlus.Repository.dll

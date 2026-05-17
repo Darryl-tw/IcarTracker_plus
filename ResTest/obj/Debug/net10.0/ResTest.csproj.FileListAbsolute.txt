@@ -1,0 +1,15 @@
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\bin\Debug\net10.0\ResTest.exe
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\bin\Debug\net10.0\ResTest.deps.json
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\bin\Debug\net10.0\ResTest.runtimeconfig.json
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\bin\Debug\net10.0\ResTest.dll
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\bin\Debug\net10.0\ResTest.pdb
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.GeneratedMSBuildEditorConfig.editorconfig
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.AssemblyInfoInputs.cache
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.AssemblyInfo.cs
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.csproj.CoreCompileInputs.cache
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.dll
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\refint\ResTest.dll
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.pdb
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.genruntimeconfig.cache
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ref\ResTest.dll
+D:\Working\Tracker_Git\IcarTracker_plus\ResTest\obj\Debug\net10.0\ResTest.csproj.AssemblyReference.cache

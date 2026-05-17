@@ -1,0 +1,103 @@
+@model IEnumerable<Tracker>
+@{
+    Layout = "_MemberLayout";
+    ViewData["Title"] = L["MyDevices_Title"].Value;
+    var timezoom = int.TryParse(User.FindFirst("Timezoom")?.Value, out var tz) ? tz : 480;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0 fw-bold">@L["DeviceList_Title"]</h5>
+    <a asp-controller="Map" asp-action="Live" class="btn btn-sm btn-outline-primary btn-with-icon">
+        @Html.UiIcon("map")<span>@L["Nav_LiveMap"]</span>
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="card-body text-center py-5 text-muted">
+            <p class="mb-0">@L["Device_NoDevices"]</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">@L["Device_Name"]</th>
+                            <th>IMEI</th>
+                            <th>@L["Device_LastReport"]</th>
+                            <th>@L["Device_Speed"]</th>
+                            <th>@L["Device_Battery"]</th>
+                            <th>@L["Device_GpsSignal"]</th>
+                            <th>@L["Common_Status"]</th>
+                            <th class="text-center">@L["Common_Operation"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var t in Model)
+                        {
+                            var localTime = t.LastReportTime.HasValue
+                                ? t.LastReportTime.Value.AddMinutes(timezoom).ToString("yyyy-MM-dd HH:mm")
+                                : "—";
+                            var isOnline = t.LastReportTime.HasValue &&
+                                (DateTime.UtcNow - t.LastReportTime.Value).TotalMinutes < 10;
+                            <tr>
+                                <td class="ps-3">
+                                    <span class="fw-semibold">@(string.IsNullOrEmpty(t.CName) ? L["Device_Unnamed"].Value : t.CName)</span>
+                                    @if (!string.IsNullOrEmpty(t.Label))
+                                    {
+                                        <br /><span class="badge bg-light text-dark border small">@t.Label</span>
+                                    }
+                                </td>
+                                <td><code class="small">@t.IMEICODE</code></td>
+                                <td>
+                                    <span class="small @(isOnline ? "text-success fw-semibold" : "text-muted")">
+                                        @localTime
+                                    </span>
+                                </td>
+                                <td>@t.Speed.ToString("F1") km/h</td>
+                                <td>
+                                    @{
+                                        var batClass = t.Voltage switch { > 80 => "text-success", > 40 => "text-warning", _ => "text-danger" };
+                                    }
+                                    <span class="@batClass fw-semibold">@t.Voltage%</span>
+                                </td>
+                                <td>
+                                    @{
+                                        var sigClass = t.GPSNo switch { > 5 => "text-success", > 0 => "text-warning", _ => "text-danger" };
+                                        var sigText = t.GPSNo switch { > 5 => L["Signal_Strong"].Value, > 0 => L["Signal_Weak"].Value, _ => L["Signal_None"].Value };
+                                    }
+                                    <span class="@sigClass">@sigText (@t.GPSNo)</span>
+                                </td>
+                                <td>
+                                    @if (isOnline)
+                                    {
+                                        <span class="badge bg-success">@L["Device_Online"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@L["Device_Offline"]</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Detail" asp-route-id="@t.TbKey"
+                                       class="btn btn-xs btn-outline-primary btn-sm me-1 btn-with-icon">@Html.UiIcon("settings")<span>@L["Device_Settings"]</span></a>
+                                    <a asp-controller="History" asp-action="Index"
+                                       asp-route-imei="@t.IMEICODE"
+                                       class="btn btn-xs btn-outline-secondary btn-sm me-1 btn-with-icon">@Html.UiIcon("history")<span>@L["Device_History"]</span></a>
+                                    <a asp-controller="Map" asp-action="Live"
+                                       class="btn btn-xs btn-outline-success btn-sm btn-with-icon">@Html.UiIcon("map")<span>@L["Device_Map"]</span></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}

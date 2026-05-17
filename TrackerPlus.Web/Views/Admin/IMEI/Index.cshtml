@@ -1,0 +1,114 @@
+@using TrackerPlus.Core.Common
+@model PagedResult<TrackerPlus.Core.Models.IMEIDevice>
+@{
+    ViewData["Title"] = L["Admin_IMEI_Title"].Value;
+    var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_IMEI_Title"]</h2>
+    <a asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_IMEI_Add"]</span></a>
+</div>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_IMEI_SearchPh"]" />
+    </div>
+    <div class="col-md-2">
+        <select name="status" class="form-select">
+            <option value="">@L["Admin_IMEI_StatusAll"]</option>
+            <option value="Y" selected="@(filter.Status == "Y")">@L["Admin_IMEI_StatusY"]</option>
+            <option value="N" selected="@(filter.Status == "N")">@L["Admin_IMEI_StatusN"]</option>
+        </select>
+    </div>
+    <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
+</form>
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>TbKey</th>
+                <th>IMEI</th>
+                <th>@L["Admin_IMEI_Model"]</th>
+                <th>@L["Detail_Firmware"]</th>
+                <th>@L["Common_Status"]</th>
+                <th>@L["Admin_IMEI_Member"]</th>
+                <th>@L["Admin_IMEI_CreatedDate"]</th>
+                <th>@L["Common_Operation"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model.Items)
+            {
+                <tr>
+                    <td>@d.TbKey</td>
+                    <td>@d.IMEICODE</td>
+                    <td>@d.ModelName</td>
+                    <td>@d.FirmwareVersion</td>
+                    <td>@d.Status</td>
+                    <td>@d.MemberName</td>
+                    <td>@d.CDate?.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <form asp-action="Reset" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="imei" value="@d.IMEICODE" />
+                            <button type="submit" class="btn btn-sm btn-outline-secondary btn-with-icon"
+                                    onclick="return confirm('@L["Admin_IMEI_Unbind"]?')">@Html.UiIcon("unlink")<span>@L["Admin_IMEI_Unbind"]</span></button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-warning btn-with-icon" data-bs-toggle="modal"
+                                data-bs-target="#fullResetModal" data-imei="@d.IMEICODE">@Html.UiIcon("reset")<span>@L["Admin_IMEI_FullReset"]</span></button>
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, d.IMEICODE)')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@d.TbKey" />
+                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)，@string.Format(L["Common_PageInfo"].Value, Model.PageIndex, Model.TotalPages)</span>
+    <div>
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+        }
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="fullResetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-action="FullReset">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="imei" id="fullResetImei" />
+                <div class="modal-header"><h5 class="modal-title">@L["Admin_IMEI_ResetModalTitle"]</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <p>IMEI：<strong id="fullResetImeiDisplay"></strong></p>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="deleteHistory" value="true" checked /><label class="form-check-label">@L["Admin_IMEI_DeleteHistory"]</label></div>
+                    <div class="form-check"><input class="form-check-input" type="checkbox" name="resetPayLog" value="true" /><label class="form-check-label">@L["Admin_IMEI_ResetPayLog"]</label></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-with-icon" data-bs-dismiss="modal">@Html.UiIcon("cancel")<span>@L["Common_Cancel"]</span></button>
+                    <button type="submit" class="btn btn-danger btn-with-icon" onclick="return confirm('@L["Common_Confirm"]?')">@Html.UiIcon("confirm")<span>@L["Common_Confirm"]</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+<script>
+document.getElementById('fullResetModal')?.addEventListener('show.bs.modal', function (e) {
+    var imei = e.relatedTarget?.getAttribute('data-imei') || '';
+    document.getElementById('fullResetImei').value = imei;
+    document.getElementById('fullResetImeiDisplay').textContent = imei;
+});
+</script>
+}

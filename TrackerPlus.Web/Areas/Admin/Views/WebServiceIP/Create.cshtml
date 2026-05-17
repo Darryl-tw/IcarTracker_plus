@@ -1,0 +1,28 @@
+﻿@model TrackerPlus.Core.Models.WebServiceIP
+@{
+    ViewData["Title"] = L["Admin_IP_CreateTitle"].Value;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_IP_CreateTitle"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+@if (!string.IsNullOrEmpty(ViewBag.Error as string))
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+<div class="card" style="max-width:400px">
+    <div class="card-body">
+        <form asp-action="Create" asp-area="Admin" method="post">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label">@L["Admin_IP_Address"] *</label>
+                <input type="text" name="IPAddress" class="form-control" required placeholder="@L["Admin_IP_Placeholder"]" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">@L["Admin_IP_Description"]</label>
+                <input type="text" name="Description" class="form-control" />
+            </div>
+            <button type="submit" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>@L["Common_Create"]</span></button>
+        </form>
+    </div>
+</div>

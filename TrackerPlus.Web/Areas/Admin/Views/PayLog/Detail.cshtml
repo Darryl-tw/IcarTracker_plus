@@ -1,0 +1,78 @@
+﻿@model TrackerPlus.Core.Models.PayLog
+@{
+    ViewData["Title"] = L["Admin_PayLog_Detail"].Value;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_PayLog_Detail"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+<div class="card" style="max-width:700px">
+    <div class="card-body">
+        <form asp-action="Update" asp-area="Admin" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="TbKey" value="@Model.TbKey" />
+            <input type="hidden" name="CDate" value="@Model.CDate" />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">IMEI</label>
+                    <input type="text" name="IMEICODE" value="@Model.IMEICODE" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_MemberTbKey"]</label>
+                    <input type="number" name="Member_TbKey" value="@Model.Member_TbKey" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">OBM TbKey</label>
+                    <input type="number" name="OBM_TbKey" value="@Model.OBM_TbKey" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_OrderNo"]</label>
+                    <input type="text" name="OrderNo" value="@Model.OrderNo" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_Amount"]</label>
+                    <input type="number" name="Amount" value="@Model.Amount" class="form-control" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_Commission"]</label>
+                    <input type="number" name="Commission" value="@Model.Commission" class="form-control" step="0.01" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">@L["Admin_PayLog_SaleModel"]</label>
+                    <select name="SaleModel" class="form-select">
+                        <option value="1" selected="@(Model.SaleModel == 1)">@L["SaleModel_Renew"]</option>
+                        <option value="4" selected="@(Model.SaleModel == 4)">@L["SaleModel_International"]</option>
+                        <option value="5" selected="@(Model.SaleModel == 5)">@L["SaleModel_Special"]</option>
+                        <option value="6" selected="@(Model.SaleModel == 6)">@L["SaleModel_Refund"]</option>
+                        <option value="7" selected="@(Model.SaleModel == 7)">@L["SaleModel_AutoEnable"]</option>
+                        <option value="21" selected="@(Model.SaleModel == 21)">@L["SaleModel_MultiMonth"]</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_ServiceStart"]</label>
+                    <input type="date" name="SDate" value="@Model.SDate?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_ServiceEnd"]</label>
+                    <input type="date" name="EDate" value="@Model.EDate?.ToString("yyyy-MM-dd")" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Admin_PayLog_Operator"]</label>
+                    <input type="text" name="Operator" value="@Model.Operator" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">@L["Common_Status"]</label>
+                    <select name="Status" class="form-select">
+                        <option value="Y" selected="@(Model.Status == "Y")">@L["Common_Normal"]</option>
+                        <option value="N" selected="@(Model.Status == "N")">@L["Common_Disabled"]</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <label class="form-label">@L["Detail_Memo"]</label>
+                    <input type="text" name="Memo" value="@Model.Memo" class="form-control" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success mt-3 btn-with-icon">@Html.UiIcon("save")<span>@L["Common_Save"]</span></button>
+        </form>
+    </div>
+</div>

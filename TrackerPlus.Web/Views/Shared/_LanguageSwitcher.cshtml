@@ -1,0 +1,56 @@
+@using TrackerPlus.Core.Common
+@{
+    var returnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
+    var current = System.Globalization.CultureInfo.CurrentUICulture.Name;
+    var variant = ViewData["LangSwitcherVariant"] as string ?? "dropdown";
+    var isDarkDropdown = string.Equals(ViewData["LangSwitcherTheme"] as string, "dark", StringComparison.OrdinalIgnoreCase);
+    var btnClass = isDarkDropdown ? "btn btn-sm btn-outline-light" : "btn btn-sm btn-outline-secondary";
+    var currentLabel = current switch
+    {
+        "zh-TW" => L["Lang_CHT"],
+        "zh-CN" => L["Lang_CHS"],
+        _ when current.StartsWith("en", StringComparison.OrdinalIgnoreCase) => L["Lang_ENG"],
+        _ => L["Lang_Switch"]
+    };
+}
+
+@if (variant == "pills")
+{
+    <div class="language-pills" role="group" aria-label="@L["Lang_Switch"]">
+        <a class="language-pill @(current == "zh-TW" ? "active" : "")"
+           asp-controller="Culture" asp-action="Set"
+           asp-route-culture="zh-TW" asp-route-returnUrl="@returnUrl">@L["Lang_CHT"]</a>
+        <a class="language-pill @(current == "zh-CN" ? "active" : "")"
+           asp-controller="Culture" asp-action="Set"
+           asp-route-culture="zh-CN" asp-route-returnUrl="@returnUrl">@L["Lang_CHS"]</a>
+        <a class="language-pill @(current.StartsWith("en") ? "active" : "")"
+           asp-controller="Culture" asp-action="Set"
+           asp-route-culture="en-US" asp-route-returnUrl="@returnUrl">@L["Lang_ENG"]</a>
+    </div>
+}
+else
+{
+    <div class="dropdown">
+        <button class="@btnClass dropdown-toggle" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false" title="@L["Lang_Switch"]">
+            @currentLabel
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <a class="dropdown-item @(current == "zh-TW" ? "active" : "")"
+                   asp-controller="Culture" asp-action="Set"
+                   asp-route-culture="zh-TW" asp-route-returnUrl="@returnUrl">@L["Lang_CHT"]</a>
+            </li>
+            <li>
+                <a class="dropdown-item @(current == "zh-CN" ? "active" : "")"
+                   asp-controller="Culture" asp-action="Set"
+                   asp-route-culture="zh-CN" asp-route-returnUrl="@returnUrl">@L["Lang_CHS"]</a>
+            </li>
+            <li>
+                <a class="dropdown-item @(current.StartsWith("en") ? "active" : "")"
+                   asp-controller="Culture" asp-action="Set"
+                   asp-route-culture="en-US" asp-route-returnUrl="@returnUrl">@L["Lang_ENG"]</a>
+            </li>
+        </ul>
+    </div>
+}

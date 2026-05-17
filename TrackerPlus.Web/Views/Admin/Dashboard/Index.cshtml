@@ -1,0 +1,35 @@
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = L["Admin_Dashboard_Title"].Value;
+}
+<h2 class="mb-4">@L["Admin_Dashboard_Title"]</h2>
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">@L["Admin_Dashboard_TrackerCount"]</h5>
+                <p class="card-text display-4">@ViewBag.TrackerCount</p>
+                <a href="/Admin/Tracker" class="text-white">@L["Common_ViewDetails"]</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">@L["Admin_Dashboard_MemberCount"]</h5>
+                <p class="card-text display-4">@ViewBag.MemberCount</p>
+                <a href="/Admin/Member" class="text-white">@L["Common_ViewDetails"]</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">@L["Admin_Dashboard_IMEIStock"]</h5>
+                <p class="card-text display-4">@ViewBag.IMEICount</p>
+                <a href="/Admin/IMEI" class="text-white">@L["Common_ViewDetails"]</a>
+            </div>
+        </div>
+    </div>
+</div>
+

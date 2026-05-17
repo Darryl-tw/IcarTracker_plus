@@ -1,0 +1,80 @@
+﻿@model TrackerPlus.Core.Models.Tracker
+@{
+    ViewData["Title"] = L["Admin_Tracker_Detail"].Value + " - " + Model.IMEICODE;
+}
+<div class="d-flex justify-content-between mb-3">
+    <h2>@L["Admin_Tracker_Detail"]</h2>
+    <a asp-action="Index" asp-area="Admin" class="btn btn-secondary btn-with-icon">@Html.UiIcon("back")<span>@L["Common_Back"]</span></a>
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">@L["Admin_Tracker_BasicInfo"]</div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">TbKey</dt><dd class="col-sm-8">@Model.TbKey</dd>
+                    <dt class="col-sm-4">IMEI</dt><dd class="col-sm-8">@Model.IMEICODE</dd>
+                    <dt class="col-sm-4">@L["Common_Status"]</dt><dd class="col-sm-8">@(Model.TrackerStatus == "Y" ? L["Common_Enabled"].Value : L["Common_Disabled"].Value)</dd>
+                    <dt class="col-sm-4">@L["Detail_Firmware"]</dt><dd class="col-sm-8">@Model.FirmwareVersion</dd>
+                    <dt class="col-sm-4">@L["Admin_Tracker_LastReport"]</dt><dd class="col-sm-8">@Model.LastReportTime?.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+                    <dt class="col-sm-4">@L["Field_Latitude"]</dt><dd class="col-sm-8">@Model.Lat</dd>
+                    <dt class="col-sm-4">@L["Field_Longitude"]</dt><dd class="col-sm-8">@Model.Lng</dd>
+                    <dt class="col-sm-4">@L["Device_Speed"]</dt><dd class="col-sm-8">@Model.Speed km/h</dd>
+                    <dt class="col-sm-4">@L["Device_Battery"]</dt><dd class="col-sm-8">@Model.Voltage</dd>
+                    <dt class="col-sm-4">@L["Detail_Csq"]</dt><dd class="col-sm-8">@Model.CSQ</dd>
+                    <dt class="col-sm-4">@L["Detail_GpsSatellites"]</dt><dd class="col-sm-8">@Model.GPSNo</dd>
+                    <dt class="col-sm-4">@L["Field_ExpiryDate"]</dt><dd class="col-sm-8">@Model.ServiceEndDate?.ToString("yyyy-MM-dd")</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header bg-success text-white">@L["Admin_Tracker_EditInfo"]</div>
+            <div class="card-body">
+                <form asp-action="UpdateInfo" asp-area="Admin" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="tbKey" value="@Model.TbKey" />
+                    <div class="mb-2">
+                        <label class="form-label">@L["Detail_DeviceName"]</label>
+                        <input type="text" name="cname" value="@Model.CName" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">@L["Field_Label"]</label>
+                        <input type="text" name="label" value="@Model.Label" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">@L["Field_Group"]</label>
+                        <input type="text" name="groupName" value="@Model.GroupName" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">@L["Detail_Memo"]</label>
+                        <input type="text" name="memo" value="@Model.Memo" class="form-control" />
+                    </div>
+                    <button type="submit" class="btn btn-success btn-with-icon">@Html.UiIcon("save")<span>@L["Admin_Tracker_SaveInfo"]</span></button>
+                </form>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-header bg-warning">@L["Admin_Tracker_Options"]</div>
+            <div class="card-body">
+                <form asp-action="UpdateOption" asp-area="Admin" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="tbKey" value="@Model.TbKey" />
+                    <div class="mb-2">
+                        <label class="form-label">@L["Admin_Tracker_Sos"]</label>
+                        <input type="text" name="sosNumber" value="@Model.SosNumber" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">@L["Admin_Tracker_PowerSaving"]</label>
+                        <select name="powerSavingMode" class="form-select">
+                            <option value="N" selected="@(!Model.PowerSavingMode)">@L["Common_Off"]</option>
+                            <option value="Y" selected="@(Model.PowerSavingMode)">@L["Common_On"]</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-with-icon">@Html.UiIcon("save")<span>@L["Admin_Tracker_SaveOptions"]</span></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,89 @@
+@model Tracker
+@using System.Globalization
+@{
+    Layout = null;
+    var googleApiJs = ViewBag.GoogleApiJs as string ?? "";
+    var memberTimezone = (int)(ViewBag.MemberTimezone ?? 480);
+    var tbKey = Model.TbKey;
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <title>@(string.IsNullOrEmpty(Model.CName) ? Model.IMEICODE : Model.CName)</title>
+    <style>
+        html, body { margin: 0; height: 100%; overflow: hidden; font-family: Tahoma, Arial, sans-serif; font-size: 11px; }
+        #bar {
+            height: 26px; background: #1e3a5f; color: #cce0f0; display: flex; align-items: center;
+            padding: 0 8px; gap: 10px; white-space: nowrap; overflow: hidden;
+        }
+        #bar .name { font-weight: 700; color: #fff; }
+        #map { position: absolute; top: 26px; left: 0; right: 0; bottom: 0; }
+    </style>
+</head>
+<body>
+<div id="bar">
+    <span class="name" id="pane-name">@(string.IsNullOrEmpty(Model.CName) ? Model.IMEICODE : Model.CName)</span>
+    <span id="pane-status"></span>
+    <span id="pane-time"></span>
+</div>
+<div id="map"></div>
+<script>
+const TB_KEY = @tbKey;
+const TIMEZOOM = @memberTimezone;
+const ICON_LETTERS = ['A','B','C','D','E','F','G','H'];
+let map, marker, refreshTimer;
+
+function makeIcon(direction, isOnline, iconFile) {
+    const letter = ICON_LETTERS.includes((iconFile || 'A').toUpperCase()) ? (iconFile || 'A').toUpperCase() : 'A';
+    let dir = Math.round((direction || 0) / 6);
+    if (dir === 60) dir = 0;
+    const imageUrl = !isOnline
+        ? (dir >= 0 && dir <= 29 ? `/images/map-icons/Icon${letter}/OffLine_0029.png` : `/images/map-icons/Icon${letter}/OffLine_3059.png`)
+        : (dir >= 0 && dir <= 29 ? `/images/map-icons/Icon${letter}/dir_0.png` : `/images/map-icons/Icon${letter}/dir_1.png`);
+    return { url: imageUrl, scaledSize: new google.maps.Size(48, 48), anchor: new google.maps.Point(24, 24) };
+}
+
+function updatePane(t) {
+    document.getElementById('pane-name').textContent = t.cname;
+    document.getElementById('pane-status').textContent = t.isOnline ? '●' : '○';
+    document.getElementById('pane-status').style.color = t.isOnline ? '#22c55e' : '#94a3b8';
+    document.getElementById('pane-time').textContent = t.lastReportLocal || '';
+    const pos = { lat: t.lat, lng: t.lng };
+    if (!marker) {
+        marker = new google.maps.Marker({ position: pos, map, title: t.cname, icon: makeIcon(t.direction, t.isOnline, t.iconFile) });
+        map.setCenter(pos);
+        map.setZoom(15);
+    } else {
+        marker.setPosition(pos);
+        marker.setIcon(makeIcon(t.direction, t.isOnline, t.iconFile));
+        marker.setTitle(t.cname);
+    }
+}
+
+function refreshPane() {
+    fetch('/Map/LivePaneData?tbKey=' + TB_KEY)
+        .then(r => r.json())
+        .then(updatePane)
+        .catch(() => {});
+}
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 14,
+        center: { lat: 25.033, lng: 121.5654 },
+        mapTypeId: 'roadmap',
+        disableDefaultUI: true,
+        zoomControl: true
+    });
+    refreshPane();
+    refreshTimer = setInterval(refreshPane, 30000);
+}
+window.initMap = initMap;
+</script>
+@if (!string.IsNullOrEmpty(googleApiJs))
+{
+    <script src="@googleApiJs&callback=initMap&loading=async" async defer></script>
+}
+</body>
+</html>

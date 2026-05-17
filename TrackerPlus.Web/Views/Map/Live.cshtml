@@ -1,0 +1,1985 @@
+@model IEnumerable<Tracker>
+@using System.Globalization
+@using System.Text.Json
+@{
+    Layout = null;
+    var googleApiJs = ViewBag.GoogleApiJs as string ?? "";
+    var memberName = ViewBag.MemberName as string ?? User.Identity?.Name ?? "";
+    var memberTimezone = (int)(ViewBag.MemberTimezone ?? 480);
+    var now = DateTime.UtcNow;
+    var maxMultiWindows = (int)(ViewBag.MaxMultiWindows ?? 6);
+    var liveI18nJson = JsonSerializer.Serialize(new
+    {
+        unknown = L["Live_Unknown"].Value,
+        groupPrefix = L["Live_Group"].Value + "\uFF1A",
+        serviceDays = L["Live_ServiceDays"].Value,
+        refreshLive = L["Live_RefreshLive"].Value,
+        traffic = L["Live_Traffic"].Value,
+        trafficOn = L["Live_TrafficOn"].Value,
+        satelliteView = L["Live_SatelliteView"].Value,
+        roadMap = L["Live_RoadMap"].Value,
+        gpsSatellitesCount = L["Live_GpsSatellitesCount"].Value,
+        refreshUpdated = L["Live_RefreshUpdated"].Value,
+        histNoData = L["Live_Hist_NoData"].Value,
+        histQueryFailed = L["Live_Hist_QueryFailed"].Value,
+        histSelectPrompt = L["Live_Hist_SelectPrompt"].Value,
+        startPoint = L["Live_StartPoint"].Value,
+        endPoint = L["Live_EndPoint"].Value,
+        mapLoadFailed = L["Live_MapLoadFailed"].Value,
+        mapAuthFailed = L["Live_MapAuthFailed"].Value,
+        mapLoadErrorTitle = L["Live_MapLoadErrorTitle"].Value,
+        batteryTitle = L["Live_BatteryTitle"].Value,
+        gpsTitle = L["Live_GpsSatellitesTitle"].Value,
+        deviceSettingsTitle = L["DeviceSettings_Title"].Value,
+        deviceSettingsHint = L["DeviceSettings_Hint"].Value,
+        tabInfo = L["DeviceSettings_Tab_Info"].Value,
+        tabOption = L["DeviceSettings_Tab_Option"].Value,
+        tabAlert = L["DeviceSettings_Tab_Alert"].Value,
+        tabPayLog = L["DeviceSettings_Tab_PayLog"].Value,
+        gpsInterval = L["DeviceSettings_GpsInterval"].Value,
+        settingsPassword = L["DeviceSettings_Password"].Value,
+        shockSection = L["DeviceSettings_ShockSection"].Value,
+        vehicleType = L["DeviceSettings_VehicleType"].Value,
+        shockSensitivity = L["DeviceSettings_ShockSensitivity"].Value,
+        idleModule = L["DeviceSettings_IdleModule"].Value,
+        idleWhen = L["DeviceSettings_IdleWhen"].Value,
+        idleReport = L["DeviceSettings_IdleReport"].Value,
+        speedModule = L["DeviceSettings_SpeedModule"].Value,
+        speedWhen = L["DeviceSettings_SpeedWhen"].Value,
+        speedAlarm = L["DeviceSettings_SpeedAlarm"].Value,
+        customMsg = L["DeviceSettings_CustomMsg"].Value,
+        sharePwd = L["DeviceSettings_SharePwd"].Value,
+        shareEnable = L["DeviceSettings_ShareEnable"].Value,
+        alertMode = L["DeviceSettings_AlertMode"].Value,
+        closed = L["DeviceSettings_Closed"].Value,
+        alertSingle = L["DeviceSettings_AlertSingle"].Value,
+        alertRepeat = L["DeviceSettings_AlertRepeat"].Value,
+        assignedGroup = L["DeviceSettings_AssignedGroup"].Value,
+        vehicleCar = L["DeviceSettings_VehicleCar"].Value,
+        vehicleTruck = L["DeviceSettings_VehicleTruck"].Value,
+        gps15s = L["DeviceSettings_Gps15s"].Value,
+        gps30s = L["DeviceSettings_Gps30s"].Value,
+        gps10m = L["DeviceSettings_Gps10m"].Value,
+        gps30m = L["DeviceSettings_Gps30m"].Value,
+        gps60m = L["DeviceSettings_Gps60m"].Value,
+        gps120m = L["DeviceSettings_Gps120m"].Value,
+        detailOffline = L["Live_Detail_Offline"].Value,
+        detailOnline = L["Live_Detail_Online"].Value,
+        detailLastLogin = L["Live_Detail_LastLogin"].Value,
+        detailLastGps = L["Live_Detail_LastGps"].Value,
+        detailLastConnect = L["Live_Detail_LastConnect"].Value,
+        detailTravelSpeed = L["Live_Detail_TravelSpeed"].Value,
+        detailDistance = L["Live_Detail_Distance"].Value,
+        detailCoords = L["Live_Detail_Coords"].Value,
+        detailAddress = L["Live_Detail_Address"].Value,
+        detailDirection = L["Live_Detail_Direction"].Value,
+        detailLithium = L["Live_Detail_LithiumBattery"].Value,
+        detailSatellites = L["Live_Detail_Satellites"].Value,
+        serviceStart = L["Admin_PayLog_ServiceStart"].Value,
+        serviceEnd = L["Admin_PayLog_ServiceEnd"].Value,
+        imeiLabel = L["Detail_Imei"].Value,
+        idName = L["Detail_DeviceName"].Value,
+        deviceSettingsIcons = L["DeviceSettings_Icons"].Value,
+        deviceSettingsSaved = L["DeviceSettings_Saved"].Value,
+        deviceSettingsSaveFailed = L["DeviceSettings_SaveFailed"].Value,
+        deviceSettingsLoadFailed = L["DeviceSettings_LoadFailed"].Value,
+        noLabels = L["Detail_NoLabels"].Value,
+        deviceName = L["Detail_DeviceName"].Value,
+        deviceMemo = L["Detail_Memo"].Value,
+        deviceLabels = L["Detail_Labels"].Value,
+        confirm = L["Common_Confirm"].Value,
+        confirmDelete = L["Common_ConfirmDelete"].Value,
+        commonDelete = L["Common_Delete"].Value,
+        reset = L["Common_Reset"].Value,
+        iconA = L["DeviceIcon_A"].Value,
+        iconB = L["DeviceIcon_B"].Value,
+        iconC = L["DeviceIcon_C"].Value,
+        iconD = L["DeviceIcon_D"].Value,
+        iconE = L["DeviceIcon_E"].Value,
+        iconF = L["DeviceIcon_F"].Value,
+        iconG = L["DeviceIcon_G"].Value,
+        iconH = L["DeviceIcon_H"].Value,
+        updateNow = L["Live_UpdateNow"].Value,
+        multiWindow = L["Live_MultiWindow"].Value,
+        customLandmark = L["Live_CustomLandmark"].Value,
+        mapTypeRoad = L["Live_MapTypeRoad"].Value,
+        multiWindowSelect = L["Live_MultiWindowSelect"].Value,
+        multiWindowMax = L["Live_MultiWindowMax"].Value,
+        landmarkTitle = L["Live_LandmarkTitle"].Value,
+        landmarkName = L["Live_LandmarkName"].Value,
+        landmarkAddress = L["Live_LandmarkAddress"].Value,
+        landmarkAddressPh = L["Live_LandmarkAddressPh"].Value,
+        landmarkAdd = L["Live_LandmarkAdd"].Value,
+        landmarkPickOnMap = L["Live_LandmarkPickOnMap"].Value,
+        landmarkLimit = L["Live_LandmarkLimit"].Value,
+        landmarkMemoRequired = L["Live_LandmarkMemoRequired"].Value,
+        landmarkAdded = L["Live_LandmarkAdded"].Value,
+        landmarkDeleted = L["Live_LandmarkDeleted"].Value,
+        landmarkCoords = L["Live_LandmarkCoords"].Value
+    });
+    var initialJson = JsonSerializer.Serialize(Model.Select(t => new
+    {
+        tbKey = t.TbKey,
+        imei = t.IMEICODE,
+        cname = string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName,
+        lat = t.Lat,
+        lng = t.Lng,
+        speed = t.Speed,
+        direction = t.Direction,
+        voltage = t.Voltage,
+        csq = t.CSQ,
+        gpsNo = t.GPSNo,
+        isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10,
+        lastReportLocal = t.LastReportTime.HasValue
+            ? t.LastReportTime.Value.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss")
+            : "",
+        groupName = t.GroupName ?? "",
+        label = t.Label ?? "",
+        firmwareVersion = t.FirmwareVersion ?? "",
+        iconFile = string.IsNullOrWhiteSpace(t.IconFile) ? "A" : t.IconFile.Trim().ToUpperInvariant(),
+        serviceDays = ServiceDaysHelper.RemainingDays(t.ServiceEndDate),
+    }));
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>@L["Live_Title"]</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/btn-icons.css" asp-append-version="true" />
+<style>
+/* ======= RESET & BASE ======= */
+html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: Tahoma, Arial, sans-serif; font-size: 13px; }
+:root {
+    --live-nav-h: 32px;
+    --live-tabs-h: 26px;
+    --live-hist-panel-h: 240px;
+}
+
+/* ======= NAVBAR ======= */
+#top-nav {
+    height: var(--live-nav-h); background: #1e3a5f; display: flex; align-items: center;
+    padding: 0 8px; gap: 2px; position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+#top-nav .brand { color: #7ecbff; font-size: 13px; font-weight: 700; margin-right: 8px; white-space: nowrap; }
+#top-nav .nav-btn {
+    color: #d0e8ff; background: transparent; border: none; padding: 3px 8px;
+    font-size: 11px; border-radius: 3px; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+}
+#top-nav .nav-btn .ui-icon { width: 13px; height: 13px; }
+#top-nav .nav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+#top-nav .dropdown-menu { font-size: 11px; min-width: 150px; }
+#top-nav .spacer { flex: 1; }
+#top-nav .user-info { color: #94c5e8; font-size: 11px; margin-right: 6px; }
+#top-nav .logout-btn {
+    color: #ff8080; background: rgba(255,80,80,0.15); border: 1px solid rgba(255,80,80,0.3);
+    padding: 2px 10px; border-radius: 3px; font-size: 11px; cursor: pointer;
+    transition: background 0.15s;
+}
+#top-nav .logout-btn .ui-icon { width: 13px; height: 13px; }
+#top-nav .logout-btn:hover { background: rgba(255,80,80,0.3); }
+
+/* ======= MAIN LAYOUT ======= */
+#main-layout { display: flex; position: fixed; top: var(--live-nav-h); left: 0; right: 0; bottom: 0; }
+
+/* ======= LEFT SIDEBAR ======= */
+#left-sidebar {
+    width: 220px; min-width: 180px; max-width: 320px;
+    background: #1a2a3a; display: flex; flex-direction: column;
+    overflow: hidden; border-right: 1px solid #0d1f30; flex-shrink: 0;
+    resize: horizontal;
+}
+#sidebar-header {
+    padding: 7px 10px 5px; background: #0f1f30; border-bottom: 1px solid #0a1520;
+    font-size: 11px; color: #aac8e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#sidebar-header .member-id { font-weight: 700; color: #7ecbff; }
+#sidebar-controls { padding: 5px 8px; border-bottom: 1px solid #0a1520; display: flex; gap: 4px; flex-wrap: wrap; }
+#sidebar-controls .ctrl-btn {
+    flex: 1; min-width: 50px; font-size: 10px; padding: 3px 4px; background: #243d52; color: #aac8e0;
+    border: 1px solid #2d5070; border-radius: 3px; cursor: pointer; text-align: center;
+    transition: background 0.12s;
+}
+#sidebar-controls .ctrl-btn:hover { background: #2d5070; color: #fff; }
+#device-list { flex: 1; overflow-y: auto; }
+#device-list::-webkit-scrollbar { width: 5px; }
+#device-list::-webkit-scrollbar-track { background: #0f1f30; }
+#device-list::-webkit-scrollbar-thumb { background: #2d5070; border-radius: 3px; }
+
+/* ======= DEVICE TABLE ======= */
+.device-table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+.col-name { width: auto; }
+.col-group { width: 50px; }
+.col-days { width: 40px; }
+.col-plat { width: 34px; }
+.device-table thead th {
+    position: sticky; top: 0; z-index: 1; background: #0d1f30;
+    color: #6080a0; font-weight: 600; font-size: 10px; padding: 4px 3px;
+    border-bottom: 1px solid #1a3a5a; white-space: nowrap; text-align: center;
+}
+.device-table thead th:first-child { text-align: left; padding-left: 6px; }
+.device-table tbody tr.device-item { cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.12s; }
+.device-table tbody tr.device-item:hover td { background: rgba(37,100,180,0.3); }
+.device-table tbody tr.device-item.active td { background: rgba(37,100,180,0.5); }
+.device-table tbody tr.device-item.offline { opacity: 0.65; }
+.device-table td { padding: 5px 3px; vertical-align: middle; }
+.device-table td:first-child { padding-left: 5px; }
+.device-table td.col-group, .device-table td.col-days, .device-table td.col-plat {
+    text-align: center; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.device-cb { cursor: pointer; accent-color: #2563eb; vertical-align: middle; }
+.device-name {
+    color: #e2e8f0; font-size: 11px; font-weight: 600; vertical-align: middle;
+    display: inline-block; max-width: calc(100% - 26px);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.device-group { color: #64a0c0; font-size: 10px; }
+.device-days { color: #7090a8; font-size: 10px; }
+.device-plat { color: #7090a8; font-size: 10px; }
+.status-dot {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    vertical-align: middle; margin-right: 3px;
+}
+.status-dot.online { background: #22c55e; box-shadow: 0 0 4px #22c55e; animation: pulse 2s infinite; }
+.status-dot.sleeping { background: #6b7280; }
+.status-dot.disconnected { background: #FF60AF; }
+.status-dot.terminated { background: #ef4444; }
+@@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* ======= RIGHT PANEL ======= */
+#right-panel { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+/* ======= TABS ======= */
+#map-tabs {
+    height: var(--live-tabs-h); background: #0d1f30; display: flex; align-items: flex-end;
+    padding: 0 8px; border-bottom: 1px solid #1a3a5a; gap: 1px; flex-shrink: 0;
+}
+.map-tab {
+    padding: 4px 12px; font-size: 11px; color: #7090a8; background: transparent;
+    border: 1px solid transparent; border-bottom: none; border-radius: 3px 3px 0 0;
+    cursor: pointer; white-space: nowrap; transition: all 0.15s;
+}
+.map-tab:hover { color: #aac8e0; background: rgba(255,255,255,0.05); }
+.map-tab.active { color: #fff; background: #1a3a5a; border-color: #1a3a5a; font-weight: 600; }
+
+/* ======= MAP CONTAINER ======= */
+#map-area { flex: 1; position: relative; min-height: 0; display: flex; flex-direction: column; }
+#map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
+
+/* ======= MAP TOOLBAR (overlay) ======= */
+#map-toolbar {
+    position: absolute; top: 8px; left: 8px; z-index: 10;
+    display: flex; flex-direction: column; gap: 2px; pointer-events: auto;
+}
+.map-tool-btn {
+    background: rgba(15,31,48,0.88); color: #cce0f0; border: 1px solid rgba(80,140,200,0.3);
+    padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; white-space: nowrap;
+    transition: all 0.15s; backdrop-filter: blur(4px); min-width: 80px; text-align: left;
+}
+.map-tool-btn:hover { background: rgba(37,100,180,0.7); color: #fff; border-color: #2563eb; }
+.map-tool-btn.active { background: rgba(37,100,180,0.8); color: #fff; border-color: #3b82f6; }
+
+#map-type-switch {
+    position: absolute; top: 8px; left: 100px; z-index: 10;
+    display: flex; background: #fff; border-radius: 4px; overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25); font-size: 11px;
+}
+#map-type-switch button {
+    border: none; padding: 5px 10px; cursor: pointer; background: #fff; color: #334155;
+}
+#map-type-switch button.active { background: #2563eb; color: #fff; font-weight: 600; }
+
+#landmark-modal-list { max-height: 200px; overflow-y: auto; font-size: 11px; }
+#landmark-modal-list .lm-row {
+    display: flex; align-items: center; gap: 6px; padding: 4px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+#landmark-modal-list .lm-row:last-child { border-bottom: none; }
+
+/* ======= REFRESH BADGE ======= */
+#refresh-badge {
+    position: absolute; bottom: 8px; right: 8px; z-index: 10;
+    background: rgba(15,31,48,0.75); color: #94a3b8; font-size: 10px;
+    padding: 4px 10px; border-radius: 12px; backdrop-filter: blur(4px);
+    transition: opacity 0.5s;
+}
+
+/* ======= DEVICE INFO POPUP ======= */
+#device-popup {
+    position: absolute; top: 8px; right: 8px; z-index: 20; width: 230px;
+    background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: none; font-size: 12px; border: 1px solid #e2e8f0;
+}
+#device-popup .popup-title { font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 6px; }
+#device-popup .popup-row { display: flex; justify-content: space-between; margin-bottom: 3px; color: #475569; }
+#device-popup .popup-actions { display: flex; gap: 5px; margin-top: 8px; }
+#device-popup .popup-actions a { flex: 1; text-align: center; padding: 4px; font-size: 11px; }
+
+/* ======= DEVICE SETTINGS MODAL ======= */
+#device-settings-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.45); align-items: center; justify-content: center;
+}
+#device-settings-overlay.visible { display: flex; }
+#device-settings-modal {
+    width: min(640px, 96vw); max-height: 90vh; overflow: auto;
+    background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    font-size: 12px; color: #334155;
+}
+#device-settings-modal .dsm-header {
+    padding: 10px 14px; background: linear-gradient(180deg, #4a7ab5, #3a6a9f);
+    color: #fff; font-weight: 700; display: flex; justify-content: space-between; align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+#device-settings-modal .dsm-close-btn {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35);
+    color: #fff; border-radius: 4px; padding: 4px 10px; font-size: 12px; cursor: pointer;
+}
+#device-settings-modal .dsm-close-btn:hover { background: rgba(255,255,255,0.28); color: #fff; }
+#device-settings-modal .dsm-close-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+#device-settings-modal .dsm-close-btn-footer {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #fff; border-color: #cbd5e1; color: #475569;
+}
+#device-settings-modal .dsm-close-btn-footer:hover { background: #f1f5f9; color: #1e293b; }
+#device-settings-modal .dsm-body { padding: 12px 14px; }
+#device-settings-modal .dsm-hint { color: #64748b; margin-bottom: 10px; font-size: 11px; }
+#device-settings-modal label { font-weight: 600; font-size: 11px; margin-bottom: 2px; }
+#device-settings-modal .form-control, #device-settings-modal .form-select { font-size: 12px; }
+#device-settings-icons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 6px; }
+.icon-choice {
+    border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px; text-align: center; cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+.icon-choice:hover { border-color: #2563eb; background: #f8fafc; }
+.icon-choice.selected { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 1px #2563eb; }
+.icon-choice img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto 4px; }
+.icon-choice span { font-size: 10px; color: #475569; }
+#device-settings-labels { max-height: 120px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px 8px; }
+#device-settings-modal .dsm-footer {
+    padding: 10px 14px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 8px;
+}
+#device-settings-modal .dsm-tabs { display: flex; gap: 0; border-bottom: 1px solid #cbd5e1; margin-bottom: 10px; }
+#device-settings-modal .dsm-tab {
+    flex: 1; text-align: center; padding: 8px 4px; cursor: pointer; background: #e2e8f0;
+    border: 1px solid #cbd5e1; border-bottom: none; font-weight: 600; font-size: 11px;
+}
+#device-settings-modal .dsm-tab.active { background: #fff; color: #1d4ed8; }
+#device-settings-modal .dsm-pane { display: none; }
+#device-settings-modal .dsm-pane.active { display: block; }
+#device-settings-modal .dsm-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+#device-settings-paylog table { width: 100%; border-collapse: collapse; font-size: 11px; }
+#device-settings-paylog th, #device-settings-paylog td { border: 1px solid #e2e8f0; padding: 6px 8px; }
+#device-settings-paylog tr.highlight td { background: #fef9c3; }
+
+#device-detail-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2050;
+    background: rgba(0,0,0,0.35); align-items: center; justify-content: center;
+}
+#device-detail-overlay.visible { display: flex; }
+#device-detail-panel {
+    width: min(420px, 94vw); max-height: 85vh; overflow: auto;
+    background: #fff; border-radius: 8px; padding: 14px 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3); font-size: 12px; color: #334155;
+}
+#device-detail-panel .dd-title { font-weight: 700; font-size: 14px; margin-bottom: 8px; padding-right: 24px; }
+#device-detail-panel .dd-status { font-weight: 700; margin-bottom: 10px; }
+#device-detail-panel .dd-row { margin-bottom: 4px; line-height: 1.5; }
+#device-detail-panel .dd-meta { color: #64748b; }
+#device-detail-panel .dd-close {
+    position: absolute; top: 10px; right: 10px; background: #f1f5f9; border: 1px solid #e2e8f0;
+    border-radius: 4px; padding: 4px 8px; font-size: 11px; cursor: pointer; color: #475569;
+}
+#device-detail-panel .dd-icons { margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
+
+/* ======= HISTORY PANEL ======= */
+#history-panel {
+    display: none; height: var(--live-hist-panel-h); background: #f8fafc; border-top: 1px solid #cbd5e1;
+    flex-shrink: 0; overflow: hidden; flex-direction: column;
+}
+#history-panel.visible { display: flex; }
+#history-toolbar {
+    background: #e2e8f0; padding: 3px 8px; display: flex; align-items: center;
+    gap: 4px; flex-wrap: wrap; border-bottom: 1px solid #cbd5e1; flex-shrink: 0;
+}
+#history-toolbar label { font-size: 10px; color: #475569; margin: 0; }
+#history-toolbar select, #history-toolbar input[type=date] {
+    font-size: 10px; padding: 2px 5px; border: 1px solid #94a3b8; border-radius: 2px;
+    background: #fff; height: 24px;
+}
+#history-toolbar .hist-btn {
+    font-size: 10px; padding: 2px 8px; border-radius: 2px; cursor: pointer;
+    border: 1px solid; white-space: nowrap;
+}
+#history-toolbar .hist-btn .ui-icon { width: 12px; height: 12px; }
+.hist-btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+.hist-btn-primary:hover { background: #1d4ed8; }
+.hist-btn-sec { background: #fff; color: #475569; border-color: #94a3b8; }
+.hist-btn-sec:hover { background: #f1f5f9; }
+/* Summary view (GPS 7-day) */
+#hist-summary-view { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+#hist-summary-view .hist-nodata { text-align: center; padding: 10px; color: #94a3b8; font-size: 10px; }
+#hist-summary-table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
+#hist-summary-table thead { background: #e2e8f0; position: sticky; top: 0; z-index: 1; }
+#hist-summary-table th { padding: 3px 6px; text-align: left; color: #475569; font-weight: 600; white-space: nowrap; border-right: 1px solid #cbd5e1; }
+#hist-summary-table td { padding: 3px 6px; border-bottom: 1px solid #e2e8f0; color: #374151; border-right: 1px solid #e2e8f0; }
+#hist-summary-table tr.data-row:hover td { background: #eff6ff; cursor: pointer; }
+/* Detail view (day drill-down or LBS result) */
+#hist-detail-view { flex: 1; overflow: hidden; display: none; flex-direction: column; }
+#hist-detail-header {
+    padding: 3px 8px; background: #dbeafe; border-bottom: 1px solid #bfdbfe;
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0; font-size: 10px; flex-wrap: wrap;
+}
+#hist-detail-stats {
+    padding: 2px 8px; background: #eff6ff; font-size: 9px; color: #1d4ed8;
+    display: flex; flex-shrink: 0; border-bottom: 1px solid #bfdbfe;
+    gap: 10px; flex-wrap: wrap; align-items: center;
+}
+#hist-detail-table-wrap { flex: 1; overflow-y: auto; }
+#hist-detail-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+#hist-detail-table thead { background: #e2e8f0; position: sticky; top: 0; z-index: 1; }
+#hist-detail-table th { padding: 2px 4px; text-align: left; color: #475569; font-weight: 600; font-size: 9px; white-space: nowrap; border-right: 1px solid #cbd5e1; }
+#hist-detail-table td { padding: 2px 4px; border-bottom: 1px solid #e2e8f0; color: #374151; border-right: 1px solid #e2e8f0; font-size: 9px; }
+#hist-detail-table tr:hover td { background: #eff6ff; cursor: pointer; }
+.hist-nodata { text-align: center; padding: 10px; color: #94a3b8; font-size: 10px; }
+
+/* ======= LOADING OVERLAY ======= */
+#loading-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 100;
+    background: rgba(15,31,48,0.6); display: none; align-items: center; justify-content: center;
+}
+#loading-overlay.visible { display: flex; }
+#loading-overlay .spinner {
+    width: 36px; height: 36px; border: 3px solid rgba(255,255,255,0.2);
+    border-top-color: #7ecbff; border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ======= NO MAP ======= */
+#no-map-msg {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    text-align: center; color: #94a3b8; display: none;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== TOP NAVBAR ===== -->
+<div id="top-nav">
+    <span class="brand">@L["Live_Brand"]</span>
+
+    <!-- ????? -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("menu")<span>@L["Live_Menu_System"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="/Tracker/Index">@L["Nav_DeviceList"]</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><h6 class="dropdown-header">@L["Live_Menu_AfterSelectDevice"]</h6></li>
+            <li><a class="dropdown-item" id="menu-tracker-detail" href="#">@L["Detail_Title"]</a></li>
+            <li><a class="dropdown-item" id="menu-geofence" href="#">@L["Live_Menu_Geofence"]</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/Account/ForgotPassword">@L["Live_Menu_ChangePassword"]</a></li>
+        </ul>
+    </div>
+
+    <!-- ?????? -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("reports")<span>@L["Live_Menu_Reports"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" id="menu-hist-gps" href="/History/Index">@L["Live_Menu_HistGps"]</a></li>
+            <li><a class="dropdown-item" id="menu-hist-lbs" href="/History/Index?type=LBS">@L["Live_Menu_HistLbs"]</a></li>
+        </ul>
+    </div>
+
+    <!-- ??? -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("help")<span>@L["Live_Menu_Help"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="https://www.traceez.com/tw/icar_webplatform.html" target="_blank">@L["Live_Menu_Manual"]</a></li>
+            <li><a class="dropdown-item" href="https://intro.traceez.com/icar/privacy_policy/app_privacy_policy_tw.html" target="_blank">@L["Live_Menu_Privacy"]</a></li>
+        </ul>
+    </div>
+
+    <div class="spacer"></div>
+    <span class="user-info">@memberName</span>
+    <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="logout-btn">@Html.UiIcon("logout")<span>@L["Live_LogoutSystem"]</span></button>
+    </form>
+</div>
+
+<!-- ===== MAIN LAYOUT ===== -->
+<div id="main-layout">
+
+    <!-- ===== LEFT SIDEBAR ===== -->
+    <div id="left-sidebar">
+        <div id="sidebar-header">
+            <span class="member-id">@memberName</span> - @L["Live_TrackerList"]
+            [<span id="device-count">@Model.Count()</span>]
+        </div>
+        <div id="sidebar-controls">
+            <button class="ctrl-btn" onclick="selectAll(true)">@Html.UiIcon("select-all")<span>@L["Live_SelectAll"]</span></button>
+            <button class="ctrl-btn" onclick="selectAll(false)">@Html.UiIcon("cancel")<span>@L["Common_Cancel"]</span></button>
+            <button class="ctrl-btn" onclick="fitAll()">@Html.UiIcon("fit-all")<span>@L["Live_FitAll"]</span></button>
+        </div>
+        <div id="device-list">
+            <table class="device-table">
+                <thead>
+                    <tr>
+                        <th class="col-name">@L["Live_Col_DeviceName"]</th>
+                        <th class="col-group">@L["Live_Col_Group"]</th>
+                        <th class="col-days">@L["Live_Col_ValidDays"]</th>
+                        <th class="col-plat">@L["Live_Col_WebPlatform"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model)
+                    {
+                        var isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10;
+                        var daysLeft = ServiceDaysHelper.RemainingDays(t.ServiceEndDate);
+                        var isExpired = daysLeft.HasValue && daysLeft.Value <= 0;
+                        var statusDot = isExpired ? "terminated" : (isOnline ? "online" : (t.PowerSavingMode ? "sleeping" : "disconnected"));
+                        <tr class="device-item @(isOnline ? "" : "offline")"
+                            data-tbkey="@t.TbKey"
+                            data-imei="@t.IMEICODE"
+                            data-power-saving="@t.PowerSavingMode.ToString().ToLower()"
+                            data-service-days="@(daysLeft.HasValue ? daysLeft.Value.ToString() : "")"
+                            onclick="onDeviceClick(@t.TbKey)">
+                            <td class="col-name">
+                                <input type="checkbox" class="device-cb" checked
+                                       data-tbkey="@t.TbKey"
+                                       onclick="event.stopPropagation(); toggleDevice(@t.TbKey, this.checked)" />
+                                <span class="status-dot @statusDot"></span>
+                                <span class="device-name" title="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</span>
+                            </td>
+                            <td class="col-group device-group">@t.GroupName</td>
+                            <td class="col-days device-days" style="@(isExpired ? "color:#f87171" : (daysLeft.HasValue && daysLeft.Value < 30 ? "color:#f87171" : ""))">
+                                @(daysLeft.HasValue ? daysLeft.Value.ToString() : "—")
+                            </td>
+                            <td class="col-plat device-plat">@t.WebPlatform</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div id="right-panel">
+
+        <!-- TABS -->
+        <div id="map-tabs">
+            <div class="map-tab active" data-tab="live" onclick="switchTab('live')">@L["Live_Tab_LiveMap"]</div>
+            <div class="map-tab" data-tab="history" onclick="switchTab('history')">@L["Live_Tab_History"]</div>
+            <div class="map-tab" data-tab="history-lbs" onclick="switchTab('history-lbs')">@L["Live_Tab_HistoryLbs"]</div>
+        </div>
+
+        <!-- MAP AREA -->
+        <div id="map-area">
+            <div id="map"></div>
+
+            <!-- MAP TOOLBAR -->
+            <div id="map-toolbar">
+                <button class="map-tool-btn" id="btn-refresh" onclick="forceRefresh()">
+                    @Html.UiIcon("refresh")<span>@L["Live_UpdateNow"] (<span id="refresh-count">0</span>)</span>
+                </button>
+                <button class="map-tool-btn" id="btn-multi" onclick="openMultiWindow()">@Html.UiIcon("multi-window")<span>@L["Live_MultiWindow"]</span></button>
+                <button class="map-tool-btn" id="btn-clear" onclick="clearTracks()">@Html.UiIcon("clear")<span>@L["Live_ClearTrack"]</span></button>
+                <button class="map-tool-btn" id="btn-landmark" onclick="openLandmarkModal()">@Html.UiIcon("landmark")<span>@L["Live_CustomLandmark"]</span></button>
+                <button class="map-tool-btn" id="btn-traffic" onclick="toggleTraffic()">@Html.UiIcon("traffic")<span>@L["Live_Traffic"]</span></button>
+            </div>
+            <div id="map-type-switch">
+                <button type="button" id="btn-map-road" class="active" onclick="setMapType(true)">@Html.UiIcon("road")<span>@L["Live_MapTypeRoad"]</span></button>
+                <button type="button" id="btn-map-sat" onclick="setMapType(false)">@Html.UiIcon("satellite")<span>@L["Live_SatelliteView"]</span></button>
+            </div>
+
+            <!-- REFRESH STATUS -->
+            <div id="refresh-badge"></div>
+
+            <!-- DEVICE POPUP -->
+            <div id="device-popup">
+                <button type="button" class="btn-with-icon" style="position:absolute;top:6px;right:8px;background:none;border:none;cursor:pointer;color:#94a3b8;padding:2px 4px"
+                        onclick="closePopup()" title="@L["Common_Close"]">@Html.UiIcon("close")</button>
+                <div class="popup-title" id="popup-name"></div>
+                <div class="popup-row"><span>@L["Detail_Imei"]</span><span id="popup-imei" style="font-size:10px;color:#94a3b8"></span></div>
+                <div class="popup-row"><span>@L["Live_ReportTime"]</span><span id="popup-time"></span></div>
+                <div class="popup-row"><span>@L["Device_Speed"]</span><span id="popup-speed"></span></div>
+                <div class="popup-row"><span>@L["Device_Battery"]</span><span id="popup-voltage"></span></div>
+                <div class="popup-row"><span>@L["Detail_GpsSatellites"]</span><span id="popup-gps"></span></div>
+                <div class="popup-row"><span>@L["Detail_Csq"]</span><span id="popup-csq"></span></div>
+                <div class="popup-actions">
+                    <a class="btn btn-sm btn-outline-secondary btn-with-icon" id="popup-history-link" href="#">@Html.UiIcon("history")<span>@L["Detail_HistoryLink"]</span></a>
+                    <a class="btn btn-sm btn-outline-primary btn-with-icon" id="popup-detail-link" href="#">@Html.UiIcon("details")<span>@L["Detail_Title"]</span></a>
+                </div>
+            </div>
+
+            <!-- DEVICE SETTINGS MODAL -->
+            <div id="device-settings-overlay">
+                <div id="device-settings-modal">
+                    <div class="dsm-header">
+                        <span id="dsm-title">@L["DeviceSettings_Title"]</span>
+                    </div>
+                    <div class="dsm-body">
+                        <div class="dsm-hint" id="dsm-hint"></div>
+                        <input type="hidden" id="dsm-tbkey" />
+                        <div class="dsm-tabs">
+                            <div class="dsm-tab active" data-tab="info" onclick="switchDeviceSettingsTab('info')">@L["DeviceSettings_Tab_Info"]</div>
+                            <div class="dsm-tab" data-tab="option" onclick="switchDeviceSettingsTab('option')">@L["DeviceSettings_Tab_Option"]</div>
+                            <div class="dsm-tab" data-tab="alert" onclick="switchDeviceSettingsTab('alert')">@L["DeviceSettings_Tab_Alert"]</div>
+                            <div class="dsm-tab" data-tab="paylog" onclick="switchDeviceSettingsTab('paylog')">@L["DeviceSettings_Tab_PayLog"]</div>
+                        </div>
+                        <div id="dsm-pane-info" class="dsm-pane active">
+                            <div class="dsm-row2 mb-2">
+                                <div>
+                                    <label>@L["Detail_Imei"]</label>
+                                    <input type="text" class="form-control form-control-sm" id="dsm-imei" readonly />
+                                </div>
+                                <div>
+                                    <label>@L["Detail_DeviceName"]</label>
+                                    <input type="text" class="form-control form-control-sm" id="dsm-cname" maxlength="20" />
+                                </div>
+                            </div>
+                            <div id="dsm-ud-fields" class="mb-2"></div>
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_AssignedGroup"]</label>
+                                <div id="device-settings-labels"></div>
+                            </div>
+                            <div class="mb-1">
+                                <label>@L["DeviceSettings_Icons"]</label>
+                                <div id="device-settings-icons"></div>
+                            </div>
+                        </div>
+                        <div id="dsm-pane-option" class="dsm-pane">
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_GpsInterval"]</label>
+                                <select class="form-select form-select-sm" id="dsm-gps-interval"></select>
+                            </div>
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_Password"]</label>
+                                <input type="text" class="form-control form-control-sm" id="dsm-sms-password" value="12345678" readonly />
+                            </div>
+                            <hr class="my-2" />
+                            <div class="fw-semibold mb-2">@L["DeviceSettings_ShockSection"]</div>
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_VehicleType"]</label>
+                                <select class="form-select form-select-sm" id="dsm-shock-mode">
+                                    <option value="1">@L["DeviceSettings_VehicleCar"]</option>
+                                    <option value="2">@L["DeviceSettings_VehicleTruck"]</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_ShockSensitivity"]</label>
+                                <select class="form-select form-select-sm" id="dsm-shock-sensitive"></select>
+                            </div>
+                        </div>
+                        <div id="dsm-pane-alert" class="dsm-pane">
+                            <div class="mb-3">
+                                <div class="fw-semibold">@L["DeviceSettings_IdleModule"]</div>
+                                <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
+                                    <span>@L["DeviceSettings_IdleWhen"]</span>
+                                    <select class="form-select form-select-sm" id="dsm-ap-minute" style="width:auto;min-width:72px"></select>
+                                    <span>@L["DeviceSettings_IdleReport"]</span>
+                                </div>
+                                <div class="mt-1"><span>@L["DeviceSettings_CustomMsg"]</span><input type="text" class="form-control form-control-sm d-inline-block" id="dsm-ap-msg" style="width:calc(100% - 120px)" maxlength="50" /></div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="fw-semibold">@L["DeviceSettings_SpeedModule"]</div>
+                                <div class="d-flex flex-wrap align-items-center gap-1 mt-1">
+                                    <span>@L["DeviceSettings_SpeedWhen"]</span>
+                                    <select class="form-select form-select-sm" id="dsm-as-minute" style="width:auto;min-width:72px"></select>
+                                    <span>@L["DeviceSettings_SpeedAlarm"]</span>
+                                </div>
+                                <div class="mt-1"><span>@L["DeviceSettings_CustomMsg"]</span><input type="text" class="form-control form-control-sm d-inline-block" id="dsm-as-msg" style="width:calc(100% - 120px)" maxlength="50" /></div>
+                            </div>
+                            <div class="mb-2">
+                                <label>@L["DeviceSettings_SharePwd"]</label>
+                                <div class="d-flex align-items-center gap-1 flex-wrap">
+                                    <select class="form-select form-select-sm dsm-pw" id="dsm-spw1" style="width:52px" disabled></select>
+                                    <select class="form-select form-select-sm dsm-pw" id="dsm-spw2" style="width:52px" disabled></select>
+                                    <select class="form-select form-select-sm dsm-pw" id="dsm-spw3" style="width:52px" disabled></select>
+                                    <select class="form-select form-select-sm dsm-pw" id="dsm-spw4" style="width:52px" disabled></select>
+                                    <label class="form-check-label ms-2"><input type="checkbox" class="form-check-input" id="dsm-share-enable" onchange="toggleSharePassword()" /> @L["DeviceSettings_ShareEnable"]</label>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <label>@L["DeviceSettings_AlertMode"]</label>
+                                <select class="form-select form-select-sm" id="dsm-alert-mode">
+                                    <option value="0">@L["DeviceSettings_AlertSingle"]</option>
+                                    <option value="1">@L["DeviceSettings_AlertRepeat"]</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="dsm-pane-paylog" class="dsm-pane">
+                            <div id="device-settings-paylog"></div>
+                        </div>
+                    </div>
+                    <div class="dsm-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-with-icon" onclick="resetDeviceSettings()">@Html.UiIcon("reset")<span>@L["Common_Reset"]</span></button>
+                        <button type="button" class="btn btn-sm btn-primary btn-with-icon" id="dsm-btn-save" onclick="saveDeviceSettings()">@Html.UiIcon("confirm")<span>@L["Common_Confirm"]</span></button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-with-icon dsm-close-btn-footer" onclick="closeDeviceSettings()" title="@L["Common_Close"]">
+                            @Html.UiIcon("close")
+                            <span>@L["Common_Close"]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAP DOUBLE-CLICK DETAIL -->
+            <div id="device-detail-overlay" onclick="if(event.target===this) closeDeviceDetail()">
+                <div id="device-detail-panel" style="position:relative" onclick="event.stopPropagation()">
+                    <button type="button" class="dd-close btn-with-icon" onclick="closeDeviceDetail()" title="@L["Common_Close"]">@Html.UiIcon("close")<span>@L["Common_Close"]</span></button>
+                    <div class="dd-title" id="dd-title"></div>
+                    <div class="dd-status" id="dd-status"></div>
+                    <div id="dd-body"></div>
+                    <div class="dd-icons" id="dd-icons"></div>
+                </div>
+            </div>
+            <!-- LANDMARK MODAL -->
+            <div id="landmark-overlay" onclick="if(event.target===this) closeLandmarkModal()" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,0.45);align-items:center;justify-content:center;">
+                <div id="landmark-modal" onclick="event.stopPropagation()" style="width:min(480px,94vw);max-height:90vh;overflow:auto;background:#fff;border-radius:8px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <strong>@L["Live_LandmarkTitle"]</strong>
+                        <button type="button" class="btn-with-icon" onclick="closeLandmarkModal()" style="border:none;background:none;cursor:pointer" title="@L["Common_Close"]">@Html.UiIcon("close")<span>@L["Common_Close"]</span></button>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">@L["Live_LandmarkName"]</label>
+                        <input type="text" id="lm-memo" class="form-control form-control-sm" maxlength="10" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-semibold">@L["Live_LandmarkAddress"]</label>
+                        <input type="text" id="lm-address" class="form-control form-control-sm" placeholder="@L["Live_LandmarkAddressPh"]" />
+                    </div>
+                    <div class="mb-2 d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-primary btn-with-icon" onclick="submitLandmarkForm()">@Html.UiIcon("add")<span>@L["Live_LandmarkAdd"]</span></button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary btn-with-icon" id="btn-lm-pick" onclick="startLandmarkPick()">@Html.UiIcon("map-pin")<span>@L["Live_LandmarkPickOnMap"]</span></button>
+                    </div>
+                    <div id="landmark-modal-list"></div>
+                </div>
+            </div>
+
+            <!-- NO MAP MSG -->
+            <div id="no-map-msg">
+                <h5>@L["Live_MapApiNotConfigured"]</h5>
+                <p>@L["Live_MapApiConfigHint"]</p>
+            </div>
+
+            <!-- LOADING -->
+            <div id="loading-overlay">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <!-- HISTORY PANEL -->
+        <div id="history-panel">
+            <div id="history-toolbar">
+                <label>@L["History_Device"]</label>
+                <select id="hist-device-sel" style="min-width:120px" onchange="onHistDeviceChange()">
+                    @foreach (var t in Model)
+                    {
+                        <option value="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</option>
+                    }
+                </select>
+                <span id="hist-lbs-controls" style="display:none;align-items:center;gap:4px">
+                    <label>@L["Live_DateLabel"]</label>
+                    <input type="date" id="hist-date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    <button class="hist-btn hist-btn-sec" onclick="histPrevDay()">@Html.UiIcon("prev")<span>@L["Live_Prev7Days"]</span></button>
+                    <button class="hist-btn hist-btn-sec" onclick="histNextDay()">@Html.UiIcon("next")<span>@L["Live_Next7Days"]</span></button>
+                    <button class="hist-btn hist-btn-primary" onclick="loadLbsHistory()">@Html.UiIcon("search")<span>@L["History_Query"]</span></button>
+                </span>
+                <button class="hist-btn hist-btn-sec" onclick="clearHistoryMap()">@Html.UiIcon("clear")<span>@L["Live_ClearMap"]</span></button>
+                <span id="hist-loading" style="font-size:11px;color:#64748b;display:none">@L["Live_Loading"]</span>
+            </div>
+            <!-- GPS 7-day Summary View -->
+            <div id="hist-summary-view">
+                <div class="hist-nodata" id="hist-summary-nodata">@L["Live_Hist_SelectPrompt"]</div>
+                <table id="hist-summary-table" style="display:none">
+                    <thead>
+                        <tr>
+                            <th>@L["Hist_Date"]</th>
+                            <th>@L["Hist_FirstGPS"]</th>
+                            <th>@L["Hist_LastGPS"]</th>
+                            <th>@L["Hist_Duration"]</th>
+                            <th>@L["Hist_RecordCount"]</th>
+                            <th>@L["Hist_TotalKm"]</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hist-summary-tbody"></tbody>
+                </table>
+            </div>
+            <!-- Day Detail View -->
+            <div id="hist-detail-view">
+                <div id="hist-detail-header">
+                    <button class="hist-btn hist-btn-sec" id="hist-back-btn" onclick="showHistSummaryView()">@Html.UiIcon("prev")<span>@L["Hist_BackToSummary"]</span></button>
+                    <span id="hist-detail-title" style="font-weight:600;color:#1e293b;font-size:10px"></span>
+                </div>
+                <div id="hist-detail-stats">
+                    <span>@L["Live_TotalDistance"]@("\uFF1A")<b id="hist-detail-dist">0</b> km</span>
+                    <span>@L["History_MaxSpeed"]@("\uFF1A")<b id="hist-detail-maxspeed">0</b> km/h</span>
+                    <span>@L["History_AvgSpeed"]@("\uFF1A")<b id="hist-detail-avgspeed">0</b> km/h</span>
+                    <span>@L["Live_TotalCount"]@("\uFF1A")<b id="hist-detail-count">0</b></span>
+                </div>
+                <div id="hist-detail-table-wrap">
+                    <div class="hist-nodata" id="hist-detail-nodata" style="display:none">@L["Live_Hist_NoData"]</div>
+                    <table id="hist-detail-table" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>@L["Live_TimeCol"]</th>
+                                <th>@L["History_Lat"]</th>
+                                <th>@L["History_Lng"]</th>
+                                <th>@L["Hist_GpsNo"]</th>
+                                <th>HDOP</th>
+                                <th>CSQ</th>
+                                <th>@L["Hist_Voltage"]</th>
+                                <th>@L["Live_DistanceKmCol"]</th>
+                                <th>@L["Live_SpeedKmhCol"]</th>
+                                <th>@L["History_Direction"]</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hist-detail-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end right-panel -->
+</div><!-- end main-layout -->
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/ui-icons.js" asp-append-version="true"></script>
+<script>
+// ========== GLOBALS ==========
+const TIMEZOOM = @memberTimezone;
+const REFRESH_INTERVAL = 30000;
+let map, trafficLayer;
+let markers = {};        // tbKey ??google.maps.Marker
+let polylines = {};      // tbKey ??google.maps.Polyline (track)
+let historyPolyline = null;
+let historyMarkers = [];
+let activeTab = 'live';
+let refreshTimer = null;
+let refreshCount = 0;
+let trafficOn = false;
+let mapTypeRoad = true;
+let selectedTbKey = null;
+let deviceSettingsSnapshot = null;
+const MAX_MULTI_WINDOWS = @maxMultiWindows;
+let landmarkMarkers = [];
+let landmarkPickMode = false;
+let geocoder = null;
+const ICON_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+const LABEL_COLON = '\uFF1A';
+const TEXT_DASH = '\u2014';
+
+const initialTrackers = @Html.Raw(initialJson);
+const i18n = @Html.Raw(liveI18nJson);
+const ICON_LABELS = {
+    A: i18n.iconA, B: i18n.iconB, C: i18n.iconC, D: i18n.iconD,
+    E: i18n.iconE, F: i18n.iconF, G: i18n.iconG, H: i18n.iconH
+};
+
+// ========== MAP INIT ==========
+function initMap() {
+    try {
+    const center = getBestCenter();
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 13,
+        center: center,
+        mapTypeId: 'roadmap',
+        gestureHandling: 'greedy',
+        fullscreenControl: false,
+        streetViewControl: false,
+        mapTypeControl: false,
+        zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_BOTTOM }
+    });
+    trafficLayer = new google.maps.TrafficLayer();
+    geocoder = new google.maps.Geocoder();
+
+    initialTrackers.forEach(t => renderMarker(t));
+    loadLandmarks();
+    map.addListener('rightclick', e => {
+        if (activeTab === 'live') quickAddLandmark(e.latLng);
+    });
+    fitAll();
+    startRefresh();
+    } catch (e) {
+        console.error('initMap failed', e);
+        showMapLoadError(i18n.mapLoadFailed.replace('{0}', e.message || e));
+    }
+}
+
+function getBestCenter() {
+    const valid = initialTrackers.filter(t => t.lat !== 0 && t.lng !== 0);
+    return valid.length > 0
+        ? { lat: valid[0].lat, lng: valid[0].lng }
+        : { lat: 25.0330, lng: 121.5654 };
+}
+
+// ========== MARKER RENDERING ==========
+function renderMarker(t) {
+    if (t.lat === 0 && t.lng === 0) return;
+    const pos = { lat: t.lat, lng: t.lng };
+
+    if (markers[t.tbKey]) {
+        markers[t.tbKey].setPosition(pos);
+        markers[t.tbKey].markerData = Object.assign(markers[t.tbKey].markerData || {}, t);
+        markers[t.tbKey].setIcon(makeIcon(t.direction, t.isOnline, t.iconFile));
+        const pl = polylines[t.tbKey];
+        if (pl) {
+            const path = pl.getPath();
+            path.push(new google.maps.LatLng(t.lat, t.lng));
+            while (path.getLength() > 60) path.removeAt(0);
+        }
+        return;
+    }
+
+    const marker = new google.maps.Marker({
+        position: pos,
+        map: map,
+        title: t.cname,
+        icon: makeIcon(t.direction, t.isOnline, t.iconFile),
+        animation: google.maps.Animation.DROP
+    });
+    marker.markerData = t;
+    marker.addListener('click', () => selectDeviceOnMap(t.tbKey));
+    marker.addListener('dblclick', (e) => {
+        if (e && e.stop) e.stop();
+        showDeviceDetail(t.tbKey);
+    });
+    markers[t.tbKey] = marker;
+
+    // track polyline
+    polylines[t.tbKey] = new google.maps.Polyline({
+        path: [pos],
+        geodesic: true,
+        strokeColor: '#2563eb',
+        strokeOpacity: 0.6,
+        strokeWeight: 2,
+        map: map
+    });
+}
+
+function makeIcon(direction, isOnline, iconFile) {
+    const letter = (iconFile || 'A').toString().trim().toUpperCase();
+    const iconLetter = ICON_LETTERS.includes(letter) ? letter : 'A';
+    let dir = Math.round((direction || 0) / 6);
+    if (dir === 60) dir = 0;
+    let imageUrl;
+    if (!isOnline) {
+        imageUrl = dir >= 0 && dir <= 29
+            ? `/images/map-icons/Icon${iconLetter}/OffLine_0029.png`
+            : `/images/map-icons/Icon${iconLetter}/OffLine_3059.png`;
+    } else {
+        imageUrl = dir >= 0 && dir <= 29
+            ? `/images/map-icons/Icon${iconLetter}/dir_0.png`
+            : `/images/map-icons/Icon${iconLetter}/dir_1.png`;
+    }
+    return {
+        url: imageUrl,
+        scaledSize: new google.maps.Size(48, 48),
+        anchor: new google.maps.Point(24, 24)
+    };
+}
+
+function updateMarkerIcon(tbKey) {
+    const m = markers[tbKey];
+    if (!m || !m.markerData) return;
+    m.setIcon(makeIcon(m.markerData.direction, m.markerData.isOnline, m.markerData.iconFile));
+}
+
+// ========== SIDEBAR DEVICE INTERACTION ==========
+function selectDeviceOnMap(tbKey) {
+    closePopup();
+    selectedTbKey = tbKey;
+    document.querySelectorAll('.device-item').forEach(el => el.classList.remove('active'));
+    const el = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
+    if (el) el.classList.add('active');
+
+    const m = markers[tbKey];
+    if (m) {
+        map.panTo(m.getPosition());
+        map.setZoom(15);
+    }
+
+    const imei = el?.dataset.imei;
+    if (imei) {
+        document.getElementById('menu-tracker-detail').href = `/Tracker/Detail/${tbKey}`;
+        document.getElementById('menu-geofence').href = `/Tracker/Detail/${tbKey}#geofence`;
+        document.getElementById('menu-hist-gps').href = `/History/Index?imei=${imei}`;
+        document.getElementById('menu-hist-lbs').href = `/History/Index?imei=${imei}&type=LBS`;
+        document.getElementById('hist-device-sel').value = imei;
+    }
+}
+
+function onDeviceClick(tbKey) {
+    selectDeviceOnMap(tbKey);
+}
+
+function toggleDevice(tbKey, checked) {
+    const m = markers[tbKey];
+    if (m) m.setVisible(checked);
+    const pl = polylines[tbKey];
+    if (pl) pl.setVisible(checked);
+}
+
+function selectAll(checked) {
+    document.querySelectorAll('.device-cb').forEach(cb => {
+        cb.checked = checked;
+        toggleDevice(parseInt(cb.dataset.tbkey), checked);
+    });
+}
+
+// ========== MAP CONTROLS ==========
+function fitAll() {
+    const keys = Object.keys(markers).filter(k => {
+        const m = markers[k];
+        return m.getVisible() && m.getPosition().lat() !== 0;
+    });
+    if (keys.length === 0) return;
+    if (keys.length === 1) {
+        map.panTo(markers[keys[0]].getPosition());
+        map.setZoom(14);
+        return;
+    }
+    const bounds = new google.maps.LatLngBounds();
+    keys.forEach(k => bounds.extend(markers[k].getPosition()));
+    map.fitBounds(bounds);
+}
+
+function clearTracks() {
+    Object.values(polylines).forEach(pl => {
+        pl.setPath([]);
+    });
+    Object.values(markers).forEach(m => {
+        if (m.markerData) {
+            const pos = m.getPosition();
+            if (pos) polylines[m.markerData.tbKey]?.setPath([pos]);
+        }
+    });
+}
+
+function toggleTraffic() {
+    trafficOn = !trafficOn;
+    trafficLayer.setMap(trafficOn ? map : null);
+    document.getElementById('btn-traffic').classList.toggle('active', trafficOn);
+    document.getElementById('btn-traffic').textContent = trafficOn ? i18n.trafficOn : i18n.traffic;
+}
+
+function setMapType(road) {
+    mapTypeRoad = road;
+    map.setMapTypeId(road ? 'roadmap' : 'satellite');
+    document.getElementById('btn-map-road').classList.toggle('active', road);
+    document.getElementById('btn-map-sat').classList.toggle('active', !road);
+}
+
+// ========== MULTI WINDOW ==========
+function getCheckedDeviceKeys() {
+    const keys = [];
+    document.querySelectorAll('.device-cb:checked').forEach(cb => {
+        keys.push(parseInt(cb.dataset.tbkey, 10));
+    });
+    return keys;
+}
+
+function openMultiWindow() {
+    const keys = getCheckedDeviceKeys();
+    if (keys.length === 0) {
+        alert(i18n.multiWindowSelect);
+        return;
+    }
+    if (keys.length > MAX_MULTI_WINDOWS) {
+        alert(i18n.multiWindowMax.replace('{0}', MAX_MULTI_WINDOWS));
+        return;
+    }
+    const url = '/Map/MultiWindow?tbKeys=' + keys.join(',');
+    window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+// ========== LANDMARKS ==========
+function openLandmarkModal() {
+    document.getElementById('landmark-overlay').style.display = 'flex';
+    renderLandmarkList();
+}
+
+function closeLandmarkModal() {
+    document.getElementById('landmark-overlay').style.display = 'none';
+    stopLandmarkPick();
+}
+
+let landmarkClickListener = null;
+
+function startLandmarkPick() {
+    landmarkPickMode = true;
+    document.getElementById('btn-lm-pick').classList.add('active');
+    closeLandmarkModal();
+    alert(i18n.landmarkPickOnMap);
+    if (landmarkClickListener) google.maps.event.removeListener(landmarkClickListener);
+    landmarkClickListener = map.addListener('click', e => {
+        if (landmarkClickListener) google.maps.event.removeListener(landmarkClickListener);
+        landmarkClickListener = null;
+        stopLandmarkPick();
+        quickAddLandmark(e.latLng);
+    });
+}
+
+function stopLandmarkPick() {
+    landmarkPickMode = false;
+    const btn = document.getElementById('btn-lm-pick');
+    if (btn) btn.classList.remove('active');
+    if (landmarkClickListener) {
+        google.maps.event.removeListener(landmarkClickListener);
+        landmarkClickListener = null;
+    }
+}
+
+function quickAddLandmark(latLng) {
+    const memo = prompt(i18n.landmarkName);
+    if (!memo || !memo.trim()) return;
+    const address = '';
+    geocoder.geocode({ location: latLng }, (results, status) => {
+        const addr = (status === 'OK' && results[0]) ? results[0].formatted_address : '';
+        postLandmark(memo.trim(), addr, latLng.lat(), latLng.lng());
+    });
+}
+
+function submitLandmarkForm() {
+    const memo = document.getElementById('lm-memo').value.trim();
+    const input = document.getElementById('lm-address').value.trim();
+    if (!memo) { alert(i18n.landmarkMemoRequired); return; }
+    if (!input) return;
+
+    if (input.includes(',')) {
+        const parts = input.split(',').map(s => s.trim());
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            postLandmark(memo, input, parseFloat(parts[0]), parseFloat(parts[1]));
+            return;
+        }
+    }
+    geocoder.geocode({ address: input }, (results, status) => {
+        if (status !== 'OK' || !results[0]) {
+            alert(i18n.histQueryFailed);
+            return;
+        }
+        const loc = results[0].geometry.location;
+        postLandmark(memo, results[0].formatted_address, loc.lat(), loc.lng());
+    });
+}
+
+function postLandmark(memo, address, lat, lng) {
+    $.ajax({
+        url: '/Map/AddLandmark',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ memo, address, lat, lng }),
+        success: function (res) {
+            if (!res.success) { alert(res.message || i18n.landmarkLimit); return; }
+            document.getElementById('lm-memo').value = '';
+            document.getElementById('lm-address').value = '';
+            loadLandmarks();
+            renderLandmarkList();
+        }
+    });
+}
+
+function deleteLandmark(tbKey) {
+    if (!window.confirm(i18n.confirmDelete)) return;
+    $.ajax({
+        url: '/Map/DeleteLandmark',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ tbKey }),
+        success: function (res) {
+            if (res.success) loadLandmarks();
+            renderLandmarkList();
+        }
+    });
+}
+
+function loadLandmarks() {
+    $.getJSON('/Map/Landmarks', function (data) {
+        landmarkMarkers.forEach(m => m.setMap(null));
+        landmarkMarkers = [];
+        (data || []).forEach(lm => {
+            if (Math.abs(lm.lat) < 0.0001) return;
+            const m = new google.maps.Marker({
+                position: { lat: lm.lat, lng: lm.lng },
+                map: map,
+                title: lm.memo,
+                icon: { url: '/images/map-landmark.png', scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }
+            });
+            m.landmarkData = lm;
+            landmarkMarkers.push(m);
+        });
+    });
+}
+
+function renderLandmarkList() {
+    $.getJSON('/Map/Landmarks', function (data) {
+        const box = document.getElementById('landmark-modal-list');
+        if (!data || data.length === 0) {
+            box.innerHTML = '<p class="text-muted small mb-0">—</p>';
+            return;
+        }
+        box.innerHTML = data.map(lm => `
+            <div class="lm-row">
+                <span style="flex:1"><b>${escapeHtml(lm.memo)}</b><br><small class="text-muted">${escapeHtml(lm.address || lm.lat + ',' + lm.lng)}</small></span>
+                <button type="button" class="btn btn-sm btn-outline-danger btn-with-icon" onclick="deleteLandmark(${lm.tbKey})">${uiIcon('delete')}<span>${i18n.commonDelete}</span></button>
+            </div>
+        `).join('');
+    });
+}
+
+function escapeHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ========== DEVICE POPUP ==========
+function showPopup(t) {
+    if (!t) return;
+    document.getElementById('popup-name').textContent = t.cname;
+    document.getElementById('popup-imei').textContent = t.imei;
+    document.getElementById('popup-time').textContent = t.lastReportLocal || i18n.unknown;
+    document.getElementById('popup-speed').textContent = (typeof t.speed === 'number' ? t.speed.toFixed(1) : t.speed) + ' km/h';
+    document.getElementById('popup-voltage').textContent = t.voltage + '%';
+    document.getElementById('popup-gps').textContent = i18n.gpsSatellitesCount.replace('{0}', t.gpsNo);
+    document.getElementById('popup-csq').textContent = t.csq;
+    document.getElementById('popup-history-link').href = '/History/Index?imei=' + t.imei;
+    document.getElementById('popup-detail-link').href = '/Tracker/Detail/' + t.tbKey;
+    document.getElementById('device-popup').style.display = 'block';
+}
+
+function closePopup() {
+    document.getElementById('device-popup').style.display = 'none';
+}
+
+// ========== DEVICE SETTINGS MODAL ==========
+let deviceSettingsControlsBuilt = false;
+
+function initDeviceSettingsControls() {
+    if (deviceSettingsControlsBuilt) return;
+    deviceSettingsControlsBuilt = true;
+    const gps = document.getElementById('dsm-gps-interval');
+    if (gps) {
+        gps.innerHTML = [
+            [15, i18n.gps15s], [30, i18n.gps30s], [600, i18n.gps10m],
+            [1800, i18n.gps30m], [3600, i18n.gps60m], [7200, i18n.gps120m]
+        ].map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
+    }
+    const shock = document.getElementById('dsm-shock-sensitive');
+    if (shock) {
+        let num = 0;
+        shock.innerHTML = '';
+        for (let i = -4; i <= 4; i++) {
+            num++;
+            const label = i > 0 ? '+' + i : String(i);
+            shock.innerHTML += `<option value="${num}">${label}</option>`;
+        }
+    }
+    const ap = document.getElementById('dsm-ap-minute');
+    if (ap) {
+        ap.innerHTML = `<option value="0">${i18n.closed}</option>`;
+        for (let m = 5; m <= 180; m += 5) ap.innerHTML += `<option value="${m}">${m}</option>`;
+    }
+    const as = document.getElementById('dsm-as-minute');
+    if (as) {
+        as.innerHTML = `<option value="0">${i18n.closed}</option>`;
+        for (let m = 20; m <= 200; m += 5) as.innerHTML += `<option value="${m}">${m}</option>`;
+    }
+    ['dsm-spw1', 'dsm-spw2', 'dsm-spw3', 'dsm-spw4'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = Array.from({ length: 10 }, (_, d) => `<option value="${d}">${d}</option>`).join('');
+    });
+}
+
+function switchDeviceSettingsTab(tab) {
+    document.querySelectorAll('#device-settings-modal .dsm-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+    });
+    document.querySelectorAll('#device-settings-modal .dsm-pane').forEach(el => {
+        el.classList.toggle('active', el.id === 'dsm-pane-' + tab);
+    });
+}
+
+function toggleSharePassword() {
+    const on = document.getElementById('dsm-share-enable').checked;
+    document.querySelectorAll('.dsm-pw').forEach(el => { el.disabled = !on; });
+}
+
+function buildIconChoices() {
+    const box = document.getElementById('device-settings-icons');
+    if (!box || box.dataset.built === '1') return;
+    box.innerHTML = ICON_LETTERS.map(letter => `
+        <div class="icon-choice" data-icon="${letter}" onclick="selectDeviceIcon('${letter}')">
+            <img src="/images/map-icons/Icon${letter}/dir_0.png" alt="${ICON_LABELS[letter]}" />
+            <span>${ICON_LABELS[letter]}</span>
+        </div>
+    `).join('');
+    box.dataset.built = '1';
+}
+
+function selectDeviceIcon(letter) {
+    document.querySelectorAll('#device-settings-icons .icon-choice').forEach(el => {
+        el.classList.toggle('selected', el.dataset.icon === letter);
+    });
+    document.getElementById('device-settings-modal').dataset.iconFile = letter;
+}
+
+function fillDeviceSettingsForm(data) {
+    document.getElementById('dsm-tbkey').value = data.tbKey;
+    document.getElementById('dsm-imei').value = data.imei;
+    document.getElementById('dsm-cname').value = data.cName || data.cname || '';
+    document.getElementById('dsm-hint').textContent = i18n.deviceSettingsHint.replace('{0}', data.imei);
+    selectDeviceIcon((data.iconFile || 'A').toUpperCase());
+
+    const udBox = document.getElementById('dsm-ud-fields');
+    const fields = data.udFields || [];
+    if (fields.length === 0) {
+        udBox.innerHTML = '';
+    } else {
+        udBox.innerHTML = fields.map(f => `
+            <div class="mb-2">
+                <label>${escapeHtml(f.fieldName)}</label>
+                <input type="text" class="form-control form-control-sm dsm-udf" data-field-tbkey="${f.fieldTbKey}" maxlength="20" value="${escapeHtml(f.value || '')}" />
+            </div>
+        `).join('');
+    }
+
+    const labelsBox = document.getElementById('device-settings-labels');
+    const labels = data.labels || [];
+    if (labels.length === 0) {
+        labelsBox.innerHTML = `<span class="text-muted small">${i18n.noLabels}</span>`;
+    } else {
+        labelsBox.innerHTML = labels.map(l => `
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="dsm-lbl-${l.tbKey}" value="${l.tbKey}" ${l.assigned ? 'checked' : ''} />
+                <label class="form-check-label" for="dsm-lbl-${l.tbKey}">${escapeHtml(l.name)}</label>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('dsm-gps-interval').value = String(data.gpsReportTime || 30);
+    document.getElementById('dsm-shock-mode').value = String(data.shockMode || 1);
+    document.getElementById('dsm-shock-sensitive').value = String(data.shockSensitive || 5);
+    document.getElementById('dsm-ap-minute').value = String(data.apMinute || 0);
+    document.getElementById('dsm-ap-msg').value = data.apMsg || data.imei || '';
+    document.getElementById('dsm-as-minute').value = String(data.asMinute || 0);
+    document.getElementById('dsm-as-msg').value = data.asMsg || data.imei || '';
+
+    const shareOn = !!data.shareEnabled;
+    document.getElementById('dsm-share-enable').checked = shareOn;
+    const pwd = (data.sharePassword || '0000').padStart(4, '0').slice(0, 4);
+    ['dsm-spw1', 'dsm-spw2', 'dsm-spw3', 'dsm-spw4'].forEach((id, i) => {
+        document.getElementById(id).value = pwd[i] || '0';
+    });
+    toggleSharePassword();
+    document.getElementById('dsm-alert-mode').value = String(data.alertMode || 0);
+
+    const payBox = document.getElementById('device-settings-paylog');
+    const logs = data.payLogs || [];
+    if (logs.length === 0) {
+        payBox.innerHTML = '<p class="text-muted small mb-0">' + i18n.histNoData + '</p>';
+    } else {
+        payBox.innerHTML = `<table><thead><tr><th>${i18n.serviceStart}</th><th>${i18n.serviceEnd}</th></tr></thead><tbody>` +
+            logs.map((p, i) => {
+                const s = p.serviceStart ? formatDateYmd(p.serviceStart) : TEXT_DASH;
+                const e = p.serviceEnd ? formatDateYmd(p.serviceEnd) : TEXT_DASH;
+                return `<tr class="${i === 0 ? 'highlight' : ''}"><td>${s}</td><td>${e}</td></tr>`;
+            }).join('') + '</tbody></table>';
+    }
+}
+
+function formatDateYmd(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+}
+
+let deviceSettingsModalGuardBound = false;
+function ensureDeviceSettingsModalGuard() {
+    if (deviceSettingsModalGuardBound) return;
+    deviceSettingsModalGuardBound = true;
+    const overlay = document.getElementById('device-settings-overlay');
+    overlay.addEventListener('mousedown', function (e) {
+        if (e.target === overlay) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
+    document.addEventListener('keydown', function (e) {
+        if (!overlay.classList.contains('visible')) return;
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }, true);
+}
+
+function openDeviceSettings(tbKey) {
+    ensureDeviceSettingsModalGuard();
+    initDeviceSettingsControls();
+    buildIconChoices();
+    switchDeviceSettingsTab('info');
+    const overlay = document.getElementById('device-settings-overlay');
+    overlay.classList.add('visible');
+    $.getJSON(`/Map/DeviceSettings?tbKey=${tbKey}`, function (data) {
+        try {
+            deviceSettingsSnapshot = JSON.parse(JSON.stringify(data));
+            fillDeviceSettingsForm(data);
+        } catch (err) {
+            overlay.classList.remove('visible');
+            console.error('fillDeviceSettingsForm failed', err);
+            alert(i18n.deviceSettingsLoadFailed);
+        }
+    }).fail(function (xhr) {
+        overlay.classList.remove('visible');
+        console.error('DeviceSettings failed', xhr);
+        alert(i18n.deviceSettingsLoadFailed);
+    });
+}
+
+function closeDeviceSettings() {
+    document.getElementById('device-settings-overlay').classList.remove('visible');
+}
+
+function resetDeviceSettings() {
+    if (!deviceSettingsSnapshot) return;
+    fillDeviceSettingsForm(deviceSettingsSnapshot);
+}
+
+function saveDeviceSettings() {
+    const tbKey = parseInt(document.getElementById('dsm-tbkey').value, 10);
+    const iconFile = document.getElementById('device-settings-modal').dataset.iconFile || 'A';
+    const labelTbKeys = Array.from(document.querySelectorAll('#device-settings-labels input:checked'))
+        .map(el => parseInt(el.value, 10));
+    const udFields = Array.from(document.querySelectorAll('.dsm-udf')).map(el => ({
+        fieldTbKey: parseInt(el.dataset.fieldTbkey, 10),
+        value: el.value
+    }));
+    let sharePassword = '0000';
+    if (document.getElementById('dsm-share-enable').checked) {
+        sharePassword = ['dsm-spw1', 'dsm-spw2', 'dsm-spw3', 'dsm-spw4']
+            .map(id => document.getElementById(id).value).join('');
+    }
+
+    const payload = {
+        tbKey: tbKey,
+        cname: document.getElementById('dsm-cname').value,
+        iconFile: iconFile,
+        labelTbKeys: labelTbKeys,
+        udFields: udFields,
+        gpsReportTime: parseInt(document.getElementById('dsm-gps-interval').value, 10),
+        shockMode: parseInt(document.getElementById('dsm-shock-mode').value, 10),
+        shockSensitive: parseInt(document.getElementById('dsm-shock-sensitive').value, 10),
+        apMinute: parseInt(document.getElementById('dsm-ap-minute').value, 10),
+        apMsg: document.getElementById('dsm-ap-msg').value,
+        asMinute: parseInt(document.getElementById('dsm-as-minute').value, 10),
+        asMsg: document.getElementById('dsm-as-msg').value,
+        shareEnabled: document.getElementById('dsm-share-enable').checked,
+        sharePassword: sharePassword,
+        alertMode: parseInt(document.getElementById('dsm-alert-mode').value, 10)
+    };
+
+    $.ajax({
+        url: '/Map/SaveDeviceSettings',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(payload),
+        success: function (res) {
+            if (!res.success) {
+                alert(res.message || i18n.deviceSettingsSaveFailed);
+                return;
+            }
+            const m = markers[tbKey];
+            if (m && m.markerData) {
+                m.markerData.cname = payload.cname;
+                m.markerData.iconFile = iconFile;
+                m.setTitle(payload.cname || m.markerData.imei);
+                updateMarkerIcon(tbKey);
+            }
+            const item = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
+            if (item) {
+                const nameEl = item.querySelector('.device-name');
+                if (nameEl) nameEl.textContent = payload.cname || item.dataset.imei;
+            }
+            refreshData();
+            $.getJSON(`/Map/DeviceSettings?tbKey=${tbKey}`, function (data) {
+                deviceSettingsSnapshot = JSON.parse(JSON.stringify(data));
+            });
+            const hint = document.getElementById('dsm-hint');
+            if (hint) {
+                const imei = document.getElementById('dsm-imei').value;
+                const savedMsg = i18n.deviceSettingsSaved;
+                hint.textContent = savedMsg;
+                hint.style.color = '#16a34a';
+                window.setTimeout(function () {
+                    hint.textContent = i18n.deviceSettingsHint.replace('{0}', imei);
+                    hint.style.color = '';
+                }, 2500);
+            }
+        },
+        error: function () {
+            alert(i18n.deviceSettingsSaveFailed);
+        }
+    });
+}
+
+// ========== MAP DEVICE DETAIL (double-click marker) ==========
+function decToDeg(dec, type) {
+    const n = parseFloat(dec);
+    if (isNaN(n)) return dec;
+    const abs = Math.abs(n);
+    const d = Math.floor(abs);
+    const m = Math.floor((abs - d) * 60);
+    const s = ((abs - d) * 60 - m) * 60;
+    const hemi = type === 'lat' ? (n >= 0 ? 'N' : 'S') : (n >= 0 ? 'E' : 'W');
+    return `${d}\u00B0 ${m}' ${s.toFixed(2)}", ${hemi}`;
+}
+
+function showDeviceDetail(tbKey) {
+    closePopup();
+    $.getJSON(`/Map/DeviceDetail?tbKey=${tbKey}`, function (d) {
+        const m = markers[tbKey];
+        let lat = d.lat;
+        let lng = d.lng;
+        if (m && m.markerData && (Math.abs(lat) < 0.0001 && Math.abs(lng) < 0.0001)) {
+            lat = m.markerData.lat;
+            lng = m.markerData.lng;
+        }
+
+        document.getElementById('dd-title').textContent = d.cName || d.imei;
+        const statusText = d.isOnline ? i18n.detailOnline : i18n.detailOffline;
+        const statusColor = d.isOnline ? '#2563eb' : '#94a3b8';
+        document.getElementById('dd-status').innerHTML = '<span style="color:' + statusColor + '">\u25CF</span> <b>' + statusText + '</b>';
+
+        let connectLine = d.lastConnectedLocal || i18n.unknown;
+        if (!d.isOnline && d.offlineDuration) {
+            connectLine += ` (${i18n.detailOffline} ${d.offlineDuration})`;
+        }
+
+        const speedVal = (m && m.markerData && typeof m.markerData.speed === 'number') ? m.markerData.speed : (d.speedKmh || 0);
+        const speedStr = speedVal.toFixed(1) + '\u516C\u91CC';
+        const distStr = Math.round(d.distanceMeters || 0) + '\u516C\u5C3A';
+        const coordDms = decToDeg(lat, 'lat') + ', ' + decToDeg(lng, 'lng');
+        const coordDec = `(${lat.toFixed(6)}, ${lng.toFixed(6)})`;
+
+        const ddRow = (label, value) =>
+            '<div class="dd-row"><span class="dd-meta">' + label + LABEL_COLON + '</span>' + value + '</div>';
+        document.getElementById('dd-body').innerHTML =
+            ddRow(i18n.detailLastLogin, d.lastLoginLocal || TEXT_DASH) +
+            ddRow(i18n.detailLastGps, d.lastReportLocal || TEXT_DASH) +
+            ddRow(i18n.detailLastConnect, connectLine) +
+            '<hr style="border-color:#e2e8f0;margin:8px 0" />' +
+            ddRow(i18n.detailTravelSpeed, speedStr) +
+            ddRow(i18n.detailDistance, distStr) +
+            ddRow(i18n.detailCoords, '<a href="https://maps.google.com.tw/maps?q=' + lat + ',' + lng + '" target="_blank" style="color:#dc2626">' + coordDms + '</a> &nbsp;' + coordDec) +
+            ddRow(i18n.detailAddress, '<span id="dd-address">\u2026</span>') +
+            ddRow(i18n.detailDirection, d.directionText || TEXT_DASH);
+
+        const csq = (m && m.markerData && m.markerData.csq) ? m.markerData.csq : d.csq;
+        const vPct = d.voltagePercent || 0;
+        const vV = d.voltageV ? d.voltageV.toFixed(2) : '';
+        document.getElementById('dd-icons').innerHTML = `
+            <div>CSQ: ${csq}</div>
+            <div>${i18n.detailSatellites}: ${d.gpsUsed || 0}/${d.gpsTotal || 12}</div>
+            <div>${i18n.detailLithium} [&gt;${vPct}%] ${vV}V</div>
+        `;
+
+        document.getElementById('device-detail-overlay').classList.add('visible');
+        if (geocoder && Math.abs(lat) > 0.0001 && Math.abs(lng) > 0.0001) {
+            geocoder.geocode({ location: { lat: lat, lng: lng } }, (results, status) => {
+                const el = document.getElementById('dd-address');
+                if (!el) return;
+                el.textContent = (status === 'OK' && results[0]) ? results[0].formatted_address : TEXT_DASH;
+            });
+        } else {
+            const el = document.getElementById('dd-address');
+            if (el) el.textContent = TEXT_DASH;
+        }
+        if (m) {
+            map.panTo(m.getPosition());
+            map.setZoom(15);
+        }
+    });
+}
+
+function closeDeviceDetail() {
+    document.getElementById('device-detail-overlay').classList.remove('visible');
+}
+
+// ========== REFRESH ==========
+function startRefresh() {
+    refreshTimer = setInterval(refreshData, REFRESH_INTERVAL);
+}
+
+function forceRefresh() {
+    clearInterval(refreshTimer);
+    refreshData();
+    refreshTimer = setInterval(refreshData, REFRESH_INTERVAL);
+}
+
+function refreshData() {
+    $.getJSON('/Map/LiveData', function (data) {
+        refreshCount++;
+        document.getElementById('refresh-count').textContent = refreshCount;
+        data.forEach(function (t) {
+            t.iconFile = (t.iconFile || 'A').toString().toUpperCase();
+            if (markers[t.tbKey] && markers[t.tbKey].markerData) {
+                Object.assign(markers[t.tbKey].markerData, t);
+            }
+            renderMarker(t);
+            updateMarkerIcon(t.tbKey);
+            // update sidebar
+            const item = document.querySelector(`.device-item[data-tbkey="${t.tbKey}"]`);
+            if (item) {
+                const nameEl = item.querySelector('.device-name');
+                if (nameEl && t.cname) nameEl.textContent = t.cname;
+                const dot = item.querySelector('.status-dot');
+                if (dot) {
+                    const status = getDeviceStatus(t.isOnline, item.dataset.powerSaving === 'true', item.dataset.serviceDays);
+                    dot.className = 'status-dot ' + status;
+                }
+                if (t.isOnline) item.classList.remove('offline');
+                else item.classList.add('offline');
+            }
+        });
+        document.getElementById('device-count').textContent = data.length;
+        showRefreshStatus(i18n.refreshUpdated.replace('{0}', new Date().toLocaleTimeString()));
+    });
+}
+
+function getDeviceStatus(isOnline, powerSaving, serviceDaysStr) {
+    if (serviceDaysStr !== '' && serviceDaysStr !== null && parseInt(serviceDaysStr, 10) <= 0) return 'terminated';
+    if (isOnline) return 'online';
+    return powerSaving ? 'sleeping' : 'disconnected';
+}
+
+function showRefreshStatus(msg) {
+    const el = document.getElementById('refresh-badge');
+    el.textContent = msg;
+    el.style.opacity = '1';
+    setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
+// ========== TABS ==========
+function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.map-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === tab);
+    });
+
+    const isLive = tab === 'live';
+    document.getElementById('map-toolbar').style.display = isLive ? '' : 'none';
+    const mts = document.getElementById('map-type-switch');
+    if (mts) mts.style.display = isLive ? '' : 'none';
+    document.getElementById('history-panel').classList.toggle('visible', !isLive);
+    document.getElementById('device-popup').style.display = 'none';
+
+    if (!isLive) {
+        clearTracks();
+        clearHistoryMap();
+        clearInterval(refreshTimer);
+        const isLbs = tab === 'history-lbs';
+        const lbsCtrl = document.getElementById('hist-lbs-controls');
+        if (lbsCtrl) lbsCtrl.style.display = isLbs ? 'flex' : 'none';
+        const backBtn = document.getElementById('hist-back-btn');
+        if (backBtn) backBtn.style.display = isLbs ? 'none' : '';
+        if (!isLbs) {
+            showHistSummaryView();
+            loadHistorySummary();
+        } else {
+            showHistDetailView('');
+        }
+    } else {
+        startRefresh();
+    }
+    if (map) {
+        setTimeout(() => google.maps.event.trigger(map, 'resize'), 50);
+    }
+}
+
+// ========== HISTORY ==========
+
+function onHistDeviceChange() {
+    if (activeTab === 'history') {
+        loadHistorySummary();
+    }
+}
+
+function histPrevDay() {
+    const d = new Date(document.getElementById('hist-date').value);
+    d.setDate(d.getDate() - 1);
+    document.getElementById('hist-date').value = d.toISOString().substring(0, 10);
+}
+
+function histNextDay() {
+    const d = new Date(document.getElementById('hist-date').value);
+    d.setDate(d.getDate() + 1);
+    document.getElementById('hist-date').value = d.toISOString().substring(0, 10);
+}
+
+function showHistSummaryView() {
+    clearHistoryMap();
+    document.getElementById('hist-summary-view').style.display = 'flex';
+    document.getElementById('hist-detail-view').style.display = 'none';
+}
+
+function showHistDetailView(titleText) {
+    document.getElementById('hist-summary-view').style.display = 'none';
+    document.getElementById('hist-detail-view').style.display = 'flex';
+    document.getElementById('hist-detail-title').textContent = titleText || '';
+    document.getElementById('hist-detail-table').style.display = 'none';
+    document.getElementById('hist-detail-nodata').style.display = 'none';
+    document.getElementById('hist-detail-tbody').innerHTML = '';
+    document.getElementById('hist-detail-dist').textContent = '0';
+    document.getElementById('hist-detail-maxspeed').textContent = '0';
+    document.getElementById('hist-detail-avgspeed').textContent = '0';
+    document.getElementById('hist-detail-count').textContent = '0';
+}
+
+function loadHistorySummary() {
+    const imei = document.getElementById('hist-device-sel').value;
+    if (!imei) return;
+    document.getElementById('hist-loading').style.display = 'inline';
+    document.getElementById('hist-summary-nodata').style.display = 'none';
+    document.getElementById('hist-summary-table').style.display = 'none';
+    document.getElementById('hist-summary-tbody').innerHTML = '';
+
+    $.getJSON(`/Map/HistoryDailySummary?imei=${encodeURIComponent(imei)}`, function (data) {
+        document.getElementById('hist-loading').style.display = 'none';
+        if (!data || data.length === 0) {
+            document.getElementById('hist-summary-nodata').textContent = i18n.histNoData;
+            document.getElementById('hist-summary-nodata').style.display = 'block';
+            return;
+        }
+        const tbody = document.getElementById('hist-summary-tbody');
+        tbody.innerHTML = '';
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = 'data-row';
+            tr.innerHTML = `
+                <td>${row.date}</td>
+                <td>${row.firstGPS}</td>
+                <td>${row.lastGPS}</td>
+                <td>${row.duration}</td>
+                <td>${row.recordCount}</td>
+                <td>${row.totalKm}</td>
+            `;
+            if (row.recordCount > 0) {
+                tr.onclick = () => loadHistoryDetail(imei, row.date);
+            } else {
+                tr.style.color = '#94a3b8';
+            }
+            tbody.appendChild(tr);
+        });
+        document.getElementById('hist-summary-table').style.display = '';
+    }).fail(function () {
+        document.getElementById('hist-loading').style.display = 'none';
+        document.getElementById('hist-summary-nodata').textContent = i18n.histQueryFailed;
+        document.getElementById('hist-summary-nodata').style.display = 'block';
+    });
+}
+
+function loadHistoryDetail(imei, date) {
+    showHistDetailView(imei + '  ' + date);
+    document.getElementById('hist-loading').style.display = 'inline';
+    clearHistoryMap();
+
+    $.getJSON(`/Map/HistoryData?imei=${encodeURIComponent(imei)}&date=${date}&type=GPS`, function (data) {
+        document.getElementById('hist-loading').style.display = 'none';
+        if (!data.logs || data.logs.length === 0) {
+            document.getElementById('hist-detail-nodata').style.display = 'block';
+            return;
+        }
+        renderHistoryOnMap(data, 'GPS');
+        document.getElementById('hist-detail-dist').textContent = data.totalDistance;
+        document.getElementById('hist-detail-maxspeed').textContent = data.maxSpeed;
+        document.getElementById('hist-detail-avgspeed').textContent = data.avgSpeed;
+        document.getElementById('hist-detail-count').textContent = data.totalCount;
+
+        const tbody = document.getElementById('hist-detail-tbody');
+        tbody.innerHTML = '';
+        data.logs.forEach(l => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${l.seq}</td>
+                <td>${l.time}</td>
+                <td>${l.lat.toFixed(6)}</td>
+                <td>${l.lng.toFixed(6)}</td>
+                <td>${l.gpsNo}</td>
+                <td>${l.hdop.toFixed(2)}</td>
+                <td>${l.csq}</td>
+                <td>${l.voltage}</td>
+                <td>${l.distanceKm.toFixed(3)}</td>
+                <td>${l.speed.toFixed(1)}</td>
+                <td>${l.direction}°</td>
+            `;
+            tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
+            tbody.appendChild(tr);
+        });
+        document.getElementById('hist-detail-table').style.display = '';
+    }).fail(function () {
+        document.getElementById('hist-loading').style.display = 'none';
+        document.getElementById('hist-detail-nodata').style.display = 'block';
+        document.getElementById('hist-detail-nodata').textContent = i18n.histQueryFailed;
+    });
+}
+
+function loadLbsHistory() {
+    const imei = document.getElementById('hist-device-sel').value;
+    const date = document.getElementById('hist-date').value;
+    if (!imei || !date) return;
+
+    showHistDetailView(imei + '  ' + date + ' (LBS)');
+    document.getElementById('hist-loading').style.display = 'inline';
+    clearHistoryMap();
+
+    $.getJSON(`/Map/HistoryData?imei=${encodeURIComponent(imei)}&date=${date}&type=LBS`, function (data) {
+        document.getElementById('hist-loading').style.display = 'none';
+        if (!data.logs || data.logs.length === 0) {
+            document.getElementById('hist-detail-nodata').style.display = 'block';
+            return;
+        }
+        renderHistoryOnMap(data, 'LBS');
+        document.getElementById('hist-detail-dist').textContent = data.totalDistance;
+        document.getElementById('hist-detail-maxspeed').textContent = data.maxSpeed;
+        document.getElementById('hist-detail-avgspeed').textContent = data.avgSpeed;
+        document.getElementById('hist-detail-count').textContent = data.totalCount;
+
+        const tbody = document.getElementById('hist-detail-tbody');
+        tbody.innerHTML = '';
+        data.logs.forEach(l => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${l.seq}</td>
+                <td>${l.time}</td>
+                <td>${l.lat.toFixed(6)}</td>
+                <td>${l.lng.toFixed(6)}</td>
+                <td>${l.gpsNo}</td>
+                <td>${l.hdop.toFixed(2)}</td>
+                <td>${l.csq}</td>
+                <td>${l.voltage}</td>
+                <td>${l.distanceKm.toFixed(3)}</td>
+                <td>${l.speed.toFixed(1)}</td>
+                <td>${l.direction}°</td>
+            `;
+            tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
+            tbody.appendChild(tr);
+        });
+        document.getElementById('hist-detail-table').style.display = '';
+    }).fail(function () {
+        document.getElementById('hist-loading').style.display = 'none';
+        document.getElementById('hist-detail-nodata').style.display = 'block';
+        document.getElementById('hist-detail-nodata').textContent = i18n.histQueryFailed;
+    });
+}
+
+function renderHistoryOnMap(data, type) {
+    if (!map) return;
+    const path = data.logs.map(l => ({ lat: l.lat, lng: l.lng }));
+    historyPolyline = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: type === 'LBS' ? '#f59e0b' : '#ef4444',
+        strokeOpacity: 0.8,
+        strokeWeight: 3,
+        map: map
+    });
+
+    // Direction arrow markers on each GPS point
+    data.logs.forEach(l => {
+        const arrowMarker = new google.maps.Marker({
+            position: { lat: l.lat, lng: l.lng },
+            map: map,
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 3,
+                rotation: l.direction,
+                fillColor: type === 'LBS' ? '#f59e0b' : '#2563eb',
+                fillOpacity: 0.85,
+                strokeColor: '#fff',
+                strokeWeight: 1
+            },
+            title: `${l.time} ${l.speed.toFixed(1)}km/h`
+        });
+        arrowMarker.addListener('click', () => {
+            if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); }
+        });
+        historyMarkers.push(arrowMarker);
+    });
+
+    // Start/end markers
+    const startM = new google.maps.Marker({
+        position: path[0], map: map, title: i18n.startPoint,
+        label: { text: 'S', color: '#fff' },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#22c55e', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    const endM = new google.maps.Marker({
+        position: path[path.length - 1], map: map, title: i18n.endPoint,
+        label: { text: 'E', color: '#fff' },
+        icon: { path: google.maps.SymbolPath.CIRCLE, scale: 9, fillColor: '#ef4444', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    historyMarkers.push(startM, endM);
+
+    const bounds = new google.maps.LatLngBounds();
+    path.forEach(p => bounds.extend(p));
+    map.fitBounds(bounds);
+}
+
+function clearHistoryMap() {
+    if (historyPolyline) { historyPolyline.setMap(null); historyPolyline = null; }
+    historyMarkers.forEach(m => m.setMap(null));
+    historyMarkers = [];
+}
+
+// ========== INIT ==========
+window.initMap = initMap;
+
+function showMapLoadError(message) {
+    const el = document.getElementById('no-map-msg');
+    if (!el) return;
+    el.style.display = 'block';
+    const h5 = el.querySelector('h5');
+    const p = el.querySelector('p');
+    if (h5) h5.textContent = i18n.mapLoadErrorTitle;
+    if (p) p.textContent = message;
+    const loading = document.getElementById('loading-overlay');
+    if (loading) loading.style.display = 'none';
+}
+
+window.gm_authFailure = function () {
+    showMapLoadError(i18n.mapAuthFailed);
+};
+
+(function bindDeviceListDblClick() {
+    const list = document.getElementById('device-list');
+    if (!list) return;
+    list.addEventListener('dblclick', function (e) {
+        const item = e.target.closest('.device-item');
+        if (!item) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const tbKey = parseInt(item.dataset.tbkey, 10);
+        if (!isNaN(tbKey)) openDeviceSettings(tbKey);
+    });
+})();
+</script>
+@if (!string.IsNullOrEmpty(googleApiJs))
+{
+    <script src="@googleApiJs&callback=initMap&loading=async" async defer></script>
+}
+else
+{
+    <script>
+        document.getElementById('no-map-msg').style.display = 'block';
+        document.getElementById('map-toolbar').style.display = 'none';
+        const mts = document.getElementById('map-type-switch');
+        if (mts) mts.style.display = 'none';
+    </script>
+}
+</body>
+</html>

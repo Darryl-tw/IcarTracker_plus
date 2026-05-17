@@ -1,0 +1,179 @@
+@model TrackingHistoryResult?
+@{
+    Layout = "_MemberLayout";
+    ViewData["Title"] = L["History_Title"].Value;
+    var trackers = ViewBag.Trackers as IEnumerable<Tracker> ?? Enumerable.Empty<Tracker>();
+    var imei = ViewBag.Imei as string ?? "";
+    var type = ViewBag.Type as string ?? "GPS";
+    var startDate = ViewBag.StartDate as string ?? DateTime.Today.ToString("yyyy-MM-dd");
+    var endDate = ViewBag.EndDate as string ?? DateTime.Today.ToString("yyyy-MM-dd");
+    var tzOffset = (int)(ViewBag.MemberTimezone ?? 480);
+    var currentPage = (int)(ViewBag.Page ?? 1);
+    var totalPages = (Model != null && Model.PageSize > 0)
+        ? (int)Math.Ceiling((double)Model.TotalCount / Model.PageSize)
+        : 1;
+}
+
+<div class="mb-3">
+    <h5 class="fw-bold">@L["History_QueryTitle"]</h5>
+</div>
+
+<form method="get" class="card p-3 mb-3 bg-white">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label form-label-sm">@L["History_Device"]</label>
+            <select name="imei" class="form-select form-select-sm">
+                <option value="">@L["History_SelectDevice"]</option>
+                @foreach (var t in trackers)
+                {
+                    <option value="@t.IMEICODE" selected="@(t.IMEICODE == imei)">
+                        @(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : $"{t.CName} ({t.IMEICODE})")
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label-sm">@L["History_StartDate"]</label>
+            <input type="date" name="startDate" value="@startDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label-sm">@L["History_EndDate"]</label>
+            <input type="date" name="endDate" value="@endDate" class="form-control form-control-sm" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label form-label-sm">@L["History_LocationType"]</label>
+            <select name="type" class="form-select form-select-sm">
+                <option value="GPS" selected="@(type == "GPS")">GPS</option>
+                <option value="LBS" selected="@(type == "LBS")">@L["History_Type_LBS"]</option>
+                <option value="WiFi" selected="@(type == "WiFi")">WiFi</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary btn-sm w-100 btn-with-icon">@Html.UiIcon("search")<span>@L["History_Query"]</span></button>
+        </div>
+        @if (!string.IsNullOrEmpty(imei) && Model != null)
+        {
+            <div class="col-md-2">
+                <a asp-controller="History" asp-action="Map"
+                   asp-route-imei="@imei" asp-route-startDate="@startDate"
+                   asp-route-endDate="@endDate" asp-route-type="@type"
+                   class="btn btn-success btn-sm w-100 btn-with-icon">@Html.UiIcon("map")<span>@L["History_MapView"]</span></a>
+            </div>
+            <div class="col-md-1">
+                <a asp-action="ExportExcel" asp-route-imei="@imei" asp-route-startDate="@startDate"
+                   asp-route-endDate="@endDate" asp-route-type="@type"
+                   class="btn btn-outline-primary btn-sm w-100 btn-with-icon">@Html.UiIcon("export")<span>Excel</span></a>
+            </div>
+            <div class="col-md-1">
+                <a asp-action="ExportGpx" asp-route-imei="@imei" asp-route-startDate="@startDate"
+                   asp-route-endDate="@endDate" class="btn btn-outline-secondary btn-sm w-100 btn-with-icon">@Html.UiIcon("download")<span>GPX</span></a>
+            </div>
+            <div class="col-md-1">
+                <a asp-action="ExportKml" asp-route-imei="@imei" asp-route-startDate="@startDate"
+                   asp-route-endDate="@endDate" class="btn btn-outline-secondary btn-sm w-100 btn-with-icon">@Html.UiIcon("download")<span>KML</span></a>
+            </div>
+        }
+    </div>
+</form>
+
+@if (Model != null && !string.IsNullOrEmpty(imei))
+{
+    <div class="d-flex gap-3 mb-2 small text-muted">
+        <span>@string.Format(L["History_TotalCount"].Value, Model.TotalCount)</span>
+        <span>@L["History_TotalDistance"] <strong>@Model.TotalDistance.ToString("F1")</strong> km</span>
+        <span>@L["History_MaxSpeed"] <strong>@Model.MaxSpeed.ToString("F0")</strong> km/h</span>
+        <span>@L["History_AvgSpeed"] <strong>@Model.AvgSpeed.ToString("F0")</strong> km/h</span>
+    </div>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>@L["History_LocalTime"]</th>
+                        <th>@L["History_Lat"]</th>
+                        <th>@L["History_Lng"]</th>
+                        <th>@L["Device_Speed"]</th>
+                        <th>@L["History_Direction"]</th>
+                        <th>@L["History_TotalDistance"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{int idx = (currentPage - 1) * 50 + 1;}
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td class="text-muted small">@idx++</td>
+                            <td>@log.UTCTime.AddMinutes(tzOffset).ToString("MM/dd HH:mm:ss")</td>
+                            <td>@log.Lat.ToString("F6")</td>
+                            <td>@log.Lng.ToString("F6")</td>
+                            <td>@log.Speed.ToString("F0")</td>
+                            <td>@log.Direction°</td>
+                            <td>@log.Distance.ToString("F3")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if (totalPages > 1)
+    {
+        <nav class="mt-2">
+            <ul class="pagination pagination-sm justify-content-center">
+                @if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-imei="@imei"
+                           asp-route-startDate="@startDate" asp-route-endDate="@endDate"
+                           asp-route-type="@type" asp-route-page="@(currentPage - 1)">«</a>
+                    </li>
+                }
+                @for (int p = Math.Max(1, currentPage - 2); p <= Math.Min(totalPages, currentPage + 2); p++)
+                {
+                    <li class="page-item @(p == currentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-imei="@imei"
+                           asp-route-startDate="@startDate" asp-route-endDate="@endDate"
+                           asp-route-type="@type" asp-route-page="@p">@p</a>
+                    </li>
+                }
+                @if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-imei="@imei"
+                           asp-route-startDate="@startDate" asp-route-endDate="@endDate"
+                           asp-route-type="@type" asp-route-page="@(currentPage + 1)">»</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+    <!-- 刪除歷史資料 -->
+    <div class="mt-2 text-end">
+        <button type="button" class="btn btn-sm btn-outline-danger btn-with-icon" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            @Html.UiIcon("delete")<span>@L["History_DeletePeriod"]</span>
+        </button>
+    </div>
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@L["History_ConfirmDelete"]</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    @string.Format(L["History_DeleteWarning"].Value, imei, startDate, endDate)
+                </div>
+                <div class="modal-footer">
+                    <form method="post" asp-action="Delete">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="imei" value="@imei" />
+                        <input type="hidden" name="startDate" value="@startDate" />
+                        <input type="hidden" name="endDate" value="@endDate" />
+                        <button type="button" class="btn btn-secondary btn-with-icon" data-bs-dismiss="modal">@Html.UiIcon("cancel")<span>@L["Common_Cancel"]</span></button>
+                        <button type="submit" class="btn btn-danger btn-with-icon">@Html.UiIcon("confirm")<span>@L["Common_Confirm"]</span></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

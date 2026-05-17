@@ -1,0 +1,88 @@
+@using System.Globalization
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @L["AppName"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        body { background: #f0f4f8; }
+        .sidebar { min-height: 100vh; background: #1e293b; width: 220px; position: fixed; top: 0; left: 0; z-index: 100; padding-top: 1rem; }
+        .sidebar .brand { color: #fff; font-size: 1.1rem; font-weight: 700; padding: 0.75rem 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 0.5rem; }
+        .sidebar .nav-link { color: rgba(255,255,255,0.7); padding: 0.55rem 1.25rem; font-size: 0.9rem; border-radius: 0; transition: all 0.15s; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: rgba(255,255,255,0.1); }
+        .sidebar .nav-label { color: rgba(255,255,255,0.35); font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.75rem 1.25rem 0.25rem; }
+        .main-content { margin-left: 220px; min-height: 100vh; }
+        .topbar { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0.6rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 99; }
+        .page-body { padding: 1.5rem; }
+        @@media (max-width: 768px) {
+            .sidebar { width: 100%; min-height: auto; position: relative; }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar d-flex flex-column">
+    <div class="brand">
+        <span>📡 @L["AppName"]</span>
+    </div>
+    <nav class="flex-grow-1">
+        <div class="nav-label">@L["Nav_MainMenu"]</div>
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Tracker" ? "active" : "")"
+           asp-controller="Tracker" asp-action="Index">
+            @L["Nav_DeviceList"]
+        </a>
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Map" ? "active" : "")"
+           asp-controller="Map" asp-action="Live">
+            @L["Nav_LiveMap"]
+        </a>
+        <div class="nav-label mt-2">@L["Nav_HistorySection"]</div>
+        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")"
+           asp-controller="History" asp-action="Index">
+            @L["Nav_History"]
+        </a>
+    </nav>
+    <div class="p-3 border-top border-secondary">
+        <div class="text-white-50 small mb-2">@(User.FindFirst("CName")?.Value ?? User.Identity?.Name)</div>
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-danger btn-sm w-100 btn-with-icon">@Html.UiIcon("logout")<span>@L["Nav_Logout"]</span></button>
+        </form>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="topbar">
+        <span class="fw-semibold text-dark">@ViewData["Title"]</span>
+        <div class="d-flex align-items-center gap-3">
+            <partial name="_LanguageSwitcher" />
+            <span class="text-muted small">@User.Identity?.Name</span>
+        </div>
+    </div>
+    <div class="page-body">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

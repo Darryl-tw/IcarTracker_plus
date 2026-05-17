@@ -1,0 +1,1783 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  
+  
+  <resheader name="resmimetype">
+    
+    
+    <value>text/microsoft-resx</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="version">
+    
+    
+    <value>2.0</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="reader">
+    
+    
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    
+  
+  </resheader>
+  
+  
+  <resheader name="writer">
+    
+    
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    
+  
+  </resheader>
+  
+  
+  <data name="AccessDenied_Title" xml:space="preserve">
+    
+    
+    <value>访问被拒</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminLogin_Heading" xml:space="preserve">
+    
+    
+    <value>TrackerPlus 后台管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminLogin_Title" xml:space="preserve">
+    
+    
+    <value>后台登录</value>
+    
+  
+  </data>
+  
+  
+  <data name="AdminTitle" xml:space="preserve">
+    
+    
+    <value>TrackerPlus 后台</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Dashboard_Title" xml:space="preserve">
+    
+    
+    <value>仪表板</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Batch" xml:space="preserve">
+    
+    
+    <value>批次排程升级</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_ImeiList" xml:space="preserve">
+    
+    
+    <value>IMEI 清单</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Schedule" xml:space="preserve">
+    
+    
+    <value>排程升级</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_SelectVersion" xml:space="preserve">
+    
+    
+    <value>选择目标固件版本</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Firmware_Title" xml:space="preserve">
+    
+    
+    <value>固件管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Add" xml:space="preserve">
+    
+    
+    <value>新增 IMEI</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_DeleteHistory" xml:space="preserve">
+    
+    
+    <value>删除历史记录</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_FullReset" xml:space="preserve">
+    
+    
+    <value>完整重置</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetModalDesc" xml:space="preserve">
+    
+    
+    <value>将删除 Tracker、AlertModule、标签等并重建设备。</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetModalTitle" xml:space="preserve">
+    
+    
+    <value>IMEI 完整重置</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_ResetPayLog" xml:space="preserve">
+    
+    
+    <value>重置 PayLog</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Title" xml:space="preserve">
+    
+    
+    <value>IMEI 管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_IMEI_Unbind" xml:space="preserve">
+    
+    
+    <value>解绑</value>
+    
+  
+  </data>
+  
+  
+  <data name="Admin_Member_Title" xml:space="preserve">
+    
+    
+    <value>会员管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="AppName" xml:space="preserve">
+    
+    
+    <value>TrackerPlus</value>
+    
+  
+  </data>
+  
+  
+  <data name="AppSubtitle" xml:space="preserve">
+    
+    
+    <value>GPS 追踪管理平台</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_All" xml:space="preserve">
+    
+    
+    <value>全部</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Back" xml:space="preserve">
+    
+    
+    <value>返回</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Cancel" xml:space="preserve">
+    
+    
+    <value>取消</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Confirm" xml:space="preserve">
+    
+    
+    <value>确认</value>
+    
+  
+  </data>
+  <data name="Common_Close" xml:space="preserve"><value>关闭</value></data>
+  
+  
+  <data name="Common_Create" xml:space="preserve">
+    
+    
+    <value>新增</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Delete" xml:space="preserve">
+    
+    
+    <value>删除</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Edit" xml:space="preserve">
+    
+    
+    <value>编辑</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_NextPage" xml:space="preserve">
+    
+    
+    <value>下一页</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_No" xml:space="preserve">
+    
+    
+    <value>否</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Operation" xml:space="preserve">
+    
+    
+    <value>操作</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_PageInfo" xml:space="preserve">
+    
+    
+    <value>第 {0} / {1} 页</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_PreviousPage" xml:space="preserve">
+    
+    
+    <value>上一页</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Save" xml:space="preserve">
+    
+    
+    <value>保存</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Search" xml:space="preserve">
+    
+    
+    <value>搜索</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Status" xml:space="preserve">
+    
+    
+    <value>状态</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_TotalRecords" xml:space="preserve">
+    
+    
+    <value>共 {0} 条</value>
+    
+  
+  </data>
+  
+  
+  <data name="Common_Yes" xml:space="preserve">
+    
+    
+    <value>是</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_AddLabel" xml:space="preserve">
+    
+    
+    <value>新增</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Advanced" xml:space="preserve">
+    
+    
+    <value>高级设置</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_BackList" xml:space="preserve">
+    
+    
+    <value>返回列表</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_BasicInfo" xml:space="preserve">
+    
+    
+    <value>基本资料</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Firmware" xml:space="preserve">
+    
+    
+    <value>固件版本</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Imei" xml:space="preserve">
+    
+    
+    <value>IMEI</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Labels" xml:space="preserve">
+    
+    
+    <value>标签／分组</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Memo" xml:space="preserve">
+    
+    
+    <value>备注</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_NewLabel" xml:space="preserve">
+    
+    
+    <value>新标签名称</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_NoLabels" xml:space="preserve">
+    
+    
+    <value>尚无标签，请先新增。</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSaving" xml:space="preserve">
+    
+    
+    <value>省电模式</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingHint" xml:space="preserve">
+    
+    
+    <value>省电模式开启时，设备上报频率将降低。</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingOff" xml:space="preserve">
+    
+    
+    <value>关闭</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_PowerSavingOn" xml:space="preserve">
+    
+    
+    <value>开启</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveAdvanced" xml:space="preserve">
+    
+    
+    <value>保存高级设置</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveBasic" xml:space="preserve">
+    
+    
+    <value>保存基本资料</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_SaveLabels" xml:space="preserve">
+    
+    
+    <value>保存标签</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_ServiceEnd" xml:space="preserve">
+    
+    
+    <value>服务到期</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Sos" xml:space="preserve">
+    
+    
+    <value>SOS 紧急号码</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Status" xml:space="preserve">
+    
+    
+    <value>设备状态</value>
+    
+  
+  </data>
+  
+  
+  <data name="Detail_Title" xml:space="preserve">
+    
+    
+    <value>设备设置</value>
+    
+  
+  </data>
+  
+  
+  <data name="DeviceList_Title" xml:space="preserve">
+    
+    
+    <value>设备列表</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Battery" xml:space="preserve">
+    
+    
+    <value>电量</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_GpsSignal" xml:space="preserve">
+    
+    
+    <value>GPS信号</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_History" xml:space="preserve">
+    
+    
+    <value>历史</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_LastReport" xml:space="preserve">
+    
+    
+    <value>最后上报时间</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Map" xml:space="preserve">
+    
+    
+    <value>地图</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Name" xml:space="preserve">
+    
+    
+    <value>设备名称</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_NoDevices" xml:space="preserve">
+    
+    
+    <value>尚无设备，请联系管理员绑定 IMEI。</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Offline" xml:space="preserve">
+    
+    
+    <value>离线</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Online" xml:space="preserve">
+    
+    
+    <value>在线</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Settings" xml:space="preserve">
+    
+    
+    <value>设置</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Speed" xml:space="preserve">
+    
+    
+    <value>速度</value>
+    
+  
+  </data>
+  
+  
+  <data name="Device_Unnamed" xml:space="preserve">
+    
+    
+    <value>未命名</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_EmailRequired" xml:space="preserve">
+    
+    
+    <value>请输入电子邮件</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_Sent" xml:space="preserve">
+    
+    
+    <value>若此邮箱已注册，重置密码邮件已寄出。</value>
+    
+  
+  </data>
+  
+  
+  <data name="ForgotPassword_Title" xml:space="preserve">
+    
+    
+    <value>忘记密码</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_AvgSpeed" xml:space="preserve">
+    
+    
+    <value>平均速度</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_ConfirmDelete" xml:space="preserve">
+    
+    
+    <value>确认删除</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeletePeriod" xml:space="preserve">
+    
+    
+    <value>删除此期间历史数据</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeleteSuccess" xml:space="preserve">
+    
+    
+    <value>历史数据删除成功</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_DeleteWarning" xml:space="preserve">
+    
+    
+    <value>确定要删除 {0} 在 {1} ~ {2} 期间的所有历史数据？此操作无法恢复。</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Device" xml:space="preserve">
+    
+    
+    <value>设备</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Direction" xml:space="preserve">
+    
+    
+    <value>方向</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_EndDate" xml:space="preserve">
+    
+    
+    <value>结束日期</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Lat" xml:space="preserve">
+    
+    
+    <value>纬度</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Lng" xml:space="preserve">
+    
+    
+    <value>经度</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_LocalTime" xml:space="preserve">
+    
+    
+    <value>本地时间</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_LocationType" xml:space="preserve">
+    
+    
+    <value>定位类型</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_MapView" xml:space="preserve">
+    
+    
+    <value>地图</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_MaxSpeed" xml:space="preserve">
+    
+    
+    <value>最高速度</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Query" xml:space="preserve">
+    
+    
+    <value>查询</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_QueryTitle" xml:space="preserve">
+    
+    
+    <value>历史记录查询</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_SelectDevice" xml:space="preserve">
+    
+    
+    <value>-- 选择设备 --</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_StartDate" xml:space="preserve">
+    
+    
+    <value>开始日期</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Title" xml:space="preserve">
+    
+    
+    <value>历史记录</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_TotalCount" xml:space="preserve">
+    
+    
+    <value>共 {0} 条</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_TotalDistance" xml:space="preserve">
+    
+    
+    <value>总距离</value>
+    
+  
+  </data>
+  
+  
+  <data name="History_Type_LBS" xml:space="preserve">
+    
+    
+    <value>LBS 基站</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_CHS" xml:space="preserve">
+    
+    
+    <value>简体中文</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_CHT" xml:space="preserve">
+    
+    
+    <value>繁體中文</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_ENG" xml:space="preserve">
+    
+    
+    <value>English</value>
+    
+  
+  </data>
+  
+  
+  <data name="Lang_Switch" xml:space="preserve">
+    
+    
+    <value>语言</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Account" xml:space="preserve">
+    
+    
+    <value>账号</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_ForgotPassword" xml:space="preserve">
+    
+    
+    <value>忘记密码？</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_NoAccount" xml:space="preserve">
+    
+    
+    <value>还没有账号？立即注册</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Password" xml:space="preserve">
+    
+    
+    <value>密码</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_PlaceholderAccount" xml:space="preserve">
+    
+    
+    <value>请输入账号</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_PlaceholderPassword" xml:space="preserve">
+    
+    
+    <value>请输入密码</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Submit" xml:space="preserve">
+    
+    
+    <value>登录</value>
+    
+  
+  </data>
+  
+  
+  <data name="Login_Title" xml:space="preserve">
+    
+    
+    <value>登录</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_AdvancedUpdated" xml:space="preserve">
+    
+    
+    <value>高级设置更新成功</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_BasicInfoUpdated" xml:space="preserve">
+    
+    
+    <value>基本资料更新成功</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_LabelsUpdated" xml:space="preserve">
+    
+    
+    <value>标签已更新</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_SaveSuccess" xml:space="preserve">
+    
+    
+    <value>保存成功</value>
+    
+  
+  </data>
+  
+  
+  <data name="Msg_UpdateSuccess" xml:space="preserve">
+    
+    
+    <value>更新成功</value>
+    
+  
+  </data>
+  
+  
+  <data name="MyDevices_Title" xml:space="preserve">
+    
+    
+    <value>我的设备</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Devices" xml:space="preserve">
+    
+    
+    <value>设备管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Firmware" xml:space="preserve">
+    
+    
+    <value>固件管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_IMEI" xml:space="preserve">
+    
+    
+    <value>IMEI 管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_IP" xml:space="preserve">
+    
+    
+    <value>IP 白名单</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_Members" xml:space="preserve">
+    
+    
+    <value>会员管理</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Admin_PayLog" xml:space="preserve">
+    
+    
+    <value>付款记录</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_DeviceList" xml:space="preserve">
+    
+    
+    <value>设备列表</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_History" xml:space="preserve">
+    
+    
+    <value>历史轨迹</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_HistorySection" xml:space="preserve">
+    
+    
+    <value>历史记录</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_LiveMap" xml:space="preserve">
+    
+    
+    <value>实时地图</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_Logout" xml:space="preserve">
+    
+    
+    <value>登出</value>
+    
+  
+  </data>
+  
+  
+  <data name="Nav_MainMenu" xml:space="preserve">
+    
+    
+    <value>主菜单</value>
+    
+  
+  </data>
+  
+  
+  <data name="Register_Success" xml:space="preserve">
+    
+    
+    <value>注册成功，请等待账号审核启用。</value>
+    
+  
+  </data>
+  
+  
+  <data name="Register_Title" xml:space="preserve">
+    
+    
+    <value>注册</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_None" xml:space="preserve">
+    
+    
+    <value>无</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_Strong" xml:space="preserve">
+    
+    
+    <value>强</value>
+    
+  
+  </data>
+  
+  
+  <data name="Signal_Weak" xml:space="preserve">
+    
+    
+    <value>弱</value>
+    
+  
+  </data>
+  
+
+  <data name="Admin_Dashboard_IMEIStock" xml:space="preserve">
+    <value>IMEI 库存</value>
+  </data>
+  <data name="Admin_Dashboard_MemberCount" xml:space="preserve">
+    <value>会员总数</value>
+  </data>
+  <data name="Admin_Dashboard_TrackerCount" xml:space="preserve">
+    <value>追踪器总数</value>
+  </data>
+  <data name="Admin_Firmware_AddVersion" xml:space="preserve">
+    <value>新增版本</value>
+  </data>
+  <data name="Admin_Firmware_CreateTitle" xml:space="preserve">
+    <value>新增固件版本</value>
+  </data>
+  <data name="Admin_Firmware_CreatedCol" xml:space="preserve">
+    <value>建立日期</value>
+  </data>
+  <data name="Admin_Firmware_Desc" xml:space="preserve">
+    <value>说明</value>
+  </data>
+  <data name="Admin_Firmware_EditTitle" xml:space="preserve">
+    <value>编辑固件</value>
+  </data>
+  <data name="Admin_Firmware_FileName" xml:space="preserve">
+    <value>文件名</value>
+  </data>
+  <data name="Admin_Firmware_FtpCol" xml:space="preserve">
+    <value>FTP</value>
+  </data>
+  <data name="Admin_Firmware_FtpDir" xml:space="preserve">
+    <value>FTP 目录</value>
+  </data>
+  <data name="Admin_Firmware_FtpHost" xml:space="preserve">
+    <value>FTP 主机</value>
+  </data>
+  <data name="Admin_Firmware_FtpPass" xml:space="preserve">
+    <value>FTP 密码</value>
+  </data>
+  <data name="Admin_Firmware_FtpUser" xml:space="preserve">
+    <value>FTP 账号</value>
+  </data>
+  <data name="Admin_Firmware_SearchPh" xml:space="preserve">
+    <value>版本 / 文件名 / 说明</value>
+  </data>
+  <data name="Admin_Firmware_Size" xml:space="preserve">
+    <value>大小</value>
+  </data>
+  <data name="Admin_Firmware_VersionCol" xml:space="preserve">
+    <value>固件版本</value>
+  </data>
+  <data name="Admin_IMEI_CreateTitle" xml:space="preserve">
+    <value>新增 IMEI</value>
+  </data>
+  <data name="Admin_IMEI_CreatedDate" xml:space="preserve">
+    <value>新增日期</value>
+  </data>
+  <data name="Admin_IMEI_ImeiPlaceholder" xml:space="preserve">
+    <value>IMEI (15位数字)</value>
+  </data>
+  <data name="Admin_IMEI_Member" xml:space="preserve">
+    <value>会员</value>
+  </data>
+  <data name="Admin_IMEI_Model" xml:space="preserve">
+    <value>型号</value>
+  </data>
+  <data name="Admin_IMEI_SearchPh" xml:space="preserve">
+    <value>IMEI / 会员名称</value>
+  </data>
+  <data name="Admin_IMEI_StatusAll" xml:space="preserve">
+    <value>全部状态</value>
+  </data>
+  <data name="Admin_IMEI_StatusN" xml:space="preserve">
+    <value>停用 (N)</value>
+  </data>
+  <data name="Admin_IMEI_StatusY" xml:space="preserve">
+    <value>启用 (Y)</value>
+  </data>
+  <data name="Admin_IP_Add" xml:space="preserve">
+    <value>新增 IP</value>
+  </data>
+  <data name="Admin_IP_Address" xml:space="preserve">
+    <value>IP 地址</value>
+  </data>
+  <data name="Admin_IP_CreateTitle" xml:space="preserve">
+    <value>新增 IP 白名单</value>
+  </data>
+  <data name="Admin_IP_Description" xml:space="preserve">
+    <value>说明</value>
+  </data>
+  <data name="Admin_IP_Placeholder" xml:space="preserve">
+    <value>e.g. 192.168.1.1</value>
+  </data>
+  <data name="Admin_IP_SearchPh" xml:space="preserve">
+    <value>IP 地址 / 说明</value>
+  </data>
+  <data name="Admin_IP_Title" xml:space="preserve">
+    <value>WebService IP 白名单</value>
+  </data>
+  <data name="Admin_Member_Account" xml:space="preserve">
+    <value>账号</value>
+  </data>
+  <data name="Admin_Member_AccountInfo" xml:space="preserve">
+    <value>账号信息</value>
+  </data>
+  <data name="Admin_Member_Add" xml:space="preserve">
+    <value>新增会员</value>
+  </data>
+  <data name="Admin_Member_Address" xml:space="preserve">
+    <value>地址</value>
+  </data>
+  <data name="Admin_Member_CreateBtn" xml:space="preserve">
+    <value>建立会员</value>
+  </data>
+  <data name="Admin_Member_CreateTitle" xml:space="preserve">
+    <value>新增会员</value>
+  </data>
+  <data name="Admin_Member_Detail" xml:space="preserve">
+    <value>会员详情</value>
+  </data>
+  <data name="Admin_Member_EditProfile" xml:space="preserve">
+    <value>编辑会员资料</value>
+  </data>
+  <data name="Admin_Member_Name" xml:space="preserve">
+    <value>姓名</value>
+  </data>
+  <data name="Admin_Member_Phone" xml:space="preserve">
+    <value>电话</value>
+  </data>
+  <data name="Admin_Member_Push" xml:space="preserve">
+    <value>推送通知</value>
+  </data>
+  <data name="Admin_Member_SearchPh" xml:space="preserve">
+    <value>账号 / 名称 / Email</value>
+  </data>
+  <data name="Admin_Member_SendEmail" xml:space="preserve">
+    <value>发送Email</value>
+  </data>
+  <data name="Admin_Member_SetActive" xml:space="preserve">
+    <value>设为启用</value>
+  </data>
+  <data name="Admin_Member_SetDisabled" xml:space="preserve">
+    <value>设为停用</value>
+  </data>
+  <data name="Admin_Member_SetPaused" xml:space="preserve">
+    <value>设为暂停</value>
+  </data>
+  <data name="Admin_Member_Timezone" xml:space="preserve">
+    <value>时区(分)</value>
+  </data>
+  <data name="Admin_Member_Unit" xml:space="preserve">
+    <value>单位</value>
+  </data>
+  <data name="Admin_PayLog_Add" xml:space="preserve">
+    <value>新增记录</value>
+  </data>
+  <data name="Admin_PayLog_AddTitle" xml:space="preserve">
+    <value>新增付款记录</value>
+  </data>
+  <data name="Admin_PayLog_Amount" xml:space="preserve">
+    <value>金额</value>
+  </data>
+  <data name="Admin_PayLog_Commission" xml:space="preserve">
+    <value>佣金</value>
+  </data>
+  <data name="Admin_PayLog_Detail" xml:space="preserve">
+    <value>付款记录详情</value>
+  </data>
+  <data name="Admin_PayLog_Member" xml:space="preserve">
+    <value>会员</value>
+  </data>
+  <data name="Admin_PayLog_MemberTbKey" xml:space="preserve">
+    <value>会员 TbKey</value>
+  </data>
+  <data name="Admin_PayLog_Operator" xml:space="preserve">
+    <value>操作人员</value>
+  </data>
+  <data name="Admin_PayLog_OrderNo" xml:space="preserve">
+    <value>订单号</value>
+  </data>
+  <data name="Admin_PayLog_SaleModel" xml:space="preserve">
+    <value>销售模式</value>
+  </data>
+  <data name="Admin_PayLog_SearchPh" xml:space="preserve">
+    <value>IMEI / 会员 / 订单号</value>
+  </data>
+  <data name="Admin_PayLog_ServiceEnd" xml:space="preserve">
+    <value>服务迄日</value>
+  </data>
+  <data name="Admin_PayLog_ServiceFrom" xml:space="preserve">
+    <value>服务起</value>
+  </data>
+  <data name="Admin_PayLog_ServiceStart" xml:space="preserve">
+    <value>服务起日</value>
+  </data>
+  <data name="Admin_PayLog_ServiceTo" xml:space="preserve">
+    <value>服务迄</value>
+  </data>
+  <data name="Admin_PayLog_Title" xml:space="preserve">
+    <value>付款记录</value>
+  </data>
+  <data name="Admin_Tracker_BasicInfo" xml:space="preserve">
+    <value>基本信息</value>
+  </data>
+  <data name="Admin_Tracker_Detail" xml:space="preserve">
+    <value>设备详情</value>
+  </data>
+  <data name="Admin_Tracker_EditInfo" xml:space="preserve">
+    <value>编辑信息</value>
+  </data>
+  <data name="Admin_Tracker_LastReport" xml:space="preserve">
+    <value>最后上报</value>
+  </data>
+  <data name="Admin_Tracker_Options" xml:space="preserve">
+    <value>功能选项</value>
+  </data>
+  <data name="Admin_Tracker_PowerSaving" xml:space="preserve">
+    <value>省电模式</value>
+  </data>
+  <data name="Admin_Tracker_SaveInfo" xml:space="preserve">
+    <value>保存信息</value>
+  </data>
+  <data name="Admin_Tracker_SaveOptions" xml:space="preserve">
+    <value>保存选项</value>
+  </data>
+  <data name="Admin_Tracker_SearchPh" xml:space="preserve">
+    <value>IMEI / 设备名称</value>
+  </data>
+  <data name="Admin_Tracker_Sos" xml:space="preserve">
+    <value>SOS 号码</value>
+  </data>
+  <data name="Admin_Tracker_Title" xml:space="preserve">
+    <value>设备管理</value>
+  </data>
+  <data name="Common_Active" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="Common_ConfirmDelete" xml:space="preserve">
+    <value>确定删除?</value>
+  </data>
+  <data name="Common_ConfirmDeleteItem" xml:space="preserve">
+    <value>确定删除 {0}?</value>
+  </data>
+  <data name="Common_CreateRecord" xml:space="preserve">
+    <value>建立</value>
+  </data>
+  <data name="Common_Details" xml:space="preserve">
+    <value>详情</value>
+  </data>
+  <data name="Common_Disabled" xml:space="preserve">
+    <value>停用</value>
+  </data>
+  <data name="Common_Enabled" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="Common_Inactive" xml:space="preserve">
+    <value>未启用</value>
+  </data>
+  <data name="Common_Normal" xml:space="preserve">
+    <value>正常</value>
+  </data>
+  <data name="Common_NotActive" xml:space="preserve">
+    <value>未启用</value>
+  </data>
+  <data name="Common_Off" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Common_On" xml:space="preserve">
+    <value>开启</value>
+  </data>
+  <data name="Common_Paused" xml:space="preserve">
+    <value>暂停</value>
+  </data>
+  <data name="Common_ViewDetails" xml:space="preserve">
+    <value>查看详情 →</value>
+  </data>
+  <data name="Detail_Csq" xml:space="preserve">
+    <value>信号强度(CSQ)</value>
+  </data>
+  <data name="Detail_DeviceName" xml:space="preserve">
+    <value>设备名称</value>
+  </data>
+  <data name="Detail_GpsSatellites" xml:space="preserve">
+    <value>GPS卫星数</value>
+  </data>
+  <data name="Detail_HistoryLink" xml:space="preserve">
+    <value>历史轨迹</value>
+  </data>
+  <data name="Detail_LabelField" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="Detail_LastReport" xml:space="preserve">
+    <value>最后上报</value>
+  </data>
+  <data name="Detail_LiveMapLink" xml:space="preserve">
+    <value>实时地图</value>
+  </data>
+  <data name="Detail_PowerSavingEco" xml:space="preserve">
+    <value>开启（省电模式）</value>
+  </data>
+  <data name="Detail_PowerSavingNormal" xml:space="preserve">
+    <value>关闭（一般模式）</value>
+  </data>
+  <data name="Detail_SosPlaceholder" xml:space="preserve">
+    <value>请输入紧急联系电话</value>
+  </data>
+  <data name="Field_CreatedDate" xml:space="preserve">
+    <value>建立日期</value>
+  </data>
+  <data name="Field_ExpiryDate" xml:space="preserve">
+    <value>到期日</value>
+  </data>
+  <data name="Field_Group" xml:space="preserve">
+    <value>分组</value>
+  </data>
+  <data name="Field_Label" xml:space="preserve">
+    <value>标签</value>
+  </data>
+  <data name="Field_Language" xml:space="preserve">
+    <value>语系</value>
+  </data>
+  <data name="Field_Latitude" xml:space="preserve">
+    <value>纬度</value>
+  </data>
+  <data name="Field_Longitude" xml:space="preserve">
+    <value>经度</value>
+  </data>
+  <data name="Field_Model" xml:space="preserve">
+    <value>型号</value>
+  </data>
+  <data name="SaleModel_AutoEnable" xml:space="preserve">
+    <value>自动启用</value>
+  </data>
+  <data name="SaleModel_International" xml:space="preserve">
+    <value>国际</value>
+  </data>
+  <data name="SaleModel_MultiMonth" xml:space="preserve">
+    <value>多月</value>
+  </data>
+  <data name="SaleModel_Refund" xml:space="preserve">
+    <value>退款</value>
+  </data>
+  <data name="SaleModel_Renew" xml:space="preserve">
+    <value>续费</value>
+  </data>
+  <data name="SaleModel_Special" xml:space="preserve">
+    <value>特殊</value>
+  </data>
+  <data name="Unit_Km" xml:space="preserve">
+    <value>公里</value>
+  </data>
+  <data name="Unit_Mile" xml:space="preserve">
+    <value>英里</value>
+  </data>
+  <data name="Live_Title" xml:space="preserve"><value>iCar 车队追踪平台</value></data>
+  <data name="Live_Brand" xml:space="preserve"><value>iCar 追踪平台</value></data>
+  <data name="Live_Menu_System" xml:space="preserve"><value>系统设置</value></data>
+  <data name="Live_Menu_AfterSelectDevice" xml:space="preserve"><value>选择装置后操作</value></data>
+  <data name="Live_Menu_Geofence" xml:space="preserve"><value>电子围栏</value></data>
+  <data name="Live_Menu_ChangePassword" xml:space="preserve"><value>更改密码</value></data>
+  <data name="Live_Menu_Reports" xml:space="preserve"><value>统计报表</value></data>
+  <data name="Live_Menu_HistGps" xml:space="preserve"><value>行驶记录(GPS)</value></data>
+  <data name="Live_Menu_HistLbs" xml:space="preserve"><value>行驶记录(LBS)</value></data>
+  <data name="Live_Menu_Help" xml:space="preserve"><value>说明</value></data>
+  <data name="Live_Menu_Manual" xml:space="preserve"><value>使用手册</value></data>
+  <data name="Live_Menu_Privacy" xml:space="preserve"><value>隐私权政策</value></data>
+  <data name="Live_LogoutSystem" xml:space="preserve"><value>登出系统</value></data>
+  <data name="Live_TrackerList" xml:space="preserve"><value>定位器列表</value></data>
+  <data name="Live_SelectAll" xml:space="preserve"><value>全选</value></data>
+  <data name="Live_FitAll" xml:space="preserve"><value>缩放全部</value></data>
+  <data name="Live_Unknown" xml:space="preserve"><value>未知</value></data>
+  <data name="Live_Group" xml:space="preserve"><value>群组</value></data>
+  <data name="Live_ServiceDays" xml:space="preserve"><value>{0} 天</value></data>
+  <data name="Live_Tab_LiveMap" xml:space="preserve"><value>装置地图</value></data>
+  <data name="Live_Tab_History" xml:space="preserve"><value>历史行驶记录</value></data>
+  <data name="Live_Tab_HistoryLbs" xml:space="preserve"><value>历史行驶记录(含LBS)</value></data>
+  <data name="Live_RefreshLive" xml:space="preserve"><value>即时更新</value></data>
+  <data name="Live_ClearTrack" xml:space="preserve"><value>清除轨迹</value></data>
+  <data name="Live_Traffic" xml:space="preserve"><value>路况</value></data>
+  <data name="Live_TrafficOn" xml:space="preserve"><value>路况 ✓</value></data>
+  <data name="Live_SatelliteView" xml:space="preserve"><value>卫星视图</value></data>
+  <data name="Live_RoadMap" xml:space="preserve"><value>路线图</value></data>
+  <data name="Live_ReportTime" xml:space="preserve"><value>回报时间</value></data>
+  <data name="Live_MapApiNotConfigured" xml:space="preserve"><value>Google Maps API 尚未设定</value></data>
+  <data name="Live_MapApiConfigHint" xml:space="preserve"><value>请在 appsettings.json 设定 AppSettings.GoogleApi.JS</value></data>
+  <data name="Live_DateLabel" xml:space="preserve"><value>日期</value></data>
+  <data name="Live_Prev7Days" xml:space="preserve"><value>◀ 前7天</value></data>
+  <data name="Live_Next7Days" xml:space="preserve"><value>后7天 ▶</value></data>
+  <data name="Live_ClearMap" xml:space="preserve"><value>清除地图</value></data>
+  <data name="Live_Loading" xml:space="preserve"><value>载入中...</value></data>
+  <data name="Live_TotalDistance" xml:space="preserve"><value>总里程</value></data>
+  <data name="Live_TotalCount" xml:space="preserve"><value>总笔数</value></data>
+  <data name="Live_Hist_SelectPrompt" xml:space="preserve"><value>请选择装置及日期后按查询</value></data>
+  <data name="Live_Hist_NoData" xml:space="preserve"><value>查询日期无资料</value></data>
+  <data name="Live_Hist_QueryFailed" xml:space="preserve"><value>查询失败，请稍后再试</value></data>
+  <data name="Live_TimeCol" xml:space="preserve"><value>时间</value></data>
+  <data name="Live_SpeedKmhCol" xml:space="preserve"><value>速度(km/h)</value></data>
+  <data name="Live_DistanceKmCol" xml:space="preserve"><value>距离(km)</value></data>
+  <data name="Live_StartPoint" xml:space="preserve"><value>起点</value></data>
+  <data name="Live_EndPoint" xml:space="preserve"><value>终点</value></data>
+  <data name="Live_GpsSatellitesCount" xml:space="preserve"><value>{0} 颗</value></data>
+  <data name="Live_RefreshUpdated" xml:space="preserve"><value>已更新 {0}</value></data>
+  <data name="Live_MapLoadFailed" xml:space="preserve"><value>地图初始化失败：{0}</value></data>
+  <data name="Live_MapAuthFailed" xml:space="preserve"><value>API 密钥验证失败。请检查 GoogleApi 设定与 Google Cloud。</value></data>
+  <data name="Live_MapLoadErrorTitle" xml:space="preserve"><value>Google 地图无法载入</value></data>
+  <data name="Live_BatteryTitle" xml:space="preserve"><value>电量</value></data>
+  <data name="Live_GpsSatellitesTitle" xml:space="preserve"><value>GPS卫星</value></data>
+  <data name="Live_ServiceDaysTitle" xml:space="preserve"><value>服务剩余天数</value></data>
+  <data name="Live_Col_DeviceName" xml:space="preserve"><value>识别名称</value></data>
+  <data name="Live_Col_Group" xml:space="preserve"><value>群组</value></data>
+  <data name="Live_Col_ValidDays" xml:space="preserve"><value>有效天数</value></data>
+  <data name="Live_Col_WebPlatform" xml:space="preserve"><value>网页平台</value></data>
+  <data name="TrackerMap_Title" xml:space="preserve"><value>装置地图</value></data>
+  <data name="TrackerMap_BackList" xml:space="preserve"><value>← 返回列表</value></data>
+  <data name="TrackerMap_DeviceCount" xml:space="preserve"><value>{0} 台装置</value></data>
+  <data name="TrackerMap_SpeedLabel" xml:space="preserve"><value>速度：</value></data>
+  <data name="TrackerMap_VoltageLabel" xml:space="preserve"><value>电量：</value></data>
+  <data name="HistoryMap_Title" xml:space="preserve"><value>历史轨迹地图</value></data>
+  <data name="HistoryMap_BackList" xml:space="preserve"><value>← 返回列表</value></data>
+  <data name="HistoryMap_RecordCount" xml:space="preserve"><value>{0} 笔记录</value></data>
+  <data name="HistoryMap_PlayControl" xml:space="preserve"><value>播放控制</value></data>
+  <data name="HistoryMap_Play" xml:space="preserve"><value>播放</value></data>
+  <data name="HistoryMap_Pause" xml:space="preserve"><value>暂停</value></data>
+  <data name="HistoryMap_Reset" xml:space="preserve"><value>重置</value></data>
+  <data name="HistoryMap_PlayHint" xml:space="preserve"><value>点击播放按钮开始回放轨迹</value></data>
+  <data name="HistoryMap_NoTrackData" xml:space="preserve"><value>此期间无轨迹资料</value></data>
+  <data name="HistoryMap_StartTitle" xml:space="preserve"><value>起点: {0}</value></data>
+  <data name="HistoryMap_EndTitle" xml:space="preserve"><value>终点: {0}</value></data>
+  <data name="HistoryMap_TotalDistanceBar" xml:space="preserve"><value>总里程</value></data>
+  <data name="HistoryMap_MaxSpeedBar" xml:space="preserve"><value>最高速</value></data>
+  <data name="HistoryMap_AvgSpeedBar" xml:space="preserve"><value>平均速</value></data>
+  <data name="HistoryMap_PlayheadSpeed" xml:space="preserve"><value>速度：{0} km/h | 方向：{1}°</value></data>
+  <data name="Register_PageTitle" xml:space="preserve"><value>会员注册</value></data>
+  <data name="Register_Heading" xml:space="preserve"><value>建立账号</value></data>
+  <data name="Register_Subtitle" xml:space="preserve"><value>TrackerPlus 会员注册</value></data>
+  <data name="Register_BackLogin" xml:space="preserve"><value>返回登录</value></data>
+  <data name="Register_Account" xml:space="preserve"><value>账号</value></data>
+  <data name="Register_AccountPh" xml:space="preserve"><value>请输入账号（英数字）</value></data>
+  <data name="Register_PasswordPh" xml:space="preserve"><value>请输入密码（至少8码）</value></data>
+  <data name="Register_Name" xml:space="preserve"><value>姓名</value></data>
+  <data name="Register_NamePh" xml:space="preserve"><value>请输入您的姓名</value></data>
+  <data name="Register_Email" xml:space="preserve"><value>电子邮件</value></data>
+  <data name="Register_EmailPh" xml:space="preserve"><value>请输入电子邮件</value></data>
+  <data name="Register_Phone" xml:space="preserve"><value>电话</value></data>
+  <data name="Register_PhonePh" xml:space="preserve"><value>请输入联络电话</value></data>
+  <data name="Register_Language" xml:space="preserve"><value>语言设置</value></data>
+  <data name="Register_Submit" xml:space="preserve"><value>立即注册</value></data>
+  <data name="Register_HasAccount" xml:space="preserve"><value>已有账号？</value></data>
+  <data name="ForgotPassword_EmailLabel" xml:space="preserve"><value>电子邮件</value></data>
+  <data name="ForgotPassword_EmailPh" xml:space="preserve"><value>请输入注册时的电子邮件</value></data>
+  <data name="ForgotPassword_Submit" xml:space="preserve"><value>送出重设信件</value></data>
+  <data name="ForgotPassword_BackLogin" xml:space="preserve"><value>返回登录页面</value></data>
+  <data name="ForgotPassword_Subtitle" xml:space="preserve"><value>输入您的电子邮件以重设密码</value></data>
+  <data name="DeviceSettings_Title" xml:space="preserve"><value>装置设定</value></data>
+  <data name="DeviceSettings_Tab_Info" xml:space="preserve"><value>装置资料</value></data>
+  <data name="DeviceSettings_Tab_Option" xml:space="preserve"><value>装置设定</value></data>
+  <data name="DeviceSettings_Tab_Alert" xml:space="preserve"><value>警报设定</value></data>
+  <data name="DeviceSettings_Tab_PayLog" xml:space="preserve"><value>订单期限</value></data>
+  <data name="DeviceSettings_GpsInterval" xml:space="preserve"><value>定位回报时间</value></data>
+  <data name="DeviceSettings_Password" xml:space="preserve"><value>密码</value></data>
+  <data name="DeviceSettings_ShockSection" xml:space="preserve"><value>震动器设定</value></data>
+  <data name="DeviceSettings_VehicleType" xml:space="preserve"><value>车型</value></data>
+  <data name="DeviceSettings_ShockSensitivity" xml:space="preserve"><value>震动器灵敏度</value></data>
+  <data name="DeviceSettings_IdleModule" xml:space="preserve"><value>怠速逾时模块</value></data>
+  <data name="DeviceSettings_IdleWhen" xml:space="preserve"><value>当怠速超过</value></data>
+  <data name="DeviceSettings_IdleReport" xml:space="preserve"><value>分钟时，回报所在坐标。</value></data>
+  <data name="DeviceSettings_SpeedModule" xml:space="preserve"><value>超速侦测模块</value></data>
+  <data name="DeviceSettings_SpeedWhen" xml:space="preserve"><value>当时速超过</value></data>
+  <data name="DeviceSettings_SpeedAlarm" xml:space="preserve"><value>公里/小时，发出警报讯息。</value></data>
+  <data name="DeviceSettings_CustomMsg" xml:space="preserve"><value>自定义讯息内容：</value></data>
+  <data name="DeviceSettings_SharePwd" xml:space="preserve"><value>分享密码(4码)</value></data>
+  <data name="DeviceSettings_ShareEnable" xml:space="preserve"><value>开启分享功能</value></data>
+  <data name="DeviceSettings_AlertMode" xml:space="preserve"><value>警报模式</value></data>
+  <data name="DeviceSettings_Closed" xml:space="preserve"><value>-关闭-</value></data>
+  <data name="DeviceSettings_AlertSingle" xml:space="preserve"><value>单次</value></data>
+  <data name="DeviceSettings_AlertRepeat" xml:space="preserve"><value>重复</value></data>
+  <data name="DeviceSettings_AssignedGroup" xml:space="preserve"><value>隶属群组指定</value></data>
+  <data name="DeviceSettings_VehicleCar" xml:space="preserve"><value>汽车</value></data>
+  <data name="DeviceSettings_VehicleTruck" xml:space="preserve"><value>货车</value></data>
+  <data name="DeviceSettings_Gps15s" xml:space="preserve"><value>15秒</value></data>
+  <data name="DeviceSettings_Gps30s" xml:space="preserve"><value>30秒</value></data>
+  <data name="DeviceSettings_Gps10m" xml:space="preserve"><value>10分钟</value></data>
+  <data name="DeviceSettings_Gps30m" xml:space="preserve"><value>30分钟</value></data>
+  <data name="DeviceSettings_Gps60m" xml:space="preserve"><value>60分钟</value></data>
+  <data name="DeviceSettings_Gps120m" xml:space="preserve"><value>120分钟</value></data>
+  <data name="Live_Detail_Offline" xml:space="preserve"><value>离线</value></data>
+  <data name="Live_Detail_Online" xml:space="preserve"><value>上线</value></data>
+  <data name="Live_Detail_LastLogin" xml:space="preserve"><value>最近登入时间</value></data>
+  <data name="Live_Detail_LastGps" xml:space="preserve"><value>最后定位时间</value></data>
+  <data name="Live_Detail_LastConnect" xml:space="preserve"><value>最后连线时间</value></data>
+  <data name="Live_Detail_TravelSpeed" xml:space="preserve"><value>行进速度</value></data>
+  <data name="Live_Detail_Distance" xml:space="preserve"><value>移动距离</value></data>
+  <data name="Live_Detail_Coords" xml:space="preserve"><value>经纬坐标</value></data>
+  <data name="Live_Detail_Address" xml:space="preserve"><value>所在位置</value></data>
+  <data name="Live_Detail_Direction" xml:space="preserve"><value>移动方向</value></data>
+  <data name="Live_Detail_LithiumBattery" xml:space="preserve"><value>锂电池</value></data>
+  <data name="Live_Detail_Satellites" xml:space="preserve"><value>卫星</value></data>
+  <data name="DeviceSettings_Hint" xml:space="preserve"><value>请选择您要变更的资料项目：[{0}]</value></data>
+  <data name="DeviceSettings_Icons" xml:space="preserve"><value>装置图示</value></data>
+  <data name="DeviceSettings_Saved" xml:space="preserve"><value>装置设定已储存</value></data>
+  <data name="DeviceSettings_SaveFailed" xml:space="preserve"><value>储存失败</value></data>
+  <data name="DeviceSettings_LoadFailed" xml:space="preserve"><value>无法加载设备设置，请稍后再试。</value></data>
+  <data name="DeviceIcon_A" xml:space="preserve"><value>汽车</value></data>
+  <data name="DeviceIcon_B" xml:space="preserve"><value>货车</value></data>
+  <data name="DeviceIcon_C" xml:space="preserve"><value>工作车</value></data>
+  <data name="DeviceIcon_D" xml:space="preserve"><value>巴士</value></data>
+  <data name="DeviceIcon_E" xml:space="preserve"><value>机车</value></data>
+  <data name="DeviceIcon_F" xml:space="preserve"><value>自行车</value></data>
+  <data name="DeviceIcon_G" xml:space="preserve"><value>人</value></data>
+  <data name="DeviceIcon_H" xml:space="preserve"><value>宠物</value></data>
+  <data name="Common_Reset" xml:space="preserve"><value>重置</value></data>
+  <data name="Live_UpdateNow" xml:space="preserve"><value>立即更新</value></data>
+  <data name="Live_MultiWindow" xml:space="preserve"><value>多重视窗</value></data>
+  <data name="Live_CustomLandmark" xml:space="preserve"><value>自建地标</value></data>
+  <data name="Live_MapTypeRoad" xml:space="preserve"><value>地图</value></data>
+  <data name="Live_MultiWindowSelect" xml:space="preserve"><value>请先勾选至少一台装置</value></data>
+  <data name="Live_MultiWindowMax" xml:space="preserve"><value>最多可同时开启 {0} 个视窗，请取消多余的勾选</value></data>
+  <data name="Live_LandmarkTitle" xml:space="preserve"><value>自建地标管理</value></data>
+  <data name="Live_LandmarkName" xml:space="preserve"><value>地标名称</value></data>
+  <data name="Live_LandmarkAddress" xml:space="preserve"><value>地址或座标</value></data>
+  <data name="Live_LandmarkAddressPh" xml:space="preserve"><value>地址，或纬度,经度</value></data>
+  <data name="Live_LandmarkAdd" xml:space="preserve"><value>新增地标</value></data>
+  <data name="Live_LandmarkPickOnMap" xml:space="preserve"><value>在地图上点选</value></data>
+  <data name="Live_LandmarkLimit" xml:space="preserve"><value>自建地标已达上限 (500)</value></data>
+  <data name="Live_LandmarkMemoRequired" xml:space="preserve"><value>请输入地标名称</value></data>
+  <data name="Live_LandmarkAdded" xml:space="preserve"><value>地标已新增</value></data>
+  <data name="Live_LandmarkDeleted" xml:space="preserve"><value>地标已删除</value></data>
+  <data name="Live_LandmarkQuickAdd" xml:space="preserve"><value>新增地标</value></data>
+  <data name="Live_LandmarkCoords" xml:space="preserve"><value>座标</value></data>
+  <data name="AccessDenied_Message" xml:space="preserve"><value>您没有权限存取此页面。</value></data>
+  <data name="AccessDenied_BackDevices" xml:space="preserve"><value>回到装置列表</value></data>
+  <data name="AccessDenied_Relogin" xml:space="preserve"><value>重新登录</value></data>
+  <data name="Home_Title" xml:space="preserve"><value>首页</value></data>
+  <data name="Home_Welcome" xml:space="preserve"><value>欢迎使用</value></data>
+  <data name="Home_Learn" xml:space="preserve"><value>使用 ASP.NET Core 建置 Web 应用程序。</value></data>
+  <data name="Privacy_Title" xml:space="preserve"><value>隐私权政策</value></data>
+  <data name="Privacy_Body" xml:space="preserve"><value>请在此说明您网站的隐私权政策。</value></data>
+  <data name="Error_Title" xml:space="preserve"><value>错误</value></data>
+  <data name="Error_Message" xml:space="preserve"><value>处理您的要求时发生错误。</value></data>
+  <data name="Error_DevMode" xml:space="preserve"><value>开发模式</value></data>
+  <data name="Nav_Home" xml:space="preserve"><value>首页</value></data>
+  <data name="Nav_Privacy" xml:space="preserve"><value>隐私权</value></data>
+  <data name="Layout_ToggleNav" xml:space="preserve"><value>切换导览</value></data>
+  <data name="Common_Required" xml:space="preserve"><value>*</value></data>
+  <data name="Hist_Date" xml:space="preserve"><value>日期</value></data>
+  <data name="Hist_FirstGPS" xml:space="preserve"><value>连线时间</value></data>
+  <data name="Hist_LastGPS" xml:space="preserve"><value>离线时间</value></data>
+  <data name="Hist_Duration" xml:space="preserve"><value>行程持续时间</value></data>
+  <data name="Hist_RecordCount" xml:space="preserve"><value>轨迹记录数</value></data>
+  <data name="Hist_TotalKm" xml:space="preserve"><value>累计里程</value></data>
+  <data name="Hist_BackToSummary" xml:space="preserve"><value>返回记录清单</value></data>
+  <data name="Hist_GpsNo" xml:space="preserve"><value>GPS卫星数</value></data>
+  <data name="Hist_Voltage" xml:space="preserve"><value>电压值</value></data>
+</root>

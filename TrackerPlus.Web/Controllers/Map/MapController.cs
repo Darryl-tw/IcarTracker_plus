@@ -1,0 +1,346 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+using TrackerPlus.Core.Common;
+using TrackerPlus.Core.Interfaces.Repositories;
+using TrackerPlus.Core.Interfaces.Services;
+
+namespace TrackerPlus.Web.Controllers;
+
+[Authorize]
+[Route("Map/[action]")]
+public class MapController : Controller
+{
+    private readonly ITrackerService _trackerService;
+    private readonly IHistoryService _historyService;
+    private readonly IGoogleApiKeyService _googleApiKeyService;
+    private readonly ILabelService _labelService;
+    private readonly IMapMarkRepository _mapMarkRepository;
+    private readonly IDeviceSettingsService _deviceSettingsService;
+    private readonly AppSettings _appSettings;
+
+    public MapController(ITrackerService trackerService, IHistoryService historyService,
+        IGoogleApiKeyService googleApiKeyService, ILabelService labelService,
+        IMapMarkRepository mapMarkRepository, IDeviceSettingsService deviceSettingsService,
+        IOptions<AppSettings> appSettings)
+    {
+        _trackerService = trackerService;
+        _historyService = historyService;
+        _googleApiKeyService = googleApiKeyService;
+        _labelService = labelService;
+        _mapMarkRepository = mapMarkRepository;
+        _deviceSettingsService = deviceSettingsService;
+        _appSettings = appSettings.Value;
+    }
+
+    private int GetMemberTbKey()
+    {
+        var val = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(val, out var key) ? key : 0;
+    }
+
+    private int GetMemberTimezone()
+    {
+        var val = User.FindFirstValue("Timezoom");
+        return int.TryParse(val, out var tz) ? tz : 480;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Live()
+    {
+        var memberTbKey = GetMemberTbKey();
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        ViewBag.GoogleApiJs = _googleApiKeyService.GetMapsJavaScriptUrl(Request.Host.Host);
+        ViewBag.MemberName = User.FindFirstValue("CName") ?? User.Identity?.Name ?? "";
+        ViewBag.MemberTimezone = GetMemberTimezone();
+        ViewBag.MaxMultiWindows = _appSettings.MaxMultiWindows;
+        return View(trackers);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> MultiWindow(string? tbKeys)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var validKeys = await FilterOwnedTrackerKeysAsync(tbKeys, memberTbKey);
+        if (validKeys.Count == 0)
+            return RedirectToAction(nameof(Live));
+
+        ViewBag.TbKeys = validKeys;
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> LivePane(int tbKey)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var tracker = await _trackerService.GetTrackerAsync(tbKey);
+        if (tracker == null) return NotFound();
+        if (tracker.Member_TbKey != memberTbKey) return Forbid();
+
+        ViewBag.GoogleApiJs = _googleApiKeyService.GetMapsJavaScriptUrl(Request.Host.Host);
+        ViewBag.MemberTimezone = GetMemberTimezone();
+        return View(tracker);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> LivePaneData(int tbKey)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+        var tracker = await _trackerService.GetTrackerAsync(tbKey);
+        if (tracker == null) return NotFound();
+        if (tracker.Member_TbKey != memberTbKey) return Forbid();
+
+        var now = DateTime.UtcNow;
+        return Json(new
+        {
+            tbKey = tracker.TbKey,
+            imei = tracker.IMEICODE,
+            cname = string.IsNullOrEmpty(tracker.CName) ? tracker.IMEICODE : tracker.CName,
+            lat = tracker.Lat,
+            lng = tracker.Lng,
+            speed = tracker.Speed,
+            direction = tracker.Direction,
+            voltage = tracker.Voltage,
+            csq = tracker.CSQ,
+            gpsNo = tracker.GPSNo,
+            isOnline = tracker.LastReportTime.HasValue && (now - tracker.LastReportTime.Value).TotalMinutes < 10,
+            lastReportLocal = tracker.LastReportTime.HasValue
+                ? tracker.LastReportTime.Value.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss")
+                : "",
+            iconFile = string.IsNullOrWhiteSpace(tracker.IconFile) ? "A" : tracker.IconFile.Trim().ToUpperInvariant()
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Landmarks()
+    {
+        var memberTbKey = GetMemberTbKey();
+        var marks = await _mapMarkRepository.GetByMemberAsync(memberTbKey);
+        return Json(marks.Select(m => new
+        {
+            tbKey = m.TbKey,
+            memo = m.Memo,
+            address = m.Address,
+            lat = m.Lat,
+            lng = m.Lng
+        }));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddLandmark([FromBody] AddLandmarkRequest request)
+    {
+        var memberTbKey = GetMemberTbKey();
+        if (string.IsNullOrWhiteSpace(request.Memo))
+            return Json(new { success = false, message = "請輸入地標名稱" });
+
+        if (Math.Abs(request.Lat) < 0.0001 && Math.Abs(request.Lng) < 0.0001)
+            return Json(new { success = false, message = "座標無效" });
+
+        var count = await _mapMarkRepository.GetCountByMemberAsync(memberTbKey);
+        if (count >= 500)
+            return Json(new { success = false, message = "自建地標已達上限 (500)" });
+
+        var id = await _mapMarkRepository.CreateAsync(
+            memberTbKey,
+            request.Address ?? string.Empty,
+            request.Lat,
+            request.Lng,
+            request.Memo);
+
+        return Json(new { success = true, tbKey = id });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteLandmark([FromBody] DeleteLandmarkRequest request)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var ok = await _mapMarkRepository.DeleteAsync(request.TbKey, memberTbKey);
+        return Json(new { success = ok });
+    }
+
+    private async Task<List<int>> FilterOwnedTrackerKeysAsync(string? tbKeys, int memberTbKey)
+    {
+        var result = new List<int>();
+        if (string.IsNullOrWhiteSpace(tbKeys)) return result;
+
+        foreach (var part in tbKeys.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (!int.TryParse(part, out var key)) continue;
+            var tracker = await _trackerService.GetTrackerAsync(key);
+            if (tracker != null && tracker.Member_TbKey == memberTbKey && !result.Contains(key))
+                result.Add(key);
+        }
+        return result;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> LiveData()
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        var now = DateTime.UtcNow;
+        var data = trackers.Select(t => new
+        {
+            tbKey = t.TbKey,
+            imei = t.IMEICODE,
+            cname = string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName,
+            lat = t.Lat,
+            lng = t.Lng,
+            speed = t.Speed,
+            direction = t.Direction,
+            lastReportTime = t.LastReportTime?.ToString("o"),
+            lastReportLocal = t.LastReportTime.HasValue
+                ? t.LastReportTime.Value.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss")
+                : "",
+            voltage = t.Voltage,
+            csq = t.CSQ,
+            gpsNo = t.GPSNo,
+            isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10,
+            groupName = t.GroupName,
+            label = t.Label,
+            serviceEndDate = t.ServiceEndDate?.ToString("yyyy-MM-dd"),
+            serviceDays = ServiceDaysHelper.RemainingDays(t.ServiceEndDate),
+            firmwareVersion = t.FirmwareVersion,
+            iconFile = string.IsNullOrWhiteSpace(t.IconFile) ? "A" : t.IconFile.Trim().ToUpperInvariant(),
+        });
+        return Json(data);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> DeviceSettings(int tbKey)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var dto = await _deviceSettingsService.GetSettingsAsync(tbKey, memberTbKey);
+        if (dto == null) return NotFound();
+        return Json(dto);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> DeviceDetail(int tbKey)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var dto = await _deviceSettingsService.GetDetailAsync(tbKey, memberTbKey, GetMemberTimezone());
+        if (dto == null) return NotFound();
+        return Json(dto);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SaveDeviceSettings([FromBody] SaveDeviceSettingsRequest request)
+    {
+        var memberTbKey = GetMemberTbKey();
+        if (request.TbKey <= 0) return BadRequest();
+
+        var saveRequest = new DeviceSettingsSaveRequest
+        {
+            Cname = request.Cname ?? string.Empty,
+            IconFile = request.IconFile ?? "A",
+            LabelTbKeys = request.LabelTbKeys?.ToList() ?? [],
+            UdFields = (request.UdFields ?? []).Select(f => new DeviceUdFieldSave
+            {
+                FieldTbKey = f.FieldTbKey,
+                Value = f.Value ?? string.Empty
+            }).ToList(),
+            GpsReportTime = request.GpsReportTime,
+            ShockMode = request.ShockMode,
+            ShockSensitive = request.ShockSensitive,
+            ApMinute = request.ApMinute,
+            ApMsg = request.ApMsg ?? string.Empty,
+            AsMinute = request.AsMinute,
+            AsMsg = request.AsMsg ?? string.Empty,
+            ShareEnabled = request.ShareEnabled,
+            SharePassword = request.SharePassword ?? "0000",
+            AlertMode = request.AlertMode
+        };
+
+        var result = await _deviceSettingsService.SaveSettingsAsync(request.TbKey, memberTbKey, saveRequest);
+
+        if (!result.Success)
+            return Json(new { success = false, message = result.Message });
+
+        return Json(new { success = true, message = result.Message });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> HistoryData(string imei, string? date, string type = "GPS")
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        if (!trackers.Any(t => t.IMEICODE == imei))
+            return Forbid();
+
+        var queryDate = DateTime.TryParse(date, out var d) ? d.Date : DateTime.Today;
+        var localStart = queryDate;
+        var localEnd = queryDate.AddDays(1).AddSeconds(-1);
+
+        var result = type == "LBS"
+            ? await _historyService.GetLBSHistoryAsync(imei, localStart, localEnd, memberTimezone, 1, 5000)
+            : await _historyService.GetGPSHistoryAsync(imei, localStart, localEnd, memberTimezone, 1, 5000);
+
+        var logs = result.Logs
+            .Where(l => Math.Abs(l.Lat) > 0.0001 && Math.Abs(l.Lng) > 0.0001)
+            .Select((l, i) => new
+            {
+                seq = i + 1,
+                lat = l.Lat,
+                lng = l.Lng,
+                speed = Math.Round(l.Speed, 1),
+                direction = l.Direction,
+                time = l.UTCTime.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss"),
+                distanceM = Math.Round(l.Distance, 0),
+                distanceKm = Math.Round(l.Distance / 1000.0, 3),
+                gpsNo = l.GPSNo,
+                hdop = Math.Round(l.HDOP, 2),
+                csq = l.CSQ,
+                voltage = l.Voltage
+            })
+            .ToList();
+
+        return Json(new
+        {
+            logs,
+            totalDistance = Math.Round(result.TotalDistance / 1000.0, 2),
+            maxSpeed = Math.Round(result.MaxSpeed, 1),
+            avgSpeed = Math.Round(result.AvgSpeed, 1),
+            totalCount = logs.Count
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> HistoryDailySummary(string imei, string? endDate)
+    {
+        var memberTbKey = GetMemberTbKey();
+        var memberTimezone = GetMemberTimezone();
+
+        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        if (!trackers.Any(t => t.IMEICODE == imei))
+            return Forbid();
+
+        var end = DateTime.TryParse(endDate, out var ed) ? ed.Date : DateTime.Today.AddMinutes(memberTimezone);
+        var summaries = await _historyService.GetDailySummaryAsync(imei, end, memberTimezone);
+
+        var result = summaries.Select(s =>
+        {
+            TimeSpan? duration = s.FirstGPS.HasValue && s.LastGPS.HasValue
+                ? s.LastGPS.Value - s.FirstGPS.Value : null;
+            var d = duration ?? TimeSpan.Zero;
+            return new
+            {
+                date = s.Date.ToString("yyyy-MM-dd"),
+                firstGPS = s.FirstGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
+                lastGPS = s.LastGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
+                duration = s.RecordCount > 0
+                    ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}"
+                    : "—",
+                recordCount = s.RecordCount,
+                totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
+            };
+        });
+
+        return Json(result);
+    }
+}

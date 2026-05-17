@@ -1,0 +1,75 @@
+@using TrackerPlus.Core.Common
+@using TrackerPlus.Core.Models
+@model PagedResult<TrackerPlus.Core.Models.Tracker>
+@{
+    ViewData["Title"] = L["Admin_Tracker_Title"].Value;
+    var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
+}
+<h2>@L["Admin_Tracker_Title"]</h2>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_Tracker_SearchPh"]" />
+    </div>
+    <div class="col-md-2">
+        <select name="status" class="form-select">
+            <option value="">@L["Common_All"]@L["Common_Status"]</option>
+            <option value="Y" selected="@(filter.Status == "Y")">@L["Common_Enabled"]</option>
+            <option value="N" selected="@(filter.Status == "N")">@L["Common_Disabled"]</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-striped table-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>TbKey</th>
+                <th>IMEI</th>
+                <th>@L["Detail_DeviceName"]</th>
+                <th>@L["Common_Status"]</th>
+                <th>@L["Admin_Tracker_LastReport"]</th>
+                <th>@L["Admin_Tracker_PowerSaving"]</th>
+                <th>@L["Common_Operation"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Items)
+            {
+                <tr>
+                    <td>@t.TbKey</td>
+                    <td>@t.IMEICODE</td>
+                    <td>@t.CName</td>
+                    <td>@(t.TrackerStatus == "Y" ? L["Common_Enabled"].Value : L["Common_Disabled"].Value)</td>
+                    <td>@t.LastReportTime?.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@(t.PowerSavingMode ? L["Common_On"].Value : L["Common_Off"].Value)</td>
+                    <td>
+                        <a asp-action="Detail" asp-route-id="@t.TbKey" class="btn btn-sm btn-info btn-with-icon">@Html.UiIcon("details")<span>@L["Common_Details"]</span></a>
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, t.IMEICODE)')">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@t.TbKey" />
+                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)，@string.Format(L["Common_PageInfo"].Value, Model.PageIndex, Model.TotalPages)</span>
+    <div>
+        @if (Model.HasPreviousPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+        }
+        @if (Model.HasNextPage)
+        {
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+        }
+    </div>
+</div>
