@@ -65,6 +65,12 @@
         gps120m = L["DeviceSettings_Gps120m"].Value,
         detailOffline = L["Live_Detail_Offline"].Value,
         detailOnline = L["Live_Detail_Online"].Value,
+        statusSleeping = "休眠",
+        statusTerminated = "已到期",
+        statusSelectDevice = "請選擇裝置",
+        labelGsm = "GSM",
+        labelSatellites = "衛星",
+        labelVoltage = "電壓",
         detailLastLogin = L["Live_Detail_LastLogin"].Value,
         detailLastGps = L["Live_Detail_LastGps"].Value,
         detailLastConnect = L["Live_Detail_LastConnect"].Value,
@@ -127,8 +133,12 @@
         speed = t.Speed,
         direction = t.Direction,
         voltage = t.Voltage,
+        voltageDisplay = t.VoltageDisplay,
         csq = t.CSQ,
         gpsNo = t.GPSNo,
+        gpsSatellitesUsed = t.GpsSatellitesUsed,
+        gpsSatellitesTotal = t.GpsSatellitesTotal,
+        powerSaving = t.PowerSavingMode,
         isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10,
         lastReportLocal = t.LastReportTime.HasValue
             ? t.LastReportTime.Value.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss")
@@ -154,7 +164,14 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 :root {
     --live-nav-h: 32px;
     --live-tabs-h: 26px;
-    --live-hist-panel-h: 240px;
+    --live-hist-splitter-h: 6px;
+    --live-hist-summary-rows: 7;
+    --live-hist-toolbar-h: 34px;
+    --live-hist-table-row-h: 22px;
+    --live-hist-panel-h: calc(
+        var(--live-hist-toolbar-h)
+        + (1 + var(--live-hist-summary-rows)) * var(--live-hist-table-row-h)
+    );
 }
 
 /* ======= NAVBAR ======= */
@@ -211,6 +228,8 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 
 /* ======= DEVICE TABLE ======= */
 .device-table { width: 100%; border-collapse: collapse; font-size: 11px; table-layout: fixed; }
+.col-check { width: 22px; text-align: center; padding: 0 !important; }
+.col-check input { cursor: pointer; margin: 0; vertical-align: middle; }
 .col-name { width: auto; }
 .col-group { width: 50px; }
 .col-days { width: 40px; }
@@ -268,9 +287,48 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 #map-area { flex: 1; position: relative; min-height: 0; display: flex; flex-direction: column; }
 #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
 
+/* ======= MAP DEVICE STATUS BAR ======= */
+#map-device-status-bar {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 11;
+    display: none; align-items: center; gap: 10px; flex-wrap: wrap;
+    min-height: 34px; padding: 4px 10px; box-sizing: border-box;
+    background: rgba(255,255,255,0.96); border-bottom: 1px solid #cbd5e1;
+    font-size: 11px; color: #334155; pointer-events: auto;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+#map-device-status-bar.visible { display: flex; }
+#map-device-status-bar .mds-name {
+    font-weight: 700; color: #1e3a5f; max-width: 200px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-right: 4px;
+}
+#map-device-status-bar .mds-chip {
+    display: inline-flex; align-items: center; gap: 3px;
+    white-space: nowrap;
+}
+#map-device-status-bar .mds-icon-cell {
+    width: 22px; height: 22px; border-radius: 2px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+}
+#map-device-status-bar .mds-icon-cell svg {
+    width: 15px; height: 15px; stroke: #fff; fill: none;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+}
+#map-device-status-bar .mds-icon-cell img {
+    width: 22px; height: 22px; display: block; image-rendering: pixelated;
+}
+#map-device-status-bar .mds-val {
+    font-weight: 700; color: #1e293b; font-size: 11px; min-width: 0;
+}
+#map-device-status-bar .mds-val.status-online { color: #15803d; }
+#map-device-status-bar .mds-val.status-offline { color: #64748b; }
+#map-device-status-bar .mds-val.status-sleeping { color: #a16207; }
+#map-device-status-bar .mds-val.status-terminated { color: #dc2626; }
+
 /* ======= MAP TOOLBAR (overlay) ======= */
 #map-toolbar {
-    position: absolute; top: 8px; left: 8px; z-index: 10;
+    position: absolute; top: 42px; left: 8px; z-index: 10;
     display: flex; flex-direction: column; gap: 2px; pointer-events: auto;
 }
 .map-tool-btn {
@@ -282,7 +340,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 .map-tool-btn.active { background: rgba(37,100,180,0.8); color: #fff; border-color: #3b82f6; }
 
 #map-type-switch {
-    position: absolute; top: 8px; left: 100px; z-index: 10;
+    position: absolute; top: 42px; left: 100px; z-index: 10;
     display: flex; background: #fff; border-radius: 4px; overflow: hidden;
     box-shadow: 0 1px 4px rgba(0,0,0,0.25); font-size: 11px;
 }
@@ -395,15 +453,31 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 }
 #device-detail-panel .dd-icons { margin-top: 10px; padding-top: 8px; border-top: 1px solid #e2e8f0; }
 
+/* ======= HISTORY PANEL RESIZE ======= */
+#hist-resize-handle {
+    display: none; flex-shrink: 0; height: var(--live-hist-splitter-h);
+    cursor: ns-resize; background: #cbd5e1; position: relative; z-index: 5;
+    touch-action: none; user-select: none;
+}
+#hist-resize-handle.visible { display: block; }
+#hist-resize-handle::after {
+    content: ''; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 36px; height: 3px; border-radius: 2px; background: #64748b;
+    box-shadow: 0 -4px 0 #64748b, 0 4px 0 #64748b; opacity: 0.5;
+}
+#hist-resize-handle:hover, #hist-resize-handle.dragging { background: #94a3b8; }
+#hist-resize-handle:hover::after, #hist-resize-handle.dragging::after { opacity: 0.75; }
+
 /* ======= HISTORY PANEL ======= */
 #history-panel {
-    display: none; height: var(--live-hist-panel-h); background: #f8fafc; border-top: 1px solid #cbd5e1;
+    display: none; height: var(--live-hist-panel-h); background: #f8fafc;
     flex-shrink: 0; overflow: hidden; flex-direction: column;
 }
 #history-panel.visible { display: flex; }
 #history-toolbar {
     background: #e2e8f0; padding: 3px 8px; display: flex; align-items: center;
     gap: 4px; flex-wrap: wrap; border-bottom: 1px solid #cbd5e1; flex-shrink: 0;
+    min-height: var(--live-hist-toolbar-h); box-sizing: border-box;
 }
 #history-toolbar label { font-size: 10px; color: #475569; margin: 0; }
 #history-toolbar select, #history-toolbar input[type=date] {
@@ -424,8 +498,16 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 #hist-summary-view .hist-nodata { text-align: center; padding: 10px; color: #94a3b8; font-size: 10px; }
 #hist-summary-table { width: 100%; border-collapse: collapse; font-size: 9.5px; }
 #hist-summary-table thead { background: #e2e8f0; position: sticky; top: 0; z-index: 1; }
-#hist-summary-table th { padding: 3px 6px; text-align: left; color: #475569; font-weight: 600; white-space: nowrap; border-right: 1px solid #cbd5e1; }
-#hist-summary-table td { padding: 3px 6px; border-bottom: 1px solid #e2e8f0; color: #374151; border-right: 1px solid #e2e8f0; }
+#hist-summary-table th {
+    padding: 0 6px; height: var(--live-hist-table-row-h); line-height: var(--live-hist-table-row-h);
+    text-align: left; color: #475569; font-weight: 600; white-space: nowrap; border-right: 1px solid #cbd5e1;
+    box-sizing: border-box;
+}
+#hist-summary-table td {
+    padding: 0 6px; height: var(--live-hist-table-row-h); line-height: var(--live-hist-table-row-h);
+    border-bottom: 1px solid #e2e8f0; color: #374151; border-right: 1px solid #e2e8f0;
+    box-sizing: border-box;
+}
 #hist-summary-table tr.data-row:hover td { background: #eff6ff; cursor: pointer; }
 /* Detail view (day drill-down or LBS result) */
 #hist-detail-view { flex: 1; overflow: hidden; display: none; flex-direction: column; }
@@ -528,6 +610,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
             <table class="device-table">
                 <thead>
                     <tr>
+                        <th class="col-check" title="@L["Live_MultiWindow"]"></th>
                         <th class="col-name">@L["Live_Col_DeviceName"]</th>
                         <th class="col-group">@L["Live_Col_Group"]</th>
                         <th class="col-days">@L["Live_Col_ValidDays"]</th>
@@ -546,8 +629,10 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                             data-imei="@t.IMEICODE"
                             data-power-saving="@t.PowerSavingMode.ToString().ToLower()"
                             data-service-days="@(daysLeft.HasValue ? daysLeft.Value.ToString() : "")"
-                            onclick="onDeviceClick(@t.TbKey)"
-                            onmouseenter="onDeviceHover(@t.TbKey)">
+                            onclick="onDeviceClick(@t.TbKey)">
+                            <td class="col-check" onclick="event.stopPropagation()">
+                                <input type="checkbox" class="device-check" value="@t.TbKey" aria-label="@t.CName" />
+                            </td>
                             <td class="col-name">
                                 <span class="status-dot @statusDot"></span>
                                 <span class="device-name" title="@t.IMEICODE">@(string.IsNullOrEmpty(t.CName) ? t.IMEICODE : t.CName)</span>
@@ -578,11 +663,33 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
         <div id="map-area">
             <div id="map"></div>
 
+            <!-- DEVICE STATUS BAR (live tab) -->
+            <div id="map-device-status-bar" aria-live="polite">
+                <span class="mds-name" id="mds-name">@L["Live_Col_DeviceName"]</span>
+                <span class="mds-chip" id="mds-status-chip" title="">
+                    <span class="mds-icon-cell" id="mds-status-icon"></span>
+                    <span class="mds-val status-offline" id="mds-status-text">@L["Live_Detail_Offline"]</span>
+                </span>
+                <span class="mds-chip" id="mds-csq-chip" title="@L["Detail_Csq"]">
+                    <span class="mds-icon-cell" id="mds-csq-icon"></span>
+                    <span class="mds-val" id="mds-csq">—</span>
+                </span>
+                <span class="mds-chip" id="mds-gps-chip" title="@L["Live_Detail_Satellites"]">
+                    <span class="mds-icon-cell" id="mds-gps-icon"></span>
+                    <span class="mds-val" id="mds-gps">—</span>
+                </span>
+                <span class="mds-chip" id="mds-voltage-chip" title="@L["Live_Detail_LithiumBattery"]">
+                    <span class="mds-icon-cell" id="mds-voltage-icon"></span>
+                    <span class="mds-val" id="mds-voltage">—</span>
+                </span>
+            </div>
+
             <!-- MAP TOOLBAR -->
             <div id="map-toolbar">
                 <button class="map-tool-btn" id="btn-refresh" onclick="forceRefresh()">
-                    @Html.UiIcon("refresh")<span>@L["Live_UpdateNow"] (<span id="refresh-count">0</span>)</span>
+                    @Html.UiIcon("refresh")<span>@L["Live_UpdateNow"] (<span id="refresh-countdown">15</span>)</span>
                 </button>
+                <button class="map-tool-btn" id="btn-multi" onclick="openMultiWindow()">@Html.UiIcon("multi-window")<span>@L["Live_MultiWindow"]</span></button>
                 <button class="map-tool-btn" id="btn-clear" onclick="clearTracks()">@Html.UiIcon("clear")<span>@L["Live_ClearTrack"]</span></button>
                 <button class="map-tool-btn" id="btn-landmark" onclick="openLandmarkModal()">@Html.UiIcon("landmark")<span>@L["Live_CustomLandmark"]</span></button>
                 <button class="map-tool-btn" id="btn-traffic" onclick="toggleTraffic()">@Html.UiIcon("traffic")<span>@L["Live_Traffic"]</span></button>
@@ -768,6 +875,9 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
             </div>
         </div>
 
+        <!-- HISTORY PANEL RESIZE HANDLE -->
+        <div id="hist-resize-handle" title="拖曳調整地圖與歷史紀錄高度" aria-label="拖曳調整地圖與歷史紀錄高度"></div>
+
         <!-- HISTORY PANEL -->
         <div id="history-panel">
             <div id="history-toolbar">
@@ -854,7 +964,8 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 <script>
 // ========== GLOBALS ==========
 const TIMEZOOM = @memberTimezone;
-const REFRESH_INTERVAL = 30000;
+const REFRESH_SECONDS = 15;
+const REFRESH_INTERVAL = REFRESH_SECONDS * 1000;
 let map, trafficLayer;
 let markers = {};        // tbKey ??google.maps.Marker
 let polylines = {};      // tbKey ??google.maps.Polyline (track)
@@ -866,8 +977,8 @@ let historyStreamSource = null;  // active EventSource for detail SSE streaming
 let summaryStreamSource = null;  // active EventSource for summary SSE streaming
 let historyPolylinePath = [];    // accumulated path during streaming
 let activeTab = 'live';
-let refreshTimer = null;
-let refreshCount = 0;
+let refreshTickTimer = null;
+let refreshClock = 0;
 let trafficOn = false;
 let mapTypeRoad = true;
 let selectedTbKey = null;
@@ -997,6 +1108,166 @@ function updateMarkerIcon(tbKey) {
 }
 
 // ========== SIDEBAR DEVICE INTERACTION ==========
+const MDS_ICON_PATH = {
+    signal: '<path d="M2 20h.01"/><path d="M7 20v-4"/><path d="M12 20v-8"/><path d="M17 20V8"/><path d="M22 4v16"/>',
+    satellite: '<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/>',
+    battery: '<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/>',
+    statusOnline: '<circle cx="12" cy="12" r="9"/><path d="m8 12 2 2 4-4"/>',
+    statusOffline: '<path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+    statusSleeping: '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+};
+const LIVE_STATUS_ICON_BASE = '/images/live-status';
+
+function getDeviceStatusLabel(isOnline, powerSaving, serviceDaysStr) {
+    if (serviceDaysStr !== '' && serviceDaysStr !== null && parseInt(serviceDaysStr, 10) <= 0) return { text: i18n.statusTerminated, cls: 'terminated' };
+    if (isOnline) return { text: i18n.detailOnline, cls: 'online' };
+    if (powerSaving) return { text: i18n.statusSleeping, cls: 'sleeping' };
+    return { text: i18n.detailOffline, cls: 'offline' };
+}
+
+function getGprsLegacyIcon(csq) {
+    const x = parseFloat(csq);
+    if (isNaN(x) || x < 4 || x === 99) return 'ico_GPRS_00.gif';
+    if (x < 10) return 'ico_GPRS_01.gif';
+    if (x < 16) return 'ico_GPRS_02.gif';
+    if (x < 22) return 'ico_GPRS_03.gif';
+    if (x < 28) return 'ico_GPRS_04.gif';
+    return 'ico_GPRS_05.gif';
+}
+
+function getSatLegacyIcon(used) {
+    const n = Math.min(12, Math.max(0, parseInt(used, 10) || 0));
+    return `ico_Sat_${String(n).padStart(2, '0')}.gif`;
+}
+
+function getStatusLegacyIcon(cls) {
+    if (cls === 'online') return 'ico_OnLine.gif';
+    return 'ico_OffLine.gif';
+}
+
+function getPowerLegacyIcon(voltageDisplay, voltagePercent) {
+    const v = parseFloat(String(voltageDisplay || '').replace(/V/i, ''));
+    if (!isNaN(v) && v > 0) {
+        if (v <= 3.44) return 'ico_Power_B10.gif';
+        if (v <= 3.5) return 'ico_Power_B10.gif';
+        if (v <= 3.6) return 'ico_Power_B10.gif';
+        if (v <= 3.7) return 'ico_Power_B20.gif';
+        if (v <= 3.75) return 'ico_Power_B30.gif';
+        if (v <= 3.8) return 'ico_Power_B40.gif';
+        if (v <= 3.83) return 'ico_Power_B50.gif';
+        if (v <= 3.85) return 'ico_Power_B60.gif';
+        if (v <= 3.87) return 'ico_Power_B70.gif';
+        if (v <= 3.9) return 'ico_Power_B80.gif';
+        if (v <= 4.1) return 'ico_Power_B90.gif';
+        return 'ico_Power_B100.gif';
+    }
+    const p = parseInt(voltagePercent, 10) || 0;
+    if (p <= 10) return 'ico_Power_B10.gif';
+    if (p <= 20) return 'ico_Power_B20.gif';
+    if (p <= 30) return 'ico_Power_B30.gif';
+    if (p <= 40) return 'ico_Power_B40.gif';
+    if (p <= 50) return 'ico_Power_B50.gif';
+    if (p <= 60) return 'ico_Power_B60.gif';
+    if (p <= 70) return 'ico_Power_B70.gif';
+    if (p <= 80) return 'ico_Power_B80.gif';
+    if (p <= 90) return 'ico_Power_B90.gif';
+    return 'ico_Power_B100.gif';
+}
+
+function getGprsIconBg(csq) {
+    const x = parseFloat(csq);
+    if (isNaN(x) || x < 4 || x === 99) return '#9ca3af';
+    if (x < 10) return '#86efac';
+    if (x < 16) return '#4ade80';
+    if (x < 22) return '#22c55e';
+    if (x < 28) return '#16a34a';
+    return '#15803d';
+}
+
+function getSatIconBg(used) {
+    const n = parseInt(used, 10) || 0;
+    if (n <= 3) return '#fdba74';
+    if (n <= 6) return '#fb923c';
+    return '#ea580c';
+}
+
+function getPowerIconBg(voltageDisplay, voltagePercent) {
+    const v = parseFloat(String(voltageDisplay || '').replace(/V/i, ''));
+    if (!isNaN(v) && v > 0) {
+        if (v <= 3.6) return '#f472b6';
+        if (v <= 3.85) return '#e879f9';
+        return '#c026d3';
+    }
+    const p = parseInt(voltagePercent, 10) || 0;
+    if (p <= 20) return '#f472b6';
+    if (p <= 60) return '#e879f9';
+    return '#c026d3';
+}
+
+function setMdsIconCell(el, bg, pathD) {
+    if (!el) return;
+    el.style.background = bg;
+    el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${pathD}</svg>`;
+}
+
+function setMdsIconCellLegacyOrSvg(el, legacyFile, bg, pathD) {
+    if (!el) return;
+    const url = `${LIVE_STATUS_ICON_BASE}/${legacyFile}`;
+    el.style.background = 'transparent';
+    el.innerHTML = `<img src="${url}" alt="" width="22" height="22">`;
+    const img = el.querySelector('img');
+    if (!img) return;
+    img.onerror = () => setMdsIconCell(el, bg, pathD);
+}
+
+function updateMapDeviceStatusBar(tbKey) {
+    const bar = document.getElementById('map-device-status-bar');
+    if (!bar || activeTab !== 'live') return;
+
+    const m = markers[tbKey];
+    const el = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
+    if (!m || !m.markerData) {
+        bar.classList.remove('visible');
+        return;
+    }
+
+    const t = m.markerData;
+    const serviceDays = el?.dataset.serviceDays ?? '';
+    const powerSaving = el?.dataset.powerSaving === 'true' || t.powerSaving === true;
+    const status = getDeviceStatusLabel(t.isOnline, powerSaving, serviceDays);
+
+    document.getElementById('mds-name').textContent = t.cname || t.imei || '—';
+
+    const statusChip = document.getElementById('mds-status-chip');
+    if (statusChip) statusChip.title = status.text;
+    const statusText = document.getElementById('mds-status-text');
+    if (statusText) {
+        statusText.textContent = status.text;
+        statusText.className = 'mds-val status-' + status.cls;
+    }
+    let statusBg = '#9ca3af';
+    let statusPath = MDS_ICON_PATH.statusOffline;
+    if (status.cls === 'online') { statusBg = '#22c55e'; statusPath = MDS_ICON_PATH.statusOnline; }
+    else if (status.cls === 'sleeping') { statusBg = '#eab308'; statusPath = MDS_ICON_PATH.statusSleeping; }
+    else if (status.cls === 'terminated') { statusBg = '#ef4444'; }
+    setMdsIconCellLegacyOrSvg(document.getElementById('mds-status-icon'), getStatusLegacyIcon(status.cls), statusBg, statusPath);
+
+    const csqVal = (t.csq != null && t.csq !== '') ? String(t.csq) : '—';
+    document.getElementById('mds-csq').textContent = csqVal;
+    setMdsIconCellLegacyOrSvg(document.getElementById('mds-csq-icon'), getGprsLegacyIcon(csqVal), getGprsIconBg(csqVal), MDS_ICON_PATH.signal);
+
+    const gpsUsed = t.gpsSatellitesUsed != null ? t.gpsSatellitesUsed : (t.gpsNo || 0);
+    const gpsTotal = t.gpsSatellitesTotal || 12;
+    document.getElementById('mds-gps').textContent = `${gpsUsed}/${gpsTotal}`;
+    setMdsIconCellLegacyOrSvg(document.getElementById('mds-gps-icon'), getSatLegacyIcon(gpsUsed), getSatIconBg(gpsUsed), MDS_ICON_PATH.satellite);
+
+    const volt = t.voltageDisplay || (t.voltage > 0 ? `${t.voltage}%` : '—');
+    document.getElementById('mds-voltage').textContent = volt || '—';
+    setMdsIconCellLegacyOrSvg(document.getElementById('mds-voltage-icon'), getPowerLegacyIcon(t.voltageDisplay, t.voltage), getPowerIconBg(t.voltageDisplay, t.voltage), MDS_ICON_PATH.battery);
+
+    bar.classList.add('visible');
+}
+
 function selectDeviceOnMap(tbKey) {
     closePopup();
     selectedTbKey = tbKey;
@@ -1021,27 +1292,32 @@ function selectDeviceOnMap(tbKey) {
         const histLabel = document.getElementById('hist-device-label');
         if (histLabel && nameEl) histLabel.textContent = nameEl.textContent.trim();
     }
+
+    updateMapDeviceStatusBar(tbKey);
 }
 
 function onDeviceClick(tbKey) {
     selectDeviceOnMap(tbKey);
 }
 
-function onDeviceHover(tbKey) {
-    const m = markers[tbKey];
-    if (!m) return;
-    if (activeTab === 'live') {
-        map.panTo(m.getPosition());
+function openMultiWindow() {
+    const checked = [...document.querySelectorAll('.device-check:checked')]
+        .map(cb => parseInt(cb.value, 10))
+        .filter(k => !isNaN(k));
+    let keys = checked;
+    if (keys.length === 0) {
+        if (selectedTbKey) keys = [selectedTbKey];
+        else {
+            alert(i18n.multiWindowSelect);
+            return;
+        }
     }
-    const el = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
-    const imei = el?.dataset.imei;
-    if (imei) {
-        const sel = document.getElementById('hist-device-sel');
-        if (sel) sel.value = imei;
-        const nameEl = el?.querySelector('.device-name');
-        const histLabel = document.getElementById('hist-device-label');
-        if (histLabel && nameEl) histLabel.textContent = nameEl.textContent.trim();
+    if (keys.length > MAX_MULTI_WINDOWS) {
+        alert(i18n.multiWindowMax.replace('{0}', String(MAX_MULTI_WINDOWS)));
+        return;
     }
+    const url = '/Map/MultiWindow?tbKeys=' + keys.join(',');
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ========== MAP CONTROLS ==========
@@ -1599,20 +1875,48 @@ function closeDeviceDetail() {
 }
 
 // ========== REFRESH ==========
+function stopRefresh() {
+    if (refreshTickTimer) {
+        clearInterval(refreshTickTimer);
+        refreshTickTimer = null;
+    }
+}
+
+function updateRefreshCountdownDisplay() {
+    const el = document.getElementById('refresh-countdown');
+    if (el) el.textContent = String(REFRESH_SECONDS - refreshClock);
+}
+
+function refreshTick() {
+    if (refreshClock < REFRESH_SECONDS) {
+        updateRefreshCountdownDisplay();
+        refreshClock++;
+    } else {
+        refreshClock = 0;
+        refreshData();
+    }
+}
+
+function startRefreshCycle() {
+    stopRefresh();
+    refreshClock = 0;
+    refreshTickTimer = setInterval(refreshTick, 1000);
+}
+
 function startRefresh() {
-    refreshTimer = setInterval(refreshData, REFRESH_INTERVAL);
+    refreshData();
+    startRefreshCycle();
 }
 
 function forceRefresh() {
-    clearInterval(refreshTimer);
+    stopRefresh();
+    refreshClock = 0;
     refreshData();
-    refreshTimer = setInterval(refreshData, REFRESH_INTERVAL);
+    startRefreshCycle();
 }
 
 function refreshData() {
     $.getJSON('/Map/LiveData', function (data) {
-        refreshCount++;
-        document.getElementById('refresh-count').textContent = refreshCount;
         data.forEach(function (t) {
             t.iconFile = (t.iconFile || 'A').toString().toUpperCase();
             if (markers[t.tbKey] && markers[t.tbKey].markerData) {
@@ -1620,6 +1924,7 @@ function refreshData() {
             }
             renderMarker(t);
             updateMarkerIcon(t.tbKey);
+            if (selectedTbKey === t.tbKey) updateMapDeviceStatusBar(t.tbKey);
             // update sidebar row
             const item = document.querySelector(`.device-item[data-tbkey="${t.tbKey}"]`);
             if (item) {
@@ -1651,6 +1956,138 @@ function showRefreshStatus(msg) {
     setTimeout(() => { el.style.opacity = '0'; }, 3000);
 }
 
+// ========== HISTORY PANEL RESIZE ==========
+const HIST_PANEL_HEIGHT_KEY = 'live-hist-panel-h-v2';
+const MAP_AREA_MIN_H = 120;
+
+function getHistPanelDefaultHeight() {
+    const style = getComputedStyle(document.documentElement);
+    const h = parseFloat(style.getPropertyValue('--live-hist-panel-h'));
+    return Number.isFinite(h) && h > 0 ? Math.round(h) : 210;
+}
+
+function getHistPanelMinHeight() {
+    const style = getComputedStyle(document.documentElement);
+    const toolbar = parseFloat(style.getPropertyValue('--live-hist-toolbar-h')) || 34;
+    const row = parseFloat(style.getPropertyValue('--live-hist-table-row-h')) || 22;
+    return Math.round(toolbar + 4 * row);
+}
+
+function getHistPanelHeight() {
+    const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--live-hist-panel-h'));
+    return Number.isFinite(v) && v > 0 ? Math.round(v) : getHistPanelDefaultHeight();
+}
+
+function setHistPanelHeight(px) {
+    document.documentElement.style.setProperty('--live-hist-panel-h', `${px}px`);
+}
+
+function getMaxHistPanelHeight() {
+    const rp = document.getElementById('right-panel');
+    if (!rp) return 600;
+    const tabs = document.getElementById('map-tabs');
+    const splitter = document.getElementById('hist-resize-handle');
+    const tabsH = tabs ? tabs.offsetHeight : 26;
+    const splitterH = splitter && splitter.classList.contains('visible') ? splitter.offsetHeight : 0;
+    const available = rp.clientHeight - tabsH - splitterH;
+    return Math.max(getHistPanelMinHeight(), available - MAP_AREA_MIN_H);
+}
+
+function clampHistPanelHeight(px) {
+    return Math.min(getMaxHistPanelHeight(), Math.max(getHistPanelMinHeight(), px));
+}
+
+function triggerMapResize() {
+    if (map) google.maps.event.trigger(map, 'resize');
+}
+
+function setHistResizeHandleVisible(visible) {
+    const handle = document.getElementById('hist-resize-handle');
+    if (handle) handle.classList.toggle('visible', visible);
+}
+
+function initHistPanelResize() {
+    const handle = document.getElementById('hist-resize-handle');
+    if (!handle) return;
+
+    const saved = localStorage.getItem(HIST_PANEL_HEIGHT_KEY);
+    if (saved) {
+        const h = parseInt(saved, 10);
+        if (Number.isFinite(h)) setHistPanelHeight(clampHistPanelHeight(h));
+    } else {
+        setHistPanelHeight(getHistPanelDefaultHeight());
+    }
+
+    let dragging = false;
+    let startY = 0;
+    let startH = 0;
+    let resizeRaf = 0;
+
+    function onPointerMove(clientY) {
+        const delta = startY - clientY;
+        setHistPanelHeight(clampHistPanelHeight(startH + delta));
+        if (!resizeRaf) {
+            resizeRaf = requestAnimationFrame(() => {
+                resizeRaf = 0;
+                triggerMapResize();
+            });
+        }
+    }
+
+    function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        handle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        localStorage.setItem(HIST_PANEL_HEIGHT_KEY, String(getHistPanelHeight()));
+        triggerMapResize();
+    }
+
+    handle.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        dragging = true;
+        startY = e.clientY;
+        startH = getHistPanelHeight();
+        handle.classList.add('dragging');
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    handle.addEventListener('touchstart', (e) => {
+        if (!e.touches.length) return;
+        e.preventDefault();
+        dragging = true;
+        startY = e.touches[0].clientY;
+        startH = getHistPanelHeight();
+        handle.classList.add('dragging');
+    }, { passive: false });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        onPointerMove(e.clientY);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!dragging || !e.touches.length) return;
+        e.preventDefault();
+        onPointerMove(e.touches[0].clientY);
+    }, { passive: false });
+
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+    window.addEventListener('touchcancel', endDrag);
+
+    window.addEventListener('resize', () => {
+        if (document.getElementById('history-panel')?.classList.contains('visible')) {
+            setHistPanelHeight(clampHistPanelHeight(getHistPanelHeight()));
+            triggerMapResize();
+        }
+    });
+}
+
 // ========== TABS ==========
 function switchTab(tab) {
     activeTab = tab;
@@ -1662,7 +2099,14 @@ function switchTab(tab) {
     document.getElementById('map-toolbar').style.display = isLive ? '' : 'none';
     const mts = document.getElementById('map-type-switch');
     if (mts) mts.style.display = isLive ? '' : 'none';
+    const statusBar = document.getElementById('map-device-status-bar');
+    if (statusBar) {
+        if (isLive && selectedTbKey) updateMapDeviceStatusBar(selectedTbKey);
+        else statusBar.classList.remove('visible');
+    }
+    setHistResizeHandleVisible(!isLive);
     document.getElementById('history-panel').classList.toggle('visible', !isLive);
+    if (!isLive) setHistPanelHeight(clampHistPanelHeight(getHistPanelHeight()));
     document.getElementById('device-popup').style.display = 'none';
 
     if (!isLive) {
@@ -1671,7 +2115,7 @@ function switchTab(tab) {
         Object.values(polylines).forEach(p => p.setMap(null));
         clearTracks();
         clearHistoryMap();
-        clearInterval(refreshTimer);
+        stopRefresh();
         const isLbs = tab === 'history-lbs';
         const gpsCtrl = document.getElementById('hist-gps-controls');
         const lbsCtrl = document.getElementById('hist-lbs-controls');
@@ -2036,6 +2480,8 @@ window.gm_authFailure = function () {
         if (!isNaN(tbKey)) openDeviceSettings(tbKey);
     });
 })();
+
+initHistPanelResize();
 </script>
 @if (!string.IsNullOrEmpty(googleApiJs))
 {

@@ -8,6 +8,7 @@ using System.Text.Json;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
+using TrackerPlus.Core.Models;
 
 namespace TrackerPlus.Web.Controllers;
 
@@ -206,8 +207,12 @@ public class MapController : Controller
                 ? t.LastReportTime.Value.AddMinutes(memberTimezone).ToString("yyyy-MM-dd HH:mm:ss")
                 : "",
             voltage = t.Voltage,
+            voltageDisplay = t.VoltageDisplay,
             csq = t.CSQ,
             gpsNo = t.GPSNo,
+            gpsSatellitesUsed = t.GpsSatellitesUsed,
+            gpsSatellitesTotal = t.GpsSatellitesTotal,
+            powerSaving = t.PowerSavingMode,
             isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10,
             groupName = t.GroupName,
             label = t.Label,
@@ -432,17 +437,7 @@ public class MapController : Controller
         {
             await foreach (var s in _historyService.StreamDailySummaryAsync(imei, end, memberTimezone).WithCancellation(ct))
             {
-                TimeSpan? dur = s.FirstGPS.HasValue && s.LastGPS.HasValue ? s.LastGPS.Value - s.FirstGPS.Value : null;
-                var d = dur ?? TimeSpan.Zero;
-                var row = new
-                {
-                    date = s.Date.ToString("yyyy-MM-dd"),
-                    firstGPS = s.FirstGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
-                    lastGPS = s.LastGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
-                    duration = s.RecordCount > 0 ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}" : "—",
-                    recordCount = s.RecordCount,
-                    totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
-                };
+                var row = FormatDailySummaryRow(s);
                 await Response.WriteAsync($"data: {JsonSerializer.Serialize(row)}\n\n", ct);
                 await Response.Body.FlushAsync(ct);
             }
@@ -466,28 +461,34 @@ public class MapController : Controller
         var end = DateTime.TryParse(endDate, out var ed) ? ed.Date : DateTime.Today.AddMinutes(memberTimezone);
         var summaries = await _historyService.GetDailySummaryAsync(imei, end, memberTimezone);
 
-        var result = summaries.Select(s =>
-        {
-            TimeSpan? duration = s.FirstGPS.HasValue && s.LastGPS.HasValue
-                ? s.LastGPS.Value - s.FirstGPS.Value : null;
-            var d = duration ?? TimeSpan.Zero;
-            return new
-            {
-                date = s.Date.ToString("yyyy-MM-dd"),
-                firstGPS = s.FirstGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
-                lastGPS = s.LastGPS?.ToString("yyyy/MM/dd HH:mm:ss") ?? "—",
-                duration = s.RecordCount > 0
-                    ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}"
-                    : "—",
-                recordCount = s.RecordCount,
-                totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
-            };
-        }).ToList();
+        var result = summaries.Select(FormatDailySummaryRow).ToList();
 
         sw.Stop();
         _logger.LogInformation("[HistoryDailySummary] IMEI={IMEI} EndDate={EndDate} Days={Days} Elapsed={Elapsed}",
             imei, endDate, result.Count, FormatElapsed(sw.Elapsed));
 
         return Json(result);
+    }
+
+    private static object FormatDailySummaryRow(DailyHistorySummary s)
+    {
+        var dayMidnight = s.Date.ToString("yyyy/MM/dd 00:00:00");
+        TimeSpan? dur = s.FirstGPS.HasValue && s.LastGPS.HasValue ? s.LastGPS.Value - s.FirstGPS.Value : null;
+        var d = dur ?? TimeSpan.Zero;
+        return new
+        {
+            date = s.Date.ToString("yyyy-MM-dd"),
+            firstGPS = s.RecordCount > 0 && s.FirstGPS.HasValue
+                ? s.FirstGPS.Value.ToString("yyyy/MM/dd HH:mm:ss")
+                : dayMidnight,
+            lastGPS = s.RecordCount > 0 && s.LastGPS.HasValue
+                ? s.LastGPS.Value.ToString("yyyy/MM/dd HH:mm:ss")
+                : dayMidnight,
+            duration = s.RecordCount > 0
+                ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}"
+                : "0days / 00:00:00",
+            recordCount = s.RecordCount,
+            totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
+        };
     }
 }

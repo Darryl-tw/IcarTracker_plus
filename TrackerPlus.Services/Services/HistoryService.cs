@@ -159,14 +159,35 @@ public class HistoryService : IHistoryService
         var utcEnd = localEnd.Date.AddDays(1).AddSeconds(-1) - offset;
         var utcStart = localEnd.Date.AddDays(-(days - 1)) - offset;
         var rows = await _historyRepo.GetDailySummaryAsync(imei, utcStart, utcEnd, memberTimezone);
-        return rows.Select(r => new DailyHistorySummary
+        var byDate = rows.ToDictionary(r => r.Date.Date);
+
+        var result = new List<DailyHistorySummary>();
+        for (var day = localEnd.Date; day >= localEnd.Date.AddDays(-(days - 1)); day = day.AddDays(-1))
         {
-            Date = r.Date,  // local date from repo
-            FirstGPS = r.FirstGPS.HasValue ? r.FirstGPS.Value + offset : null,
-            LastGPS = r.LastGPS.HasValue ? r.LastGPS.Value + offset : null,
-            RecordCount = r.RecordCount,
-            TotalDistanceKm = r.TotalDistanceKm
-        });
+            if (byDate.TryGetValue(day, out var r))
+            {
+                result.Add(new DailyHistorySummary
+                {
+                    Date = r.Date,
+                    FirstGPS = r.FirstGPS.HasValue ? r.FirstGPS.Value + offset : null,
+                    LastGPS = r.LastGPS.HasValue ? r.LastGPS.Value + offset : null,
+                    RecordCount = r.RecordCount,
+                    TotalDistanceKm = r.TotalDistanceKm
+                });
+            }
+            else
+            {
+                result.Add(new DailyHistorySummary
+                {
+                    Date = day,
+                    RecordCount = 0,
+                    TotalDistanceKm = 0,
+                    FirstGPS = null,
+                    LastGPS = null
+                });
+            }
+        }
+        return result;
     }
 
     public async IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(

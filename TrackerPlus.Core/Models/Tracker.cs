@@ -46,4 +46,10 @@ public class Tracker
     public int Voltage { get; set; }
     public int CSQ { get; set; }
     public int GPSNo { get; set; }
+    /// <summary>顯示用電壓，例如 4.16V</summary>
+    public string VoltageDisplay { get; set; } = string.Empty;
+    /// <summary>衛星數（使用中）</summary>
+    public int GpsSatellitesUsed { get; set; }
+    /// <summary>衛星數（可見總數，舊版固定 12）</summary>
+    public int GpsSatellitesTotal { get; set; } = 12;
 }

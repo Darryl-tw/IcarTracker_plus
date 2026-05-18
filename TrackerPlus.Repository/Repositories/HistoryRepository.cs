@@ -299,7 +299,18 @@ public class HistoryRepository : IHistoryRepository
                 var tn = $"TLG_{t:yyyyMMdd}";
                 if (existing.Contains(tn)) tables.Add(tn);
             }
-            if (tables.Count == 0) continue;
+            if (tables.Count == 0)
+            {
+                yield return new DailyHistorySummary
+                {
+                    Date = localDay,
+                    RecordCount = 0,
+                    TotalDistanceKm = 0,
+                    FirstGPS = null,
+                    LastGPS = null
+                };
+                continue;
+            }
 
             // Aggregate across all relevant tables for this local day
             var unionParts = tables.Select(t =>
@@ -317,15 +328,13 @@ public class HistoryRepository : IHistoryRepository
             var row = await conn.QuerySingleAsync(aggSql, new { IMEI = imei, Start = dayUtcStart, End = dayUtcEnd });
 
             var count = (int)row.RecordCount;
-            if (count == 0) continue;
-
             yield return new DailyHistorySummary
             {
                 Date = localDay,   // local date — correct for any timezone
                 RecordCount = count,
-                TotalDistanceKm = Math.Round(Convert.ToDouble(row.TotalDistanceM) / 1000.0, 2),
-                FirstGPS = row.FirstGPS != null ? (DateTime?)row.FirstGPS : null,  // UTC — service converts
-                LastGPS  = row.LastGPS  != null ? (DateTime?)row.LastGPS  : null
+                TotalDistanceKm = count > 0 ? Math.Round(Convert.ToDouble(row.TotalDistanceM) / 1000.0, 2) : 0,
+                FirstGPS = count > 0 && row.FirstGPS != null ? (DateTime?)row.FirstGPS : null,  // UTC — service converts
+                LastGPS  = count > 0 && row.LastGPS  != null ? (DateTime?)row.LastGPS  : null
             };
         }
     }
