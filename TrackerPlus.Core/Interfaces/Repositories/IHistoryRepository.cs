@@ -16,5 +16,7 @@ public interface IHistoryRepository
     Task<IEnumerable<DailyHistorySummary>> GetDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes);
     IAsyncEnumerable<TrackingLog> StreamGPSHistoryAsync(string imei, DateTime startUtc, DateTime endUtc, CancellationToken ct = default);
     IAsyncEnumerable<TrackingLog> StreamLBSHistoryAsync(string imei, DateTime startUtc, DateTime endUtc, CancellationToken ct = default);
+    IAsyncEnumerable<TrackingLog> StreamCombinedHistoryAsync(string imei, DateTime startUtc, DateTime endUtc, CancellationToken ct = default);
     IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes, CancellationToken ct = default);
+    IAsyncEnumerable<DailyHistorySummary> StreamCombinedDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes, CancellationToken ct = default);
 }

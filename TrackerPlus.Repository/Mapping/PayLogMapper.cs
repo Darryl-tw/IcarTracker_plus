@@ -18,6 +18,7 @@ internal static class PayLogMapper
             p.CMemo,
             p.Model,
             p.sale_memo,
+            ISNULL(CAST(p.ValueAddedWeb AS INT), 0) AS ValueAddedWeb,
             RTRIM(m.CName) AS MemberName,
             t.OBM_tbKey,
             RTRIM(u.UserName) AS OBMName";
@@ -41,6 +42,8 @@ internal static class PayLogMapper
         EDate = row.EDate,
         CDate = row.CDate,
         Memo = row.CMemo?.Trim() ?? string.Empty,
+        SaleMemo = row.sale_memo?.Trim() ?? string.Empty,
+        ValueAddedWeb = row.ValueAddedWeb,
         Status = "Y",
         Operator = string.Empty,
         MemberName = row.MemberName?.Trim() ?? string.Empty,

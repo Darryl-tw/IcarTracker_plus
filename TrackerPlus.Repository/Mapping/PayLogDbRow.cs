@@ -14,6 +14,7 @@ internal sealed class PayLogDbRow
     public string? CMemo { get; set; }
     public int Model { get; set; }
     public string? sale_memo { get; set; }
+    public int ValueAddedWeb { get; set; }
     public string? MemberName { get; set; }
     public int? OBM_tbKey { get; set; }
     public string? OBMName { get; set; }

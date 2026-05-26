@@ -217,7 +217,7 @@ public class MapController : Controller
             groupName = t.GroupName,
             label = t.Label,
             serviceEndDate = t.ServiceEndDate?.ToString("yyyy-MM-dd"),
-            serviceDays = ServiceDaysHelper.RemainingDays(t.ServiceEndDate),
+            serviceDays = t.EffectiveDays,
             firmwareVersion = t.FirmwareVersion,
             iconFile = string.IsNullOrWhiteSpace(t.IconFile) ? "A" : t.IconFile.Trim().ToUpperInvariant(),
         });
@@ -307,6 +307,8 @@ public class MapController : Controller
 
         var stream = type == "LBS"
             ? _historyService.StreamLBSHistoryAsync(imei, localStart, localEnd, memberTimezone, ct)
+            : type == "Combined"
+            ? _historyService.StreamCombinedHistoryAsync(imei, localStart, localEnd, memberTimezone, ct)
             : _historyService.StreamGPSHistoryAsync(imei, localStart, localEnd, memberTimezone, ct);
 
         async Task FlushBatch()
@@ -337,7 +339,8 @@ public class MapController : Controller
                     hdop = Math.Round(l.HDOP, 2),
                     csq = l.CSQ,
                     voltage = l.Voltage,
-                    voltageV = l.VoltageStr
+                    voltageV = l.VoltageStr,
+                    logType = l.Type
                 });
                 totalDistance += l.Distance;
                 if (l.Speed > maxSpeed) maxSpeed = l.Speed;
@@ -414,7 +417,7 @@ public class MapController : Controller
     }
 
     [HttpGet]
-    public async Task HistoryDailySummaryStream(string imei, string? endDate)
+    public async Task HistoryDailySummaryStream(string imei, string? endDate, string type = "GPS")
     {
         var memberTbKey = GetMemberTbKey();
         var memberTimezone = GetMemberTimezone();
@@ -433,9 +436,13 @@ public class MapController : Controller
         var ct = HttpContext.RequestAborted;
         var end = DateTime.TryParse(endDate, out var ed) ? ed.Date : DateTime.Today.AddMinutes(memberTimezone);
 
+        var summaryStream = type == "Combined"
+            ? _historyService.StreamCombinedDailySummaryAsync(imei, end, memberTimezone, ct: ct)
+            : _historyService.StreamDailySummaryAsync(imei, end, memberTimezone, ct: ct);
+
         try
         {
-            await foreach (var s in _historyService.StreamDailySummaryAsync(imei, end, memberTimezone).WithCancellation(ct))
+            await foreach (var s in summaryStream.WithCancellation(ct))
             {
                 var row = FormatDailySummaryRow(s);
                 await Response.WriteAsync($"data: {JsonSerializer.Serialize(row)}\n\n", ct);

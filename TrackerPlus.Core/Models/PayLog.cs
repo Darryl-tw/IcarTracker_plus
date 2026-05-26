@@ -16,6 +16,10 @@ public class PayLog
     public DateTime? EDate { get; set; }
     public DateTime CDate { get; set; } = DateTime.UtcNow;
     public string Memo { get; set; } = string.Empty;
+    /// <summary>業務備註（sale_memo）</summary>
+    public string SaleMemo { get; set; } = string.Empty;
+    /// <summary>加值服務：1=網頁平台, 0=無</summary>
+    public int ValueAddedWeb { get; set; }
     public string Status { get; set; } = "Y";
     /// <summary>操作人員</summary>
     public string Operator { get; set; } = string.Empty;

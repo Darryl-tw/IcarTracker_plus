@@ -225,6 +225,34 @@ public class HistoryService : IHistoryService
         return _historyRepo.StreamLBSHistoryAsync(imei, utcStart, utcEnd, ct);
     }
 
+    public IAsyncEnumerable<TrackingLog> StreamCombinedHistoryAsync(
+        string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default)
+    {
+        var (utcStart, utcEnd) = ToUtc(localStart, localEnd, memberTimezone);
+        return _historyRepo.StreamCombinedHistoryAsync(imei, utcStart, utcEnd, ct);
+    }
+
+    public async IAsyncEnumerable<DailyHistorySummary> StreamCombinedDailySummaryAsync(
+        string imei, DateTime localEnd, int memberTimezone, int days = 7,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var offset = TimeSpan.FromMinutes(memberTimezone);
+        var utcEnd = localEnd.Date.AddDays(1).AddSeconds(-1) - offset;
+        var utcStart = localEnd.Date.AddDays(-(days - 1)) - offset;
+
+        await foreach (var r in _historyRepo.StreamCombinedDailySummaryAsync(imei, utcStart, utcEnd, memberTimezone, ct).WithCancellation(ct))
+        {
+            yield return new DailyHistorySummary
+            {
+                Date = r.Date,
+                RecordCount = r.RecordCount,
+                TotalDistanceKm = r.TotalDistanceKm,
+                FirstGPS = r.FirstGPS.HasValue ? r.FirstGPS.Value + offset : null,
+                LastGPS  = r.LastGPS.HasValue  ? r.LastGPS.Value  + offset : null
+            };
+        }
+    }
+
     private static (DateTime utcStart, DateTime utcEnd) ToUtc(DateTime localStart, DateTime localEnd, int timezoneMinutes)
     {
         var offset = TimeSpan.FromMinutes(timezoneMinutes);

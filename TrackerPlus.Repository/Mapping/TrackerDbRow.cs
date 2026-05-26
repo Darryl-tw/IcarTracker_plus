@@ -44,8 +44,19 @@ internal sealed class TrackerDbRow
     public string? FC_R3 { get; set; }
     public string? isFCEnable3 { get; set; }
     public string? MemberName { get; set; }
+    public string? OBMName { get; set; }
+    public string? MemberAccount { get; set; }
+    public string? ICCID { get; set; }
+    public string? APN { get; set; }
+    public DateTime? CDate { get; set; }
     /// <summary>0=標準, 1=專業 (from PayLog.ValueAddedWeb)</summary>
     public int ValueAddedWeb { get; set; }
     /// <summary>目前有效訂單的服務到期日（vPayLog / PayLog.EDate）。</summary>
     public DateTime? PayLogEndDate { get; set; }
+    /// <summary>有效天數（使用中剩餘 + 未開始訂單）；無訂單時 null。</summary>
+    public int? EffectiveDays { get; set; }
+    /// <summary>連線狀態（Y=連線中）</summary>
+    public string? CurrentStatus { get; set; }
+    /// <summary>省電/離線狀態（Y=離線中）</summary>
+    public string? IsSleep { get; set; }
 }

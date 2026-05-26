@@ -39,10 +39,28 @@ public class Tracker
     public string Memo { get; set; } = string.Empty;
     /// <summary>地圖圖示代碼 A–H（對應 IconA–IconH）</summary>
     public string IconFile { get; set; } = "A";
-    /// <summary>服務到期日</summary>
+    /// <summary>使用中訂單的服務到期日（PayLog.EDate，不含待生效訂單）。</summary>
     public DateTime? ServiceEndDate { get; set; }
+    /// <summary>有效天數：使用中剩餘 + 未開始訂單整段天數；無訂單時為 null。</summary>
+    public int? EffectiveDays { get; set; }
     /// <summary>網頁平台：標準 / 專業</summary>
     public string WebPlatform { get; set; } = "標準";
+    /// <summary>會員名稱（Join）</summary>
+    public string MemberName { get; set; } = string.Empty;
+    /// <summary>會員帳號 ID（Join）</summary>
+    public string MemberAccount { get; set; } = string.Empty;
+    /// <summary>經銷商名稱（Join Userdb）</summary>
+    public string OBMName { get; set; } = string.Empty;
+    /// <summary>SIM 卡 ICCID</summary>
+    public string ICCID { get; set; } = string.Empty;
+    /// <summary>APN 設定</summary>
+    public string APN { get; set; } = string.Empty;
+    /// <summary>裝置建立日期（t.CDate）</summary>
+    public DateTime? CreateDate { get; set; }
+    /// <summary>連線狀態：Y=連線中（CurrentStatus）</summary>
+    public string CurrentStatus { get; set; } = string.Empty;
+    /// <summary>省電/離線狀態：Y=離線中（issleep）</summary>
+    public string IsSleep { get; set; } = string.Empty;
     public int Voltage { get; set; }
     public int CSQ { get; set; }
     public int GPSNo { get; set; }

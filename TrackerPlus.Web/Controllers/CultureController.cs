@@ -48,9 +48,12 @@ public class CultureController : Controller
         if (User.Identity?.IsAuthenticated == true)
         {
             if (Request.Path.StartsWithSegments("/Admin") || (returnUrl?.Contains("/Admin", StringComparison.OrdinalIgnoreCase) ?? false))
-                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
+                return RedirectToAction("Index", "Tracker", new { area = "Admin" });
             return RedirectToAction("Index", "Tracker");
         }
+
+        if (!string.IsNullOrEmpty(returnUrl) && returnUrl.Contains("/Admin", StringComparison.OrdinalIgnoreCase))
+            return RedirectToAction("Login", "Account", new { area = "Admin" });
 
         return RedirectToAction("Login", "Account");
     }

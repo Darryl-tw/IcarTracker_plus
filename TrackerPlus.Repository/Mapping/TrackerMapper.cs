@@ -27,6 +27,11 @@ internal static class TrackerMapper
             t.FC_Lat1, t.FC_Lng1, t.FC_R1, t.isFCEnable1,
             t.FC_Lat2, t.FC_Lng2, t.FC_R2, t.isFCEnable2,
             t.FC_Lat3, t.FC_Lng3, t.FC_R3, t.isFCEnable3,
+            t.CDate,
+            ISNULL(RTRIM(t.ICCID),'') AS ICCID,
+            ISNULL(RTRIM(t.APN),'') AS APN,
+            ISNULL(t.CurrentStatus,'N') AS CurrentStatus,
+            ISNULL(t.issleep,'N') AS IsSleep,
             ISNULL((SELECT TOP 1 CAST(pl.ValueAddedWeb AS INT)
                 FROM dbo.PayLog pl
                 WHERE pl.Tracker_tbKey = t.tbKey
@@ -40,7 +45,34 @@ internal static class TrackerMapper
                   AND pl.SDate <= GETDATE()
                   AND pl.EDate >= DATEADD(DAY,-1,GETDATE())
                   AND pl.SDate <> pl.EDate
-                ORDER BY pl.EDate DESC) AS PayLogEndDate";
+                ORDER BY pl.EDate DESC) AS PayLogEndDate,
+            (CASE
+                WHEN EXISTS (
+                    SELECT 1 FROM dbo.PayLog pl
+                    WHERE pl.Tracker_tbKey = t.tbKey
+                      AND pl.SDate <> pl.EDate
+                      AND ((pl.SDate <= GETDATE() AND pl.EDate >= DATEADD(DAY,-1,GETDATE())) OR pl.SDate > GETDATE())
+                )
+                THEN
+                    ISNULL((
+                        SELECT TOP 1 DATEDIFF(day, GETDATE(), pl.EDate) + 1
+                        FROM dbo.PayLog pl
+                        WHERE pl.Tracker_tbKey = t.tbKey
+                          AND pl.SDate <= GETDATE()
+                          AND pl.EDate >= DATEADD(DAY,-1,GETDATE())
+                          AND pl.SDate <> pl.EDate
+                        ORDER BY pl.EDate DESC
+                    ), 0)
+                    + ISNULL((
+                        SELECT SUM(DATEDIFF(day, pl.SDate, pl.EDate) + 1)
+                        FROM dbo.PayLog pl
+                        WHERE pl.Tracker_tbKey = t.tbKey
+                          AND pl.SDate > GETDATE()
+                          AND pl.SDate <> pl.EDate
+                          AND pl.EDate >= pl.SDate
+                    ), 0)
+                ELSE NULL
+            END) AS EffectiveDays";
 
     private const string TrackerFromSql = @"
         FROM dbo.Tracker t
@@ -80,6 +112,7 @@ internal static class TrackerMapper
             IconFile = NormalizeIconFile(row.IconFile),
             FirmwareVersion = row.FWVersion?.Trim() ?? string.Empty,
             ServiceEndDate = row.PayLogEndDate,
+            EffectiveDays = row.EffectiveDays,
             WebPlatform = row.ValueAddedWeb == 1 ? "專業" : "標準",
             Voltage = GpsHelper.ParseVoltagePercent(row.OtherStatus),
             GPSNo = GpsHelper.ParseGpsSatelliteCount(row.QTY_GPS),
@@ -101,7 +134,15 @@ internal static class TrackerMapper
             FC3_Lat = row.FC_Lat3?.Trim() ?? string.Empty,
             FC3_Lng = row.FC_Lng3?.Trim() ?? string.Empty,
             FC3_Radius = ParseRadius(row.FC_R3),
-            FC3_Enable = NormalizeEnable(row.isFCEnable3)
+            FC3_Enable = NormalizeEnable(row.isFCEnable3),
+            MemberName = row.MemberName?.Trim() ?? string.Empty,
+            MemberAccount = row.MemberAccount?.Trim() ?? string.Empty,
+            OBMName = row.OBMName?.Trim() ?? string.Empty,
+            ICCID = row.ICCID?.Trim() ?? string.Empty,
+            APN = row.APN?.Trim() ?? string.Empty,
+            CreateDate = row.CDate,
+            CurrentStatus = row.CurrentStatus?.Trim() ?? string.Empty,
+            IsSleep = row.IsSleep?.Trim() ?? string.Empty
         };
     }
 

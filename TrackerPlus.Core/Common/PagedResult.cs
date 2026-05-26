@@ -33,6 +33,12 @@ public class QueryFilter
     public int PageIndex { get; set; } = 1;
     public int PageSize { get; set; } = 100;
     public string? Keyword { get; set; }
+    /// <summary>經銷商（OBM 名稱 / Domain / Userdb.UserName）</summary>
+    public string? Obm { get; set; }
+    /// <summary>IMEI 或裝置識別名稱</summary>
+    public string? Imei { get; set; }
+    /// <summary>會員帳號 / Email / 姓名</summary>
+    public string? Account { get; set; }
     public string? Status { get; set; }
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }

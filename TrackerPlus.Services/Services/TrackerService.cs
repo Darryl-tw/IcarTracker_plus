@@ -31,12 +31,7 @@ public class TrackerService : ITrackerService
         => await _trackerRepo.GetByIMEIAsync(imei);
 
     public async Task<IEnumerable<Tracker>> GetMemberTrackersAsync(int memberTbKey)
-    {
-        var list = (await _trackerRepo.GetByMemberAsync(memberTbKey)).ToList();
-        foreach (var t in list)
-            t.Label = await _labelRepo.GetLabelNamesDisplayAsync(t.TbKey, memberTbKey);
-        return list;
-    }
+        => await _trackerRepo.GetByMemberAsync(memberTbKey);
 
     public async Task<PagedResult<Tracker>> GetTrackersPagedAsync(QueryFilter filter, int? memberTbKey = null)
         => await _trackerRepo.GetPagedAsync(filter, memberTbKey);

@@ -65,6 +65,26 @@
   </data>
   
   
+  <data name="AdminLogin_RememberMe" xml:space="preserve">
+    <value>记住我</value>
+  </data>
+  
+  
+  <data name="AdminLogin_Language" xml:space="preserve">
+    <value>使用的语言</value>
+  </data>
+  
+  
+  <data name="AdminLogin_IdleLogout" xml:space="preserve">
+    <value>您已闲置超过允许时间，请重新登录。</value>
+  </data>
+  
+  
+  <data name="AdminLogin_SessionHint" xml:space="preserve">
+    <value>未勾选记住我：{0} 分钟；勾选记住我：{1} 分钟；无操作超过 {2} 分钟将自动登出。</value>
+  </data>
+  
+  
   <data name="AdminTitle" xml:space="preserve">
     
     
@@ -1786,4 +1806,51 @@
   <data name="Hist_GsmSignal" xml:space="preserve"><value>GSM信号</value></data>
   <data name="Hist_DistanceM" xml:space="preserve"><value>移动距离</value></data>
   <data name="Hist_SpeedKmh" xml:space="preserve"><value>行进速度</value></data>
+  <data name="Nav_Admin_Menu_Data" xml:space="preserve"><value>资料管理</value></data>
+  <data name="Nav_Admin_Menu_Firmware" xml:space="preserve"><value>固件管理</value></data>
+  <data name="Nav_Admin_Menu_Reports" xml:space="preserve"><value>统计报表</value></data>
+  <data name="Nav_Admin_Menu_Settings" xml:space="preserve"><value>设定</value></data>
+  <data name="Nav_Admin_Tracker_Home" xml:space="preserve"><value>装置管理</value></data>
+  <data name="Nav_Admin_Account_Mgmt" xml:space="preserve"><value>帐号管理</value></data>
+  <data name="Nav_Admin_OBM_Mgmt" xml:space="preserve"><value>经销商管理</value></data>
+  <data name="Nav_Admin_Firmware_Version" xml:space="preserve"><value>固件版本管理</value></data>
+  <data name="Nav_Admin_Firmware_UpdateLog" xml:space="preserve"><value>装置更新明细表</value></data>
+  <data name="Nav_Admin_Report_OrderStatus" xml:space="preserve"><value>订单状态报表</value></data>
+  <data name="Nav_Admin_Report_Account" xml:space="preserve"><value>帐号报表</value></data>
+  <data name="Nav_Admin_Report_Pending" xml:space="preserve"><value>待缴名单一览表</value></data>
+  <data name="Nav_Admin_Report_AbnormalLogin" xml:space="preserve"><value>装置异常登入统计</value></data>
+  <data name="Nav_Admin_Report_Commission" xml:space="preserve"><value>结算续约佣金报表</value></data>
+  <data name="Nav_Admin_Settings_System" xml:space="preserve"><value>系统设定</value></data>
+  <data name="Nav_Admin_Settings_IP" xml:space="preserve"><value>Web service 合法IP 维护</value></data>
+  <data name="Admin_Tracker_Col_OBM" xml:space="preserve"><value>经销商</value></data>
+  <data name="Admin_Tracker_Col_Name" xml:space="preserve"><value>识别名称</value></data>
+  <data name="Admin_Tracker_Col_BindCount" xml:space="preserve"><value>绑定手机</value></data>
+  <data name="Admin_Tracker_Col_CreateDate" xml:space="preserve"><value>创建日期</value></data>
+  <data name="Admin_Tracker_Col_ServiceEnd" xml:space="preserve"><value>订单期限</value></data>
+  <data name="Admin_Tracker_Col_Account" xml:space="preserve"><value>帐号</value></data>
+  <data name="Admin_Tracker_Col_CurrentStatus" xml:space="preserve"><value>目前状态</value></data>
+  <data name="Admin_Tracker_Col_Firmware" xml:space="preserve"><value>固件版本</value></data>
+  <data name="Admin_Tracker_Col_OrderNo" xml:space="preserve"><value>订单号码</value></data>
+  <data name="Admin_Tracker_Col_SaleMemo" xml:space="preserve"><value>业务备注</value></data>
+  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>增值服务</value></data>
+  <data name="Admin_Tracker_Col_StartDate" xml:space="preserve"><value>起始日期</value></data>
+  <data name="Admin_Tracker_Col_EndDate" xml:space="preserve"><value>结束日期</value></data>
+  <data name="Admin_Tracker_Col_LastReportTime" xml:space="preserve"><value>最后回报时间</value></data>
+  <data name="Admin_Tracker_SubTitle_DeviceList" xml:space="preserve"><value>设备列表</value></data>
+  <data name="Admin_Tracker_SubTitle_Orders" xml:space="preserve"><value>订单管理</value></data>
+  <data name="Admin_Tracker_AllStatus" xml:space="preserve"><value>全部状态</value></data>
+  <data name="Admin_Tracker_Status_Online" xml:space="preserve"><value>在线</value></data>
+  <data name="Admin_Tracker_Status_Offline" xml:space="preserve"><value>离线</value></data>
+  <data name="Admin_Tracker_Status_Disconnected" xml:space="preserve"><value>断线</value></data>
+  <data name="Admin_Tracker_PayLog_Active" xml:space="preserve"><value>有效</value></data>
+  <data name="Admin_Tracker_NoSelection" xml:space="preserve"><value>点击上方设备以显示</value></data>
+  <data name="Admin_Tracker_NoData" xml:space="preserve"><value>无资料</value></data>
+  <data name="Admin_Tracker_NoOrders" xml:space="preserve"><value>无订单记录</value></data>
+  <data name="Admin_Tracker_NoBoundMember" xml:space="preserve"><value>此设备无绑定会员</value></data>
+  <data name="Admin_Tracker_Loading" xml:space="preserve"><value>加载中…</value></data>
+  <data name="Admin_Tracker_LoadFail" xml:space="preserve"><value>加载失败</value></data>
+  <data name="Admin_Tracker_ConfirmDelete" xml:space="preserve"><value>确定删除 {0}？</value></data>
+  <data name="Admin_Tracker_DeleteFail" xml:space="preserve"><value>删除失败</value></data>
+  <data name="Common_PerPage" xml:space="preserve"><value>每页</value></data>
+  <data name="Common_JumpTo" xml:space="preserve"><value>跳至</value></data>
 </root>

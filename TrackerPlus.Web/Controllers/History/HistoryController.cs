@@ -49,35 +49,7 @@ public class HistoryController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? imei, DateTime? startDate, DateTime? endDate,
-        string type = "GPS", int page = 1)
-    {
-        var memberTbKey = GetMemberTbKey();
-        var memberTimezone = GetMemberTimezone();
-        var trackers = await _trackerService.GetMemberTrackersAsync(memberTbKey);
-        ViewBag.Trackers = trackers;
-        ViewBag.Imei = imei;
-        ViewBag.Type = type;
-        ViewBag.Page = page;
-
-        if (string.IsNullOrEmpty(imei))
-            return View();
-
-        var (localStart, localEnd) = ResolveLocalDateRange(startDate, endDate);
-        ViewBag.StartDate = localStart.ToString("yyyy-MM-dd");
-        ViewBag.EndDate = localEnd.Date.ToString("yyyy-MM-dd");
-
-        const int pageSize = 50;
-        var result = type switch
-        {
-            "LBS" => await _historyService.GetLBSHistoryAsync(imei, localStart, localEnd, memberTimezone, page, pageSize),
-            "WiFi" => await _historyService.GetWifiHistoryAsync(imei, localStart, localEnd, memberTimezone, page, pageSize),
-            _ => await _historyService.GetGPSHistoryAsync(imei, localStart, localEnd, memberTimezone, page, pageSize)
-        };
-
-        ViewBag.MemberTimezone = memberTimezone;
-        return View(result);
-    }
+    public IActionResult Index() => RedirectToAction("Live", "Map");
 
     [HttpGet]
     public async Task<IActionResult> Map(string imei, DateTime? startDate, DateTime? endDate,

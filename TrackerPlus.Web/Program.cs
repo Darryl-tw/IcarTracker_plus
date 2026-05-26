@@ -20,6 +20,8 @@ builder.Host.UseSerilog((ctx, lc) =>
 // Configuration
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<DatabaseSettings>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.Configure<AdminAuthSettings>(builder.Configuration.GetSection("AdminAuth"));
+var adminAuthDefaults = builder.Configuration.GetSection("AdminAuth").Get<AdminAuthSettings>() ?? new AdminAuthSettings();
 
 // Database
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
@@ -37,6 +39,7 @@ builder.Services.AddScoped<IGeofenceRepository, GeofenceRepository>();
 builder.Services.AddScoped<IOBMRepository, OBMRepository>();
 builder.Services.AddScoped<IMapMarkRepository, MapMarkRepository>();
 builder.Services.AddScoped<IDeviceSettingsRepository, DeviceSettingsRepository>();
+builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
 
 // Services
 builder.Services.AddScoped<ITrackerService, TrackerService>();
@@ -68,9 +71,33 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Admin/Account/Login";
         options.LogoutPath = "/Admin/Account/Logout";
         options.AccessDeniedPath = "/Admin/Account/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromHours(4);
-        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(adminAuthDefaults.RememberMeMinutes);
+        options.SlidingExpiration = false;
         options.Cookie.Name = "TrackerPlus.Admin";
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = context =>
+            {
+                var settings = context.HttpContext.RequestServices
+                    .GetRequiredService<IOptions<AdminAuthSettings>>().Value;
+                var idleLimit = TimeSpan.FromMinutes(settings.IdleTimeoutMinutes);
+                var now = DateTimeOffset.UtcNow;
+
+                if (!context.Properties.Items.TryGetValue("LastActivityUtc", out var raw)
+                    || !DateTimeOffset.TryParse(raw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var last))
+                    last = context.Properties.IssuedUtc ?? now;
+
+                if (now - last > idleLimit)
+                {
+                    context.RejectPrincipal();
+                    return Task.CompletedTask;
+                }
+
+                context.Properties.Items["LastActivityUtc"] = now.ToString("o", CultureInfo.InvariantCulture);
+                context.ShouldRenew = true;
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddLocalization();
@@ -121,7 +148,7 @@ app.UseAuthorization();
 // Area route for Admin
 app.MapControllerRoute(
     name: "areas",
-    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+    pattern: "{area:exists}/{controller=Tracker}/{action=Index}/{id?}");
 
 // Default route
 app.MapControllerRoute(

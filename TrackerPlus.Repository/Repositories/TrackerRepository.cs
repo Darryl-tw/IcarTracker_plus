@@ -10,6 +10,10 @@ namespace TrackerPlus.Repository.Repositories;
 
 public class TrackerRepository : ITrackerRepository
 {
+    private const string TrackerMemberJoins = @"
+        LEFT JOIN dbo.Member m ON t.Member_tbKey = m.tbKey
+        LEFT JOIN dbo.Userdb u ON t.OBM_tbKey = u.tbKey";
+
     private readonly IDbConnectionFactory _db;
     private readonly ILogger<TrackerRepository> _logger;
 
@@ -40,8 +44,26 @@ public class TrackerRepository : ITrackerRepository
     public async Task<IEnumerable<Tracker>> GetByMemberAsync(int memberTbKey)
     {
         _logger.LogDebug("取得會員追蹤器列表 Member={Member}", memberTbKey);
-        var sql = $@"{TrackerMapper.SelectColumns} {TrackerMapper.FromClause}
-            WHERE t.Member_tbKey = @MemberTbKey AND t.TrackerEnabled = 'Y'
+        const string sql = @"
+            SELECT
+                t.tbKey       AS TbKey,
+                RTRIM(ISNULL(t.IMEICode,'')) AS IMEICode,
+                t.Member_tbKey,
+                RTRIM(ISNULL(t.CName,''))    AS CName,
+                ISNULL(t.TrackerEnabled,'N') AS TrackerEnabled,
+                t.CDate,
+                t.LastReportDate,
+                t.LastConnectedDate,
+                t.Lastlogintime,
+                ISNULL(t.CurrentStatus,'N') AS CurrentStatus,
+                ISNULL(t.issleep,'N')       AS IsSleep,
+                (SELECT TOP 1 pl.EDate
+                    FROM dbo.PayLog pl
+                    WHERE pl.Tracker_tbKey = t.tbKey
+                      AND pl.SDate <> pl.EDate
+                    ORDER BY pl.EDate DESC) AS PayLogEndDate
+            FROM dbo.Tracker t
+            WHERE t.Member_tbKey = @MemberTbKey
             ORDER BY t.CName";
         using var conn = _db.CreateMainConnection();
         var rows = await conn.QueryAsync<TrackerDbRow>(sql, new { MemberTbKey = memberTbKey });
@@ -53,15 +75,28 @@ public class TrackerRepository : ITrackerRepository
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter, memberTbKey);
 
-        var countSql = $"SELECT COUNT(*) FROM dbo.Tracker t LEFT JOIN dbo.Member m ON t.Member_tbKey = m.tbKey {where}";
-        var dataSql = $@"{TrackerMapper.SelectColumns}, RTRIM(m.CName) AS MemberName
+        var countSql = $"SELECT COUNT(*) FROM dbo.Tracker t {TrackerMemberJoins} {where}";
+        var dataSql = $@"{TrackerMapper.SelectColumns},
+            RTRIM(ISNULL(m.CName,'')) AS MemberName,
+            RTRIM(ISNULL(u.UserName,'')) AS OBMName,
+            RTRIM(ISNULL(m.ID,'')) AS MemberAccount
             {TrackerMapper.FromClause}
-            LEFT JOIN dbo.Member m ON t.Member_tbKey = m.tbKey
+            {TrackerMemberJoins}
             {where}
-            ORDER BY t.tbKey DESC
+            ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
-        var param = new { filter.Keyword, Status = filter.Status, MemberTbKey = memberTbKey, Offset = offset, filter.PageSize };
+        var param = new
+        {
+            filter.Obm,
+            filter.Imei,
+            filter.Account,
+            filter.Keyword,
+            Status = filter.Status,
+            MemberTbKey = memberTbKey,
+            Offset = offset,
+            filter.PageSize
+        };
         using var conn = _db.CreateMainConnection();
         var total = await conn.ExecuteScalarAsync<int>(countSql, param);
         var rows = await conn.QueryAsync<TrackerDbRow>(dataSql, param);
@@ -205,8 +240,23 @@ public class TrackerRepository : ITrackerRepository
         var conditions = new List<string>();
         if (memberTbKey.HasValue)
             conditions.Add("t.Member_tbKey = @MemberTbKey");
+        if (!string.IsNullOrWhiteSpace(filter.Obm))
+            conditions.Add("RTRIM(u.UserName) LIKE '%' + @Obm + '%'");
+        if (!string.IsNullOrWhiteSpace(filter.Imei))
+            conditions.Add(@"(RTRIM(t.IMEICode) LIKE '%' + @Imei + '%'
+                OR RTRIM(t.CName) LIKE '%' + @Imei + '%')");
+        if (!string.IsNullOrWhiteSpace(filter.Account))
+            conditions.Add(@"(RTRIM(m.ID) LIKE '%' + @Account + '%'
+                OR RTRIM(m.EMail) LIKE '%' + @Account + '%'
+                OR RTRIM(m.CName) LIKE '%' + @Account + '%')");
+        // 相容舊版單一關鍵字搜尋
         if (!string.IsNullOrWhiteSpace(filter.Keyword))
-            conditions.Add("(RTRIM(t.IMEICode) LIKE '%' + @Keyword + '%' OR RTRIM(t.CName) LIKE '%' + @Keyword + '%')");
+            conditions.Add(@"(RTRIM(t.IMEICode) LIKE '%' + @Keyword + '%'
+                OR RTRIM(t.CName) LIKE '%' + @Keyword + '%'
+                OR RTRIM(m.ID) LIKE '%' + @Keyword + '%'
+                OR RTRIM(m.EMail) LIKE '%' + @Keyword + '%'
+                OR RTRIM(m.CName) LIKE '%' + @Keyword + '%'
+                OR RTRIM(u.UserName) LIKE '%' + @Keyword + '%')");
         if (!string.IsNullOrWhiteSpace(filter.Status))
             conditions.Add("t.TrackerEnabled = @Status");
         return conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;

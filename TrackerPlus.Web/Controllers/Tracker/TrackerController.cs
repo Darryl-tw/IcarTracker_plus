@@ -32,12 +32,7 @@ public class TrackerController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index()
-    {
-        var memberTbKey = GetMemberTbKey();
-        var trackers = await _trackerService.GetMemberTrackersAsync(memberTbKey);
-        return View(trackers);
-    }
+    public IActionResult Index() => RedirectToAction("Live", "Map");
 
     [HttpGet]
     public async Task<IActionResult> Detail(int id)

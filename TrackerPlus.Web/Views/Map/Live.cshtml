@@ -147,7 +147,7 @@
         label = t.Label ?? "",
         firmwareVersion = t.FirmwareVersion ?? "",
         iconFile = string.IsNullOrWhiteSpace(t.IconFile) ? "A" : t.IconFile.Trim().ToUpperInvariant(),
-        serviceDays = ServiceDaysHelper.RemainingDays(t.ServiceEndDate),
+        serviceDays = t.EffectiveDays,
     }));
 }
 <!DOCTYPE html>
@@ -204,11 +204,28 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
 
 /* ======= LEFT SIDEBAR ======= */
 #left-sidebar {
-    width: 220px; min-width: 180px; max-width: 320px;
+    width: 220px; min-width: 140px; max-width: 480px;
     background: #1a2a3a; display: flex; flex-direction: column;
-    overflow: hidden; border-right: 1px solid #0d1f30; flex-shrink: 0;
-    resize: horizontal;
+    overflow: hidden; flex-shrink: 0;
 }
+
+/* ======= SIDEBAR RESIZE HANDLE ======= */
+#sidebar-resize-handle {
+    width: 5px; flex-shrink: 0; cursor: ew-resize;
+    background: #0d1f30; border-left: 1px solid #0d1f30; border-right: 1px solid #0d1f30;
+    position: relative; z-index: 5; touch-action: none; user-select: none;
+    transition: background 0.15s;
+}
+#sidebar-resize-handle::after {
+    content: ''; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 3px; height: 40px; border-radius: 2px; background: #2d5070; opacity: 0.6;
+    box-shadow: -4px 0 0 #2d5070, 4px 0 0 #2d5070;
+}
+#sidebar-resize-handle:hover, #sidebar-resize-handle.dragging {
+    background: #1a3a5a;
+}
+#sidebar-resize-handle:hover::after, #sidebar-resize-handle.dragging::after { opacity: 0.9; }
 #sidebar-header {
     padding: 7px 10px 5px; background: #0f1f30; border-bottom: 1px solid #0a1520;
     font-size: 11px; color: #aac8e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -621,7 +638,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                     @foreach (var t in Model)
                     {
                         var isOnline = t.LastReportTime.HasValue && (now - t.LastReportTime.Value).TotalMinutes < 10;
-                        var daysLeft = ServiceDaysHelper.RemainingDays(t.ServiceEndDate);
+                        var daysLeft = t.EffectiveDays;
                         var isExpired = daysLeft.HasValue && daysLeft.Value <= 0;
                         var statusDot = isExpired ? "terminated" : (isOnline ? "online" : (t.PowerSavingMode ? "sleeping" : "disconnected"));
                         <tr class="device-item @(isOnline ? "" : "offline")"
@@ -648,6 +665,9 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
             </table>
         </div>
     </div>
+
+    <!-- ===== SIDEBAR RESIZE HANDLE ===== -->
+    <div id="sidebar-resize-handle" title="拖曳調整裝置列表寬度" aria-label="拖曳調整裝置列表寬度"></div>
 
     <!-- ===== RIGHT PANEL ===== -->
     <div id="right-panel">
@@ -895,10 +915,12 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
                 </span>
                 <span id="hist-lbs-controls" style="display:none;align-items:center;gap:4px">
                     <label>@L["Live_DateLabel"]</label>
-                    <input type="date" id="hist-date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
-                    <button class="hist-btn hist-btn-sec" onclick="histPrevDay()">@Html.UiIcon("prev")<span>@L["Live_Prev7Days"]</span></button>
-                    <button class="hist-btn hist-btn-sec" onclick="histNextDay()">@Html.UiIcon("next")<span>@L["Live_Next7Days"]</span></button>
-                    <button class="hist-btn hist-btn-primary" onclick="loadLbsHistory()">@Html.UiIcon("search")<span>@L["History_Query"]</span></button>
+                    <input type="date" id="hist-lbs-date" value="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           max="@DateTime.Today.ToString("yyyy-MM-dd")"
+                           min="@DateTime.Today.AddMonths(-6).ToString("yyyy-MM-dd")" />
+                    <button class="hist-btn hist-btn-sec" onclick="histLbsPrev7()">@Html.UiIcon("prev")<span>@L["Live_Prev7Days"]</span></button>
+                    <button class="hist-btn hist-btn-sec" onclick="histLbsNext7()">@Html.UiIcon("next")<span>@L["Live_Next7Days"]</span></button>
+                    <button class="hist-btn hist-btn-primary" onclick="loadLbsSummary()">@Html.UiIcon("confirm")<span>@L["Common_Confirm"]</span></button>
                 </span>
                 <button class="hist-btn hist-btn-sec" onclick="clearHistoryMap()">@Html.UiIcon("clear")<span>@L["Live_ClearMap"]</span></button>
                 <span id="hist-loading" style="font-size:11px;color:#64748b;display:none">@L["Live_Loading"]</span>
@@ -1275,12 +1297,6 @@ function selectDeviceOnMap(tbKey) {
     const el = document.querySelector(`.device-item[data-tbkey="${tbKey}"]`);
     if (el) el.classList.add('active');
 
-    const m = markers[tbKey];
-    if (m) {
-        map.panTo(m.getPosition());
-        map.setZoom(15);
-    }
-
     const imei = el?.dataset.imei;
     if (imei) {
         document.getElementById('menu-tracker-detail').href = `/Tracker/Detail/${tbKey}`;
@@ -1293,7 +1309,13 @@ function selectDeviceOnMap(tbKey) {
         if (histLabel && nameEl) histLabel.textContent = nameEl.textContent.trim();
     }
 
-    updateMapDeviceStatusBar(tbKey);
+    if (activeTab === 'live') {
+        const m = markers[tbKey];
+        if (m) { map.panTo(m.getPosition()); map.setZoom(15); }
+        updateMapDeviceStatusBar(tbKey);
+    } else if (activeTab === 'history' || activeTab === 'history-lbs') {
+        resetHistoryForDevice(imei);
+    }
 }
 
 function onDeviceClick(tbKey) {
@@ -1956,6 +1978,83 @@ function showRefreshStatus(msg) {
     setTimeout(() => { el.style.opacity = '0'; }, 3000);
 }
 
+// ========== SIDEBAR RESIZE ==========
+const SIDEBAR_WIDTH_KEY = 'live-sidebar-w-v1';
+
+function initSidebarResize() {
+    const handle = document.getElementById('sidebar-resize-handle');
+    const sidebar = document.getElementById('left-sidebar');
+    if (!handle || !sidebar) return;
+
+    const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
+    if (saved) {
+        const w = parseInt(saved, 10);
+        if (Number.isFinite(w)) sidebar.style.width = w + 'px';
+    }
+
+    let dragging = false;
+    let startX = 0;
+    let startW = 0;
+    let raf = 0;
+
+    const MIN_W = parseInt(getComputedStyle(sidebar).minWidth) || 140;
+    const MAX_W = parseInt(getComputedStyle(sidebar).maxWidth) || 480;
+
+    function clamp(w) { return Math.min(MAX_W, Math.max(MIN_W, w)); }
+
+    function onMove(clientX) {
+        const delta = clientX - startX;
+        sidebar.style.width = clamp(startW + delta) + 'px';
+        if (!raf) raf = requestAnimationFrame(() => { raf = 0; triggerMapResize(); });
+    }
+
+    function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        handle.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        localStorage.setItem(SIDEBAR_WIDTH_KEY, String(parseInt(sidebar.style.width) || sidebar.offsetWidth));
+        triggerMapResize();
+    }
+
+    handle.addEventListener('mousedown', (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        dragging = true;
+        startX = e.clientX;
+        startW = sidebar.offsetWidth;
+        handle.classList.add('dragging');
+        document.body.style.cursor = 'ew-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    handle.addEventListener('touchstart', (e) => {
+        if (!e.touches.length) return;
+        e.preventDefault();
+        dragging = true;
+        startX = e.touches[0].clientX;
+        startW = sidebar.offsetWidth;
+        handle.classList.add('dragging');
+    }, { passive: false });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        e.preventDefault();
+        onMove(e.clientX);
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!dragging || !e.touches.length) return;
+        e.preventDefault();
+        onMove(e.touches[0].clientX);
+    }, { passive: false });
+
+    window.addEventListener('mouseup', endDrag);
+    window.addEventListener('touchend', endDrag);
+    window.addEventListener('touchcancel', endDrag);
+}
+
 // ========== HISTORY PANEL RESIZE ==========
 const HIST_PANEL_HEIGHT_KEY = 'live-hist-panel-h-v2';
 const MAP_AREA_MIN_H = 120;
@@ -2121,13 +2220,12 @@ function switchTab(tab) {
         const lbsCtrl = document.getElementById('hist-lbs-controls');
         if (gpsCtrl) gpsCtrl.style.display = isLbs ? 'none' : 'flex';
         if (lbsCtrl) lbsCtrl.style.display = isLbs ? 'flex' : 'none';
-        const backBtn = document.getElementById('hist-back-btn');
-        if (backBtn) backBtn.style.display = isLbs ? 'none' : '';
         if (!isLbs) {
             showHistSummaryView();
             loadHistorySummary();
         } else {
-            showHistDetailView('');
+            showHistSummaryView();
+            loadLbsSummary();
         }
     } else {
         // Restore live device markers when returning to live tab
@@ -2162,24 +2260,35 @@ function histGpsNext7() {
     loadHistorySummary();
 }
 
-function histPrevDay() {
-    const d = new Date(document.getElementById('hist-date').value);
-    d.setDate(d.getDate() - 1);
-    document.getElementById('hist-date').value = d.toISOString().substring(0, 10);
-}
-
-function histNextDay() {
-    const d = new Date(document.getElementById('hist-date').value);
-    d.setDate(d.getDate() + 1);
-    document.getElementById('hist-date').value = d.toISOString().substring(0, 10);
+function resetMapToWorld() {
+    if (!map) return;
+    map.setCenter({ lat: 25, lng: 110 });
+    map.setZoom(4);
 }
 
 function showHistSummaryView() {
     clearHistoryMap();
+    resetMapToWorld();
     document.getElementById('history-toolbar').style.display = '';
     document.getElementById('hist-summary-view').style.display = 'flex';
     document.getElementById('hist-detail-view').style.display = 'none';
     if (map) setTimeout(() => google.maps.event.trigger(map, 'resize'), 50);
+}
+
+function resetHistoryForDevice(imei) {
+    clearHistoryMap();
+    resetMapToWorld();
+    document.getElementById('hist-summary-tbody').innerHTML = '';
+    document.getElementById('hist-summary-table').style.display = 'none';
+    document.getElementById('hist-summary-nodata').style.display = 'none';
+    document.getElementById('hist-detail-tbody').innerHTML = '';
+    document.getElementById('history-toolbar').style.display = '';
+    document.getElementById('hist-summary-view').style.display = 'flex';
+    document.getElementById('hist-detail-view').style.display = 'none';
+    if (map) setTimeout(() => google.maps.event.trigger(map, 'resize'), 50);
+    if (!imei) return;
+    if (activeTab === 'history') loadHistorySummary();
+    else if (activeTab === 'history-lbs') loadLbsSummary();
 }
 
 function showHistDetailView(titleText) {
@@ -2263,13 +2372,87 @@ function loadHistoryDetail(imei, date) {
     startHistoryStream(imei, date, 'GPS');
 }
 
-function loadLbsHistory() {
+function histLbsPrev7() {
+    const el = document.getElementById('hist-lbs-date');
+    const d = new Date(el.value);
+    d.setDate(d.getDate() - 7);
+    const min = new Date(el.min);
+    if (d < min) d.setTime(min.getTime());
+    el.value = d.toISOString().substring(0, 10);
+    loadLbsSummary();
+}
+
+function histLbsNext7() {
+    const el = document.getElementById('hist-lbs-date');
+    const d = new Date(el.value);
+    d.setDate(d.getDate() + 7);
+    const max = new Date(el.max);
+    if (d > max) d.setTime(max.getTime());
+    el.value = d.toISOString().substring(0, 10);
+    loadLbsSummary();
+}
+
+function loadLbsSummary() {
     const imei = document.getElementById('hist-device-sel').value;
-    const date = document.getElementById('hist-date').value;
-    if (!imei || !date) return;
-    showHistDetailView(imei + '  ' + date + ' (LBS)');
+    const endDate = document.getElementById('hist-lbs-date').value;
+    if (!imei) return;
+
+    document.getElementById('hist-loading').style.display = 'inline';
+    document.getElementById('hist-summary-nodata').style.display = 'none';
+    document.getElementById('hist-summary-table').style.display = 'none';
+    document.getElementById('hist-summary-tbody').innerHTML = '';
+
+    if (summaryStreamSource) { summaryStreamSource.close(); summaryStreamSource = null; }
+
+    const url = `/Map/HistoryDailySummaryStream?imei=${encodeURIComponent(imei)}&endDate=${endDate}&type=Combined`;
+    const es = new EventSource(url);
+    summaryStreamSource = es;
+    let hasData = false;
+
+    es.onmessage = function(e) {
+        const row = JSON.parse(e.data);
+        if (row.done) {
+            es.close(); summaryStreamSource = null;
+            document.getElementById('hist-loading').style.display = 'none';
+            if (!hasData) {
+                document.getElementById('hist-summary-nodata').textContent = i18n.histNoData;
+                document.getElementById('hist-summary-nodata').style.display = 'block';
+            }
+            return;
+        }
+        hasData = true;
+        const tr = document.createElement('tr');
+        tr.className = 'data-row';
+        tr.innerHTML = `
+            <td>${row.date}</td>
+            <td>${row.firstGPS}</td>
+            <td>${row.lastGPS}</td>
+            <td>${row.duration}</td>
+            <td>${row.recordCount}</td>
+            <td>${row.totalKm}</td>
+        `;
+        if (row.recordCount > 0) {
+            tr.onclick = () => loadLbsDetail(imei, row.date);
+        } else {
+            tr.style.color = '#94a3b8';
+        }
+        document.getElementById('hist-summary-tbody').appendChild(tr);
+        document.getElementById('hist-summary-table').style.display = '';
+    };
+
+    es.onerror = function() {
+        if (es.readyState === EventSource.CLOSED) return;
+        es.close(); summaryStreamSource = null;
+        document.getElementById('hist-loading').style.display = 'none';
+        document.getElementById('hist-summary-nodata').textContent = i18n.histQueryFailed;
+        document.getElementById('hist-summary-nodata').style.display = 'block';
+    };
+}
+
+function loadLbsDetail(imei, date) {
+    showHistDetailView(imei + '  ' + date + ' (含LBS)');
     clearHistoryMap();
-    startHistoryStream(imei, date, 'LBS');
+    startHistoryStream(imei, date, 'Combined');
 }
 
 // -------- SSE streaming engine --------
@@ -2312,6 +2495,7 @@ function startHistoryStream(imei, date, type) {
 function appendHistBatch(logs, imei, type, polylineColor) {
     const tbody = document.getElementById('hist-detail-tbody');
     logs.forEach(l => {
+        const effectiveLogType = l.logType || (type === 'LBS' ? 'L' : 'G');
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${l.seq}</td>
@@ -2323,7 +2507,7 @@ function appendHistBatch(logs, imei, type, polylineColor) {
             <td>${voltageCell(l.voltageV, l.voltage)}</td>
             <td>${l.distanceM}公尺</td>
             <td>${l.speed.toFixed(1)}公里/時</td>
-            <td>${dirBadge(l.direction)}</td>
+            <td>${dirBadge(l.direction, effectiveLogType)}</td>
         `;
         tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
         tr.addEventListener('mouseenter', () => { tr.classList.add('row-hover'); highlightHistMarker(0, l, type, imei); });
@@ -2343,7 +2527,7 @@ function appendHistBatch(logs, imei, type, polylineColor) {
             }
             const arrowMarker = new google.maps.Marker({
                 position: pos, map: map,
-                icon: makeHistArrowIcon(l.direction, type),
+                icon: makeHistPointIcon(l.direction, effectiveLogType),
                 title: `${l.time} ${l.speed.toFixed(1)}km/h`
             });
             arrowMarker.addListener('click', () => { map.panTo(pos); map.setZoom(17); });
@@ -2392,8 +2576,12 @@ function voltageBars(pct) {
         `</span>`;
 }
 
-// Direction badge: rotating arrow + "GPS" label (matches old system style)
-function dirBadge(direction) {
+function dirBadge(direction, logType) {
+    if (logType === 'L') {
+        return `<span style="display:inline-flex;align-items:center;gap:1px;background:#f59e0b;color:#fff;` +
+            `border-radius:2px;padding:1px 4px;font-size:8px;white-space:nowrap">` +
+            `<span style="font-size:10px;line-height:1">◉</span>LBS</span>`;
+    }
     return `<span style="display:inline-flex;align-items:center;gap:1px;background:#2563eb;color:#fff;` +
         `border-radius:2px;padding:1px 4px;font-size:8px;white-space:nowrap">` +
         `<span style="display:inline-block;transform:rotate(${direction}deg);font-size:10px;line-height:1">↑</span>` +
@@ -2425,12 +2613,22 @@ function restoreHistMarker() {
     if (hoveredHistMarker) { hoveredHistMarker.setMap(null); hoveredHistMarker = null; }
 }
 
-function makeHistArrowIcon(direction, type) {
+function makeHistPointIcon(direction, logType) {
+    if (logType === 'L') {
+        return {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 5,
+            fillColor: '#f59e0b',
+            fillOpacity: 0.9,
+            strokeColor: '#fff',
+            strokeWeight: 1.5
+        };
+    }
     return {
         path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
         scale: 3,
         rotation: direction,
-        fillColor: type === 'LBS' ? '#f59e0b' : '#2563eb',
+        fillColor: '#2563eb',
         fillOpacity: 0.85,
         strokeColor: '#fff',
         strokeWeight: 1
@@ -2481,6 +2679,7 @@ window.gm_authFailure = function () {
     });
 })();
 
+initSidebarResize();
 initHistPanelResize();
 </script>
 @if (!string.IsNullOrEmpty(googleApiJs))

@@ -29,7 +29,10 @@ public class PayLogRepository : IPayLogRepository
 
     public async Task<IEnumerable<PayLog>> GetByIMEIAsync(string imei)
     {
-        var sql = $"{PayLogMapper.SelectSql} {PayLogMapper.FromSql} WHERE RTRIM(p.IMEICode) = @IMEI ORDER BY p.CDate DESC";
+        var sql = $@"{PayLogMapper.SelectSql} {PayLogMapper.FromSql}
+            WHERE RTRIM(ISNULL(p.IMEICode,'')) = @IMEI
+               OR (p.Tracker_tbKey > 0 AND RTRIM(ISNULL(t.IMEICode,'')) = @IMEI)
+            ORDER BY p.CDate ASC";
         using var conn = _db.CreateMainConnection();
         var rows = await conn.QueryAsync<PayLogDbRow>(sql, new { IMEI = imei.Trim() });
         return rows.Select(PayLogMapper.ToModel);

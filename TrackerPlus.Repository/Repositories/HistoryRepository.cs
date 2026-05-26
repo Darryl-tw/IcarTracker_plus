@@ -228,7 +228,7 @@ public class HistoryRepository : IHistoryRepository
     private static string BuildGpsUnionSql(IEnumerable<string> tables) =>
         string.Join(" UNION ALL ", tables.Select(t =>
             $"SELECT {GpsSelectColumns()} FROM {t} " +
-            $"WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End AND (GPSStatus='A' OR GPSStatus='V')"));
+            $"WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End AND GPSStatus='A'"));
 
     public async Task<IEnumerable<DailyHistorySummary>> GetDailySummaryAsync(string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes)
     {
@@ -374,6 +374,96 @@ public class HistoryRepository : IHistoryRepository
 
         await foreach (var row in conn.QueryUnbufferedAsync<TrackingLogDbRow>(sql, param).WithCancellation(ct))
             yield return TrackingLogMapper.ToModel(row);
+    }
+
+    public async IAsyncEnumerable<TrackingLog> StreamCombinedHistoryAsync(
+        string imei, DateTime startUtc, DateTime endUtc,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        using var conn = _db.CreateLogConnection();
+        await conn.OpenAsync(ct);
+        var tables = await GetExistingGpsTables(conn, startUtc, endUtc);
+        if (tables.Count == 0) yield break;
+
+        var combinedUnion = string.Join(" UNION ALL ", tables.Select(t =>
+            $"SELECT RTRIM(IMEICode) AS IMEICode, GPSDateTime AS UTCTime, Lat, LatPos, Lng, LngPos, " +
+            $"Speed, Direction, Distance, OtherStatus, QTY_GPS, " +
+            $"CASE WHEN GPSStatus='A' THEN SatelliteStatus ELSE NULL END AS SatelliteStatus, " +
+            $"CASE WHEN GPSStatus='A' THEN ISNULL(CAST(HDOP AS NVARCHAR(20)),'0') ELSE '0' END AS HDOP, " +
+            $"CASE WHEN GPSStatus='A' THEN 'G' ELSE 'L' END AS Type " +
+            $"FROM {t} WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime <= @End " +
+            $"AND GPSStatus IN ('A','V','L')"));
+
+        var sql = $"SELECT * FROM ({combinedUnion}) AS t ORDER BY UTCTime ASC";
+        var param = new { IMEI = imei, Start = startUtc, End = endUtc };
+
+        await foreach (var row in conn.QueryUnbufferedAsync<TrackingLogDbRow>(sql, param).WithCancellation(ct))
+            yield return TrackingLogMapper.ToModel(row);
+    }
+
+    public async IAsyncEnumerable<DailyHistorySummary> StreamCombinedDailySummaryAsync(
+        string imei, DateTime startUtc, DateTime endUtc, int timezoneMinutes,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        var offset = TimeSpan.FromMinutes(timezoneMinutes);
+
+        using var conn = _db.CreateLogConnection();
+        await conn.OpenAsync(ct);
+        var existing = (await GetExistingGpsTables(conn, startUtc, endUtc))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var localEnd   = (endUtc   + offset).Date;
+        var localStart = (startUtc + offset).Date;
+
+        for (var localDay = localEnd; localDay >= localStart; localDay = localDay.AddDays(-1))
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var dayUtcStart = localDay - offset;
+            var dayUtcEnd   = localDay.AddDays(1) - offset;
+
+            var utcTableEnd = dayUtcEnd.TimeOfDay == TimeSpan.Zero
+                ? dayUtcEnd.Date.AddDays(-1)
+                : dayUtcEnd.Date;
+
+            var tables = new List<string>();
+            for (var t = dayUtcStart.Date; t <= utcTableEnd; t = t.AddDays(1))
+            {
+                var tn = $"TLG_{t:yyyyMMdd}";
+                if (existing.Contains(tn)) tables.Add(tn);
+            }
+
+            if (tables.Count == 0)
+            {
+                yield return new DailyHistorySummary { Date = localDay, RecordCount = 0, TotalDistanceKm = 0 };
+                continue;
+            }
+
+            var unionParts = tables.Select(t =>
+                $"SELECT COUNT(*) AS RecordCount, " +
+                $"ISNULL(SUM(ISNULL(TRY_CAST(Distance AS FLOAT),0)),0) AS TotalDistanceM, " +
+                $"MIN(GPSDateTime) AS FirstGPS, MAX(GPSDateTime) AS LastGPS " +
+                $"FROM {t} " +
+                $"WHERE RTRIM(IMEICode)=@IMEI AND GPSDateTime >= @Start AND GPSDateTime < @End " +
+                $"AND GPSStatus IN ('A','V','L')");
+
+            var aggSql =
+                $"SELECT SUM(RecordCount) AS RecordCount, SUM(TotalDistanceM) AS TotalDistanceM, " +
+                $"MIN(FirstGPS) AS FirstGPS, MAX(LastGPS) AS LastGPS " +
+                $"FROM ({string.Join(" UNION ALL ", unionParts)}) AS t";
+
+            var row = await conn.QuerySingleAsync(aggSql, new { IMEI = imei, Start = dayUtcStart, End = dayUtcEnd });
+
+            var count = (int)row.RecordCount;
+            yield return new DailyHistorySummary
+            {
+                Date = localDay,
+                RecordCount = count,
+                TotalDistanceKm = count > 0 ? Math.Round(Convert.ToDouble(row.TotalDistanceM) / 1000.0, 2) : 0,
+                FirstGPS = count > 0 && row.FirstGPS != null ? (DateTime?)row.FirstGPS : null,
+                LastGPS  = count > 0 && row.LastGPS  != null ? (DateTime?)row.LastGPS  : null
+            };
+        }
     }
 
     private static TrackingHistoryResult EmptyResult(int pageIndex, int pageSize) =>

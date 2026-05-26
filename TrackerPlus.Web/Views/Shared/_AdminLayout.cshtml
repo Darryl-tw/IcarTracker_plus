@@ -1,4 +1,8 @@
 @using System.Globalization
+@inject Microsoft.Extensions.Options.IOptions<TrackerPlus.Core.Common.AdminAuthSettings> AdminAuthOptions
+@{
+    var adminAuth = AdminAuthOptions.Value;
+}
 <!DOCTYPE html>
 <html lang="@CultureInfo.CurrentUICulture.Name">
 <head>
@@ -9,30 +13,51 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
     <div class="container-fluid">
-        <a class="navbar-brand" asp-controller="Dashboard" asp-action="Index">@L["AdminTitle"]</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navMenu">
+        <div class="collapse navbar-collapse" id="adminNavMenu">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" asp-controller="Tracker" asp-action="Index">@L["Nav_Admin_Devices"]</a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Member" asp-action="Index">@L["Nav_Admin_Members"]</a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="IMEI" asp-action="Index">@L["Nav_Admin_IMEI"]</a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="PayLog" asp-action="Index">@L["Nav_Admin_PayLog"]</a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="Firmware" asp-action="Index">@L["Nav_Admin_Firmware"]</a></li>
-                <li class="nav-item"><a class="nav-link" asp-controller="WebServiceIP" asp-action="Index">@L["Nav_Admin_IP"]</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@L["Nav_Admin_Menu_Data"]</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Tracker" asp-action="Index">@L["Nav_Admin_Tracker_Home"]</a></li>
+                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Member" asp-action="Index">@L["Nav_Admin_Account_Mgmt"]</a></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_OBM_Mgmt"]</span></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@L["Nav_Admin_Menu_Firmware"]</a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Firmware" asp-action="Index">@L["Nav_Admin_Firmware_Version"]</a></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Firmware_UpdateLog"]</span></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@L["Nav_Admin_Menu_Reports"]</a>
+                    <ul class="dropdown-menu">
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Report_OrderStatus"]</span></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Report_Account"]</span></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Report_Pending"]</span></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Report_AbnormalLogin"]</span></li>
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Report_Commission"]</span></li>
+                    </ul>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">@L["Nav_Admin_Menu_Settings"]</a>
+                    <ul class="dropdown-menu">
+                        <li><span class="dropdown-item disabled">@L["Nav_Admin_Settings_System"]</span></li>
+                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="WebServiceIP" asp-action="Index">@L["Nav_Admin_Settings_IP"]</a></li>
+                    </ul>
+                </li>
             </ul>
             <ul class="navbar-nav align-items-center gap-2">
                 <li class="nav-item"><partial name="_LanguageSwitcher" /></li>
                 <li class="nav-item">
-                    <span class="nav-link text-light">@ViewBag.AdminAccount</span>
-                </li>
-                <li class="nav-item">
                     <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-link nav-link text-danger btn-with-icon">@Html.UiIcon("logout")<span>@L["Nav_Logout"]</span></button>
+                        <button type="submit" class="btn btn-link nav-link text-danger">@string.Format("{0}[{1}]", L["Nav_Logout"], ViewBag.AdminAccount ?? User.Identity?.Name)</button>
                     </form>
                 </li>
             </ul>
@@ -43,6 +68,16 @@
     @RenderBody()
 </div>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<form id="admin-idle-logout-form" asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="d-none">
+    <input type="hidden" name="reason" value="idle" />
+</form>
+<script>
+    window.adminIdleConfig = {
+        idleMs: @(adminAuth.IdleTimeoutMinutes * 60 * 1000),
+        logoutUrl: '@Url.Action("Logout", "Account", new { area = "Admin" })'
+    };
+</script>
+<script src="~/js/admin-idle.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

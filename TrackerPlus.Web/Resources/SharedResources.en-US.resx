@@ -65,6 +65,26 @@
   </data>
   
   
+  <data name="AdminLogin_RememberMe" xml:space="preserve">
+    <value>Remember me</value>
+  </data>
+  
+  
+  <data name="AdminLogin_Language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  
+  
+  <data name="AdminLogin_IdleLogout" xml:space="preserve">
+    <value>Your session expired due to inactivity. Please sign in again.</value>
+  </data>
+  
+  
+  <data name="AdminLogin_SessionHint" xml:space="preserve">
+    <value>Without remember me: {0} min; with remember me: {1} min; auto sign-out after {2} min idle.</value>
+  </data>
+  
+  
   <data name="AdminTitle" xml:space="preserve">
     
     
@@ -1786,4 +1806,51 @@
   <data name="Hist_GsmSignal" xml:space="preserve"><value>GSM Signal</value></data>
   <data name="Hist_DistanceM" xml:space="preserve"><value>Distance</value></data>
   <data name="Hist_SpeedKmh" xml:space="preserve"><value>Speed</value></data>
+  <data name="Nav_Admin_Menu_Data" xml:space="preserve"><value>Data Management</value></data>
+  <data name="Nav_Admin_Menu_Firmware" xml:space="preserve"><value>Firmware Mgmt</value></data>
+  <data name="Nav_Admin_Menu_Reports" xml:space="preserve"><value>Reports</value></data>
+  <data name="Nav_Admin_Menu_Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav_Admin_Tracker_Home" xml:space="preserve"><value>Device Management</value></data>
+  <data name="Nav_Admin_Account_Mgmt" xml:space="preserve"><value>Account Management</value></data>
+  <data name="Nav_Admin_OBM_Mgmt" xml:space="preserve"><value>Reseller Management</value></data>
+  <data name="Nav_Admin_Firmware_Version" xml:space="preserve"><value>Firmware Versions</value></data>
+  <data name="Nav_Admin_Firmware_UpdateLog" xml:space="preserve"><value>Device Update Log</value></data>
+  <data name="Nav_Admin_Report_OrderStatus" xml:space="preserve"><value>Order Status Report</value></data>
+  <data name="Nav_Admin_Report_Account" xml:space="preserve"><value>Account Report</value></data>
+  <data name="Nav_Admin_Report_Pending" xml:space="preserve"><value>Pending Payment List</value></data>
+  <data name="Nav_Admin_Report_AbnormalLogin" xml:space="preserve"><value>Abnormal Login Stats</value></data>
+  <data name="Nav_Admin_Report_Commission" xml:space="preserve"><value>Renewal Commission Report</value></data>
+  <data name="Nav_Admin_Settings_System" xml:space="preserve"><value>System Settings</value></data>
+  <data name="Nav_Admin_Settings_IP" xml:space="preserve"><value>Web Service IP Whitelist</value></data>
+  <data name="Admin_Tracker_Col_OBM" xml:space="preserve"><value>Reseller</value></data>
+  <data name="Admin_Tracker_Col_Name" xml:space="preserve"><value>Device name</value></data>
+  <data name="Admin_Tracker_Col_BindCount" xml:space="preserve"><value>Bound phones</value></data>
+  <data name="Admin_Tracker_Col_CreateDate" xml:space="preserve"><value>Create date</value></data>
+  <data name="Admin_Tracker_Col_ServiceEnd" xml:space="preserve"><value>Service end</value></data>
+  <data name="Admin_Tracker_Col_Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Admin_Tracker_Col_CurrentStatus" xml:space="preserve"><value>Current status</value></data>
+  <data name="Admin_Tracker_Col_Firmware" xml:space="preserve"><value>Firmware</value></data>
+  <data name="Admin_Tracker_Col_OrderNo" xml:space="preserve"><value>Order no.</value></data>
+  <data name="Admin_Tracker_Col_SaleMemo" xml:space="preserve"><value>Sales note</value></data>
+  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>Value-added</value></data>
+  <data name="Admin_Tracker_Col_StartDate" xml:space="preserve"><value>Start date</value></data>
+  <data name="Admin_Tracker_Col_EndDate" xml:space="preserve"><value>End date</value></data>
+  <data name="Admin_Tracker_Col_LastReportTime" xml:space="preserve"><value>Last report time</value></data>
+  <data name="Admin_Tracker_SubTitle_DeviceList" xml:space="preserve"><value>Device list</value></data>
+  <data name="Admin_Tracker_SubTitle_Orders" xml:space="preserve"><value>Orders</value></data>
+  <data name="Admin_Tracker_AllStatus" xml:space="preserve"><value>All status</value></data>
+  <data name="Admin_Tracker_Status_Online" xml:space="preserve"><value>Online</value></data>
+  <data name="Admin_Tracker_Status_Offline" xml:space="preserve"><value>Offline</value></data>
+  <data name="Admin_Tracker_Status_Disconnected" xml:space="preserve"><value>Disconnected</value></data>
+  <data name="Admin_Tracker_PayLog_Active" xml:space="preserve"><value>Active</value></data>
+  <data name="Admin_Tracker_NoSelection" xml:space="preserve"><value>Click a device above to view</value></data>
+  <data name="Admin_Tracker_NoData" xml:space="preserve"><value>No data</value></data>
+  <data name="Admin_Tracker_NoOrders" xml:space="preserve"><value>No orders</value></data>
+  <data name="Admin_Tracker_NoBoundMember" xml:space="preserve"><value>No member bound</value></data>
+  <data name="Admin_Tracker_Loading" xml:space="preserve"><value>Loading…</value></data>
+  <data name="Admin_Tracker_LoadFail" xml:space="preserve"><value>Load failed</value></data>
+  <data name="Admin_Tracker_ConfirmDelete" xml:space="preserve"><value>Delete {0}?</value></data>
+  <data name="Admin_Tracker_DeleteFail" xml:space="preserve"><value>Delete failed</value></data>
+  <data name="Common_PerPage" xml:space="preserve"><value>Per page</value></data>
+  <data name="Common_JumpTo" xml:space="preserve"><value>Jump to</value></data>
 </root>

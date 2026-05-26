@@ -1,75 +1,1007 @@
-@using TrackerPlus.Core.Common
-@using TrackerPlus.Core.Models
-@model PagedResult<TrackerPlus.Core.Models.Tracker>
 @{
     ViewData["Title"] = L["Admin_Tracker_Title"].Value;
-    var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<h2>@L["Admin_Tracker_Title"]</h2>
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-4">
-        <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_Tracker_SearchPh"]" />
+
+<form id="af-form" style="display:none">@Html.AntiForgeryToken()</form>
+
+<div class="adm-tracker-page">
+    <!-- ===== Top Panel: Device Grid ===== -->
+    <div class="adm-top-panel">
+        <!-- Search / Filter bar -->
+        <div class="adm-panel-hdr">
+            <span class="adm-panel-title">@L["Admin_Tracker_Title"]</span>
+            <span id="total-info" class="badge bg-secondary ms-1" style="font-size:.75rem"></span>
+            <div class="adm-ctrl-row ms-2" style="flex:1;min-width:200px;flex-wrap:wrap">
+                <span class="text-muted" style="font-size:.8rem">@L["Admin_Tracker_Col_OBM"]</span>
+                <input type="text" id="kw-obm" class="form-control form-control-sm" style="width:100px"
+                       onkeydown="if(event.key==='Enter')doSearch()" />
+                <span class="text-muted" style="font-size:.8rem">IMEI</span>
+                <input type="text" id="kw-imei" class="form-control form-control-sm" style="width:110px"
+                       onkeydown="if(event.key==='Enter')doSearch()" />
+                <span class="text-muted" style="font-size:.8rem">@L["Admin_Tracker_Col_Account"]</span>
+                <input type="text" id="kw-account" class="form-control form-control-sm" style="width:120px"
+                       placeholder="ID / Email" onkeydown="if(event.key==='Enter')doSearch()" />
+                <select id="st" class="form-select form-select-sm" style="width:88px">
+                    <option value="">@L["Admin_Tracker_AllStatus"]</option>
+                    <option value="Y">@L["Common_Enabled"]</option>
+                    <option value="N">@L["Common_Disabled"]</option>
+                </select>
+                <button onclick="doSearch()" class="btn btn-primary btn-sm">@L["Common_Search"]</button>
+            </div>
+            <!-- Pagination -->
+            <div class="adm-ctrl-row">
+                <span class="text-muted" style="font-size:.8rem">@L["Common_PerPage"]</span>
+                <select id="pg-size" class="form-select form-select-sm" style="width:68px" onchange="doSearch()">
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                </select>
+                <button class="btn btn-outline-secondary btn-sm px-2" onclick="goFirst()" title="@L["Common_PreviousPage"]">|◀</button>
+                <button class="btn btn-outline-secondary btn-sm px-2" onclick="goPrev()"  title="@L["Common_PreviousPage"]">◀</button>
+                <span id="pg-info" style="white-space:nowrap;font-size:.83rem">- / -</span>
+                <button class="btn btn-outline-secondary btn-sm px-2" onclick="goNext()"  title="@L["Common_NextPage"]">▶</button>
+                <button class="btn btn-outline-secondary btn-sm px-2" onclick="goLast()" title="@L["Common_NextPage"]">▶|</button>
+                <span class="text-muted" style="font-size:.8rem">@L["Common_JumpTo"]</span>
+                <input type="number" id="pg-jump" class="form-control form-control-sm" style="width:56px"
+                       min="1" value="1" onkeydown="if(event.key==='Enter')doJump()" />
+                <button class="btn btn-outline-secondary btn-sm" onclick="doJump()">Go</button>
+            </div>
+        </div>
+        <!-- Table -->
+        <div class="adm-table-area">
+            <div id="loading-overlay">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <table class="table table-striped table-sm table-hover mb-0 adm-grid-table">
+                <thead class="table-dark adm-sticky-head">
+                    <tr>
+                        <th style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_OBM"]</th>
+                        <th style="min-width:140px;white-space:nowrap">IMEI</th>
+                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Name"]</th>
+                        <th style="min-width:65px;white-space:nowrap">@L["Admin_Tracker_Col_BindCount"]</th>
+                        <th style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_CreateDate"]</th>
+                        <th style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_ServiceEnd"]</th>
+                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Account"]</th>
+                        <th style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_CurrentStatus"]</th>
+                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Firmware"]</th>
+                        <th style="min-width:90px;white-space:nowrap">ICCID</th>
+                        <th style="min-width:70px;white-space:nowrap">APN</th>
+                    </tr>
+                    <tr id="filter-row">
+                        <th><input type="text" id="f-obm"     class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-imei"    class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-cname"   class="col-filter" placeholder="篩選…" /></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th><input type="text" id="f-account" class="col-filter" placeholder="篩選…" /></th>
+                        <th>
+                            <select id="f-cur-status" class="col-filter-sel">
+                                <option value="">全部狀態</option>
+                                <option value="online">@L["Admin_Tracker_Status_Online"]</option>
+                                <option value="sleep">@L["Admin_Tracker_Status_Offline"]</option>
+                                <option value="disconnected">@L["Admin_Tracker_Status_Disconnected"]</option>
+                            </select>
+                        </th>
+                        <th><input type="text" id="f-firmware" class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-iccid"   class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-apn"     class="col-filter" placeholder="篩選…" /></th>
+                    </tr>
+                </thead>
+                <tbody id="tracker-tbody">
+                    <tr><td colspan="11" class="text-center text-muted py-3" style="font-size:.85rem">@L["Admin_Tracker_NoData"]</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="col-md-2">
-        <select name="status" class="form-select">
-            <option value="">@L["Common_All"]@L["Common_Status"]</option>
-            <option value="Y" selected="@(filter.Status == "Y")">@L["Common_Enabled"]</option>
-            <option value="N" selected="@(filter.Status == "N")">@L["Common_Disabled"]</option>
-        </select>
+
+    <!-- ===== Vertical Splitter ===== -->
+    <div class="adm-v-splitter" id="vSplitter"></div>
+
+    <!-- ===== Bottom Panels ===== -->
+    <div class="adm-bottom-panels">
+        <!-- Left: Member Tracker List -->
+        <div class="adm-bottom-pane" id="leftPane">
+            <div class="adm-panel-hdr">
+                <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_DeviceList"]</span>
+                <span id="member-info" class="text-muted" style="font-size:.8rem"></span>
+            </div>
+            <div class="adm-pane-body">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-secondary adm-sticky-head" style="font-size:.78rem">
+                        <tr>
+                            <th style="white-space:nowrap">IMEI</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_Name"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_CreateDate"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_ServiceEnd"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_LastReportTime"]</th>
+                            <th style="white-space:nowrap">@L["Common_Status"]</th>
+                        </tr>
+                    </thead>
+                    <tbody id="member-tbody">
+                        <tr><td colspan="6" class="text-center text-muted py-3" style="font-size:.85rem">@L["Admin_Tracker_NoSelection"]</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Horizontal Splitter -->
+        <div class="adm-h-splitter" id="hSplitter"></div>
+        <!-- Right: PayLog -->
+        <div class="adm-bottom-pane" id="rightPane">
+            <div class="adm-panel-hdr">
+                <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_Orders"]</span>
+                <span id="paylog-info" class="text-muted" style="font-size:.8rem"></span>
+            </div>
+            <div class="adm-pane-body">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-secondary adm-sticky-head" style="font-size:.78rem">
+                        <tr>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_CreateDate"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_OrderNo"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_SaleMemo"]</th>
+                            <th style="white-space:nowrap">@L["Admin_PayLog_Operator"]</th>
+                            <th style="white-space:nowrap">@L["Admin_PayLog_SaleModel"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_ValueAdded"]</th>
+                            <th style="white-space:nowrap">@L["Admin_PayLog_Amount"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_StartDate"]</th>
+                            <th style="white-space:nowrap">@L["Admin_Tracker_Col_EndDate"]</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paylog-tbody">
+                        <tr><td colspan="9" class="text-center text-muted py-3" style="font-size:.85rem">@L["Admin_Tracker_NoSelection"]</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="col-md-2">
-        <button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button>
+</div>
+
+<!-- ===== Edit Tracker Modal ===== -->
+<div class="modal fade" id="trackerEditModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2 bg-light">
+        <h6 class="modal-title mb-0">修改定位器資料 — <code id="em-imei-hdr"></code></h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0" style="position:relative">
+        <div id="em-loading" style="display:none;position:absolute;inset:0;z-index:9;background:rgba(255,255,255,.85);align-items:center;justify-content:center">
+          <div class="spinner-border text-primary"></div>
+        </div>
+        <ul class="nav nav-tabs px-3 pt-2" role="tablist">
+          <li class="nav-item"><button class="nav-link active px-3 py-1" data-bs-toggle="tab" data-bs-target="#etab-device"   type="button">裝置資料</button></li>
+          <li class="nav-item"><button class="nav-link px-3 py-1"        data-bs-toggle="tab" data-bs-target="#etab-settings" type="button">裝置設定</button></li>
+          <li class="nav-item"><button class="nav-link px-3 py-1"        data-bs-toggle="tab" data-bs-target="#etab-alert"    type="button">警報設定</button></li>
+          <li class="nav-item"><button class="nav-link px-3 py-1"        data-bs-toggle="tab" data-bs-target="#etab-orders"   type="button">訂單期限</button></li>
+        </ul>
+        <div class="tab-content border border-top-0 mx-3 mb-2 rounded-bottom" style="min-height:360px">
+
+          <!-- Tab 1: 裝置資料 -->
+          <div class="tab-pane fade show active p-3" id="etab-device">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold mb-0">IMEI</label>
+                  <div id="em-imei-val" class="form-control-plaintext fw-bold ps-1" style="font-size:.85rem;line-height:2"></div>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label small mb-1" for="em-cname">識別名稱</label>
+                  <input type="text" id="em-cname" class="form-control form-control-sm" />
+                </div>
+              </div>
+              <div class="col-md-6" id="em-udfields-col">
+                <!-- UdFields rendered dynamically -->
+              </div>
+            </div>
+            <div id="em-labels-row" class="mb-2"></div>
+            <hr class="my-2" />
+            <div class="mb-2">
+              <label class="form-label small fw-semibold mb-2">裝置圖示</label>
+              <div class="d-flex flex-wrap gap-3">
+                @foreach (var ic in new[] {("A","汽車"),("B","貨車"),("C","工作車"),("D","巴士"),("E","機車"),("F","自行車"),("G","人"),("H","寵物")}) {
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="em-icon" id="em-icon-@ic.Item1" value="@ic.Item1">
+                    <label class="form-check-label small" for="em-icon-@ic.Item1">@ic.Item2</label>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: 裝置設定 -->
+          <div class="tab-pane fade p-3" id="etab-settings">
+            <div class="row g-3">
+              <div class="col-md-5">
+                <label class="form-label small fw-semibold mb-1">緊急通報號碼</label>
+                <input type="text" id="em-sos1" class="form-control form-control-sm" placeholder="+886..." />
+              </div>
+              <div class="col-md-7">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small mb-1">定位回報時間</label>
+                    <div class="input-group input-group-sm">
+                      <input type="number" id="em-gps-time" class="form-control" min="1" max="7200" />
+                      <span class="input-group-text" style="font-size:.78rem">秒（1~7200）</span>
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small mb-1">密碼</label>
+                    <input type="text" id="em-password" class="form-control form-control-sm" readonly />
+                  </div>
+                </div>
+                <hr class="my-2" />
+                <div class="small fw-semibold mb-2">震動器設定</div>
+                <div class="row g-2">
+                  <div class="col-6">
+                    <label class="form-label small mb-1">車型</label>
+                    <select id="em-shock-mode" class="form-select form-select-sm">
+                      <option value="1">汽車</option>
+                      <option value="2">機車</option>
+                      <option value="3">腳踏車</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small mb-1">震動器靈敏度</label>
+                    <select id="em-shock-sens" class="form-select form-select-sm">
+                      @for (int i = 0; i <= 9; i++) { <option value="@i">@i</option> }
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label small mb-1">是否開啟（省電模式）</label>
+                    <select id="em-power-saving" class="form-select form-select-sm" style="width:120px">
+                      <option value="N">關閉</option>
+                      <option value="Y">開啟</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: 警報設定 -->
+          <div class="tab-pane fade p-3" id="etab-alert">
+            <div class="mb-3">
+              <div class="small fw-semibold mb-1">急速逾時模組</div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="small">當急速超過</span>
+                <select id="em-ap-minute" class="form-select form-select-sm" style="width:80px">
+                  <option value="0">關閉</option>
+                  <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                  <option value="5">5</option><option value="10">10</option><option value="15">15</option>
+                  <option value="20">20</option><option value="30">30</option><option value="60">60</option>
+                </select>
+                <span class="small">分鐘時，回報所在座標。</span>
+              </div>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="small" style="white-space:nowrap">自定訊息內容:</span>
+                <input type="text" id="em-ap-msg" class="form-control form-control-sm" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <div class="small fw-semibold mb-1">超速偵測模組</div>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="small">當時速超過</span>
+                <select id="em-as-minute" class="form-select form-select-sm" style="width:80px">
+                  <option value="0">關閉</option>
+                  <option value="30">30</option><option value="40">40</option><option value="50">50</option>
+                  <option value="60">60</option><option value="70">70</option><option value="80">80</option>
+                  <option value="90">90</option><option value="100">100</option><option value="110">110</option>
+                  <option value="120">120</option>
+                </select>
+                <span class="small">公里/小時，發出警報訊息。</span>
+              </div>
+              <div class="d-flex align-items-center gap-2 mt-1">
+                <span class="small" style="white-space:nowrap">自定訊息內容:</span>
+                <input type="text" id="em-as-msg" class="form-control form-control-sm" />
+              </div>
+            </div>
+            <hr class="my-2" />
+            <div class="d-flex align-items-center gap-3 flex-wrap mb-2">
+              <div class="d-flex align-items-center gap-2">
+                <label class="form-label small mb-0">分享密碼（4碼）</label>
+                <input type="text" id="em-share-pwd" class="form-control form-control-sm" maxlength="4" style="width:70px" />
+              </div>
+              <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="em-share-enabled">
+                <label class="form-check-label small" for="em-share-enabled">開啟分享功能</label>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <label class="form-label small mb-0">警報模式</label>
+              <select id="em-alert-mode" class="form-select form-select-sm" style="width:110px">
+                <option value="0">持續</option>
+                <option value="1">單次</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Tab 4: 訂單期限 -->
+          <div class="tab-pane fade" id="etab-orders">
+            <div class="d-flex gap-2 align-items-center p-2 border-bottom" style="background:#f8f9fa">
+              <input type="text" id="em-pl-date" class="form-control form-control-sm" placeholder="建立日期" style="width:110px" oninput="filterModalPayLogs()" />
+              <select id="em-pl-op" class="form-select form-select-sm" style="width:110px" onchange="filterModalPayLogs()">
+                <option value="">操作者</option>
+              </select>
+            </div>
+            <div style="overflow-x:auto;max-height:320px;overflow-y:auto">
+              <table class="table table-sm table-hover mb-0" style="font-size:.78rem;white-space:nowrap">
+                <thead class="table-secondary" style="position:sticky;top:0;z-index:1">
+                  <tr>
+                    <th>建立日期</th><th>訂單號碼</th><th>業務備註</th><th>操作者</th>
+                    <th>銷售類型</th><th>加值服務</th><th class="text-end">訂單金額</th>
+                    <th>起始日期</th><th>結束日期</th>
+                  </tr>
+                </thead>
+                <tbody id="em-pl-tbody">
+                  <tr><td colspan="9" class="text-center text-muted py-3">請等候…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-primary btn-sm" onclick="saveTrackerModal()">確定</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="resetTrackerModal()">重置</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">關閉</button>
+      </div>
     </div>
-</form>
-<div class="table-responsive">
-    <table class="table table-striped table-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>TbKey</th>
-                <th>IMEI</th>
-                <th>@L["Detail_DeviceName"]</th>
-                <th>@L["Common_Status"]</th>
-                <th>@L["Admin_Tracker_LastReport"]</th>
-                <th>@L["Admin_Tracker_PowerSaving"]</th>
-                <th>@L["Common_Operation"]</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Model.Items)
-            {
-                <tr>
-                    <td>@t.TbKey</td>
-                    <td>@t.IMEICODE</td>
-                    <td>@t.CName</td>
-                    <td>@(t.TrackerStatus == "Y" ? L["Common_Enabled"].Value : L["Common_Disabled"].Value)</td>
-                    <td>@t.LastReportTime?.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@(t.PowerSavingMode ? L["Common_On"].Value : L["Common_Off"].Value)</td>
-                    <td>
-                        <a asp-action="Detail" asp-route-id="@t.TbKey" class="btn btn-sm btn-info btn-with-icon">@Html.UiIcon("details")<span>@L["Common_Details"]</span></a>
-                        <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, t.IMEICODE)')">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@t.TbKey" />
-                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
-                        </form>
-                    </td>
-                </tr>
+  </div>
+</div>
+
+<style>
+    .adm-tracker-page {
+        height: calc(100vh - 76px);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    .adm-top-panel {
+        flex: 0 0 57%;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+        min-height: 0;
+    }
+    .adm-table-area {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+    }
+    .adm-bottom-panels {
+        flex: 1;
+        display: flex;
+        gap: 5px;
+        min-height: 0;
+    }
+    .adm-bottom-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+        min-height: 0;
+    }
+    .adm-pane-body {
+        flex: 1;
+        overflow: auto;
+    }
+    .adm-panel-hdr {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+    }
+    .adm-panel-title {
+        font-weight: 600;
+        font-size: .85rem;
+        white-space: nowrap;
+    }
+    .adm-ctrl-row {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex-wrap: wrap;
+    }
+    .adm-sticky-head {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    #loading-overlay {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,.85);
+        z-index: 10;
+        align-items: center;
+        justify-content: center;
+    }
+    .btn-adm {
+        padding: 1px 7px;
+        font-size: .72rem;
+        line-height: 1.5;
+        border-radius: 3px;
+    }
+    /* Resizable splitters */
+    .adm-v-splitter {
+        height: 5px;
+        background: #dee2e6;
+        cursor: ns-resize;
+        flex-shrink: 0;
+        transition: background .15s;
+    }
+    .adm-v-splitter:hover, .adm-v-splitter.dragging { background: #0d6efd; }
+    .adm-h-splitter {
+        width: 5px;
+        background: #dee2e6;
+        cursor: ew-resize;
+        flex-shrink: 0;
+        transition: background .15s;
+    }
+    .adm-h-splitter:hover, .adm-h-splitter.dragging { background: #0d6efd; }
+    /* Expired service date highlight */
+    .svc-expired { color: #dc3545; font-weight: 600; }
+    .svc-soon    { color: #fd7e14; font-weight: 600; }
+    /* Uniform grid font/color/nowrap */
+    .adm-grid-table td,
+    #member-tbody td,
+    #paylog-tbody td {
+        font-size: .78rem;
+        color: #212529;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+        padding: 3px 6px;
+        vertical-align: middle;
+    }
+    .adm-grid-table code {
+        font-size: .73rem;
+        color: #212529;
+        background: none;
+        padding: 0;
+    }
+    #member-tbody code {
+        font-size: .73rem;
+        color: #212529;
+        background: none;
+        padding: 0;
+    }
+    /* Column filter row */
+    #filter-row th {
+        padding: 2px 3px;
+        background: #e9ecef;
+    }
+    .col-filter, .col-filter-sel {
+        width: 100%;
+        padding: 1px 4px;
+        font-size: .72rem;
+        border: 1px solid #adb5bd;
+        border-radius: 2px;
+        height: 20px;
+        box-sizing: border-box;
+        color: #212529;
+    }
+</style>
+
+@section Scripts {
+<script>
+var _T = {
+    online:        '@Html.Raw(L["Admin_Tracker_Status_Online"].Value)',
+    offline:       '@Html.Raw(L["Admin_Tracker_Status_Offline"].Value)',
+    disconnected:  '@Html.Raw(L["Admin_Tracker_Status_Disconnected"].Value)',
+    enabled:       '@Html.Raw(L["Common_Enabled"].Value)',
+    disabled:      '@Html.Raw(L["Common_Disabled"].Value)',
+    paylogActive:  '@Html.Raw(L["Admin_Tracker_PayLog_Active"].Value)',
+    noSelection:   '@Html.Raw(L["Admin_Tracker_NoSelection"].Value)',
+    noData:        '@Html.Raw(L["Admin_Tracker_NoData"].Value)',
+    noOrders:      '@Html.Raw(L["Admin_Tracker_NoOrders"].Value)',
+    noBoundMember: '@Html.Raw(L["Admin_Tracker_NoBoundMember"].Value)',
+    loading:       '@Html.Raw(L["Admin_Tracker_Loading"].Value)',
+    loadFail:      '@Html.Raw(L["Admin_Tracker_LoadFail"].Value)',
+    confirmDel:    '@Html.Raw(L["Admin_Tracker_ConfirmDelete"].Value)',
+    deleteFail:    '@Html.Raw(L["Admin_Tracker_DeleteFail"].Value)',
+    details:       '@Html.Raw(L["Common_Details"].Value)',
+    delete_:       '@Html.Raw(L["Common_Delete"].Value)'
+};
+(function () {
+    // ── State ─────────────────────────────────────────────────────────────
+    let curPage = 1, curPageSize = 20, totalPages = 1, totalCount = 0;
+    let curObm = '', curImei = '', curAccount = '', curStatus = '';
+    let activeEs = null;
+    const today = new Date(); today.setHours(0,0,0,0);
+
+    const saleModelLabel = { 1:'續費', 4:'國際', 5:'特殊', 6:'退款', 7:'自動啟用', 21:'多月' };
+
+    // ── Init ──────────────────────────────────────────────────────────────
+    loadPage(1);
+
+    // ── Pagination ────────────────────────────────────────────────────────
+    window.doSearch = function () {
+        curObm      = document.getElementById('kw-obm').value.trim();
+        curImei     = document.getElementById('kw-imei').value.trim();
+        curAccount  = document.getElementById('kw-account').value.trim();
+        curStatus   = document.getElementById('st').value;
+        curPageSize = parseInt(document.getElementById('pg-size').value);
+        loadPage(1);
+    };
+    window.goFirst = function () { if (curPage > 1) loadPage(1); };
+    window.goPrev  = function () { if (curPage > 1) loadPage(curPage - 1); };
+    window.goNext  = function () { if (curPage < totalPages) loadPage(curPage + 1); };
+    window.goLast  = function () { if (curPage < totalPages) loadPage(totalPages); };
+    window.doJump  = function () {
+        const p = parseInt(document.getElementById('pg-jump').value);
+        if (!isNaN(p) && p >= 1 && p <= totalPages) loadPage(p);
+    };
+
+    // ── SSE load ──────────────────────────────────────────────────────────
+    function loadPage(page) {
+        curPage = page;
+        if (activeEs) { activeEs.close(); activeEs = null; }
+        document.getElementById('tracker-tbody').innerHTML = '';
+        showSpinner(true);
+        updatePagUI();
+
+        const q = new URLSearchParams({ obm: curObm, imei: curImei, account: curAccount, status: curStatus, page, pageSize: curPageSize });
+        const es = new EventSource('/Admin/Tracker/TrackerStream?' + q);
+        activeEs = es;
+
+        es.onmessage = ev => {
+            const d = JSON.parse(ev.data);
+            if (d.type === 'total') {
+                totalCount = d.count;
+                totalPages = d.totalPages;
+                updatePagUI();
+            } else if (d.type === 'row') {
+                document.getElementById('tracker-tbody').appendChild(makeRow(d));
+            } else if (d.type === 'done') {
+                es.close(); activeEs = null; showSpinner(false);
+                const tb = document.getElementById('tracker-tbody');
+                if (!tb.children.length)
+                    tb.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-3">' + _T.noData + '</td></tr>';
+                applyColumnFilters();
             }
-        </tbody>
-    </table>
-</div>
-<div class="d-flex justify-content-between align-items-center">
-    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)，@string.Format(L["Common_PageInfo"].Value, Model.PageIndex, Model.TotalPages)</span>
-    <div>
-        @if (Model.HasPreviousPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+        };
+        es.onerror = () => { es.close(); activeEs = null; showSpinner(false); };
+    }
+
+    function updatePagUI() {
+        document.getElementById('pg-info').textContent = totalPages > 0 ? curPage + ' / ' + totalPages : '- / -';
+        document.getElementById('total-info').textContent = totalCount > 0 ? totalCount + ' 筆' : '';
+        const j = document.getElementById('pg-jump');
+        j.value = curPage; j.max = totalPages;
+    }
+
+    // ── Build row ─────────────────────────────────────────────────────────
+    function makeRow(d) {
+        let statusBadge, statusKey;
+        if (d.currentStatus === 'Y') {
+            statusBadge = '<span class="badge bg-success">' + _T.online + '</span>';
+            statusKey = 'online';
+        } else if (d.isSleep === 'Y') {
+            statusBadge = '<span class="badge bg-warning text-dark">' + _T.offline + '</span>';
+            statusKey = 'sleep';
+        } else {
+            statusBadge = '<span class="badge bg-secondary">' + _T.disconnected + '</span>';
+            statusKey = 'disconnected';
         }
-        @if (Model.HasNextPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+
+        let svcHtml = d.serviceEndDate ?? '-';
+        if (d.serviceEndDate) {
+            const svcDate = new Date(d.serviceEndDate);
+            svcDate.setHours(0,0,0,0);
+            const diff = Math.round((svcDate - today) / 86400000);
+            if (diff < 0) svcHtml = '<span class="svc-expired">' + d.serviceEndDate + '</span>';
+            else if (diff <= 30) svcHtml = '<span class="svc-soon">' + d.serviceEndDate + '</span>';
         }
-    </div>
-</div>
+
+        const tr = document.createElement('tr');
+        tr.dataset.tbkey = d.tbKey;
+        tr.dataset.status = statusKey;
+        tr.style.cursor = 'pointer';
+        tr.innerHTML =
+            '<td>' + escHtml(d.obmName || '-') + '</td>' +
+            '<td><code>' + d.imei + '</code></td>' +
+            '<td>' + escHtml(d.cname) + '</td>' +
+            '<td class="text-center">' + (d.bindCount ?? 0) + '</td>' +
+            '<td>' + (d.createDate ?? '-') + '</td>' +
+            '<td>' + svcHtml + '</td>' +
+            '<td>' + escHtml(d.memberAccount || '-') + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td>' + escHtml(d.firmwareVersion || '-') + '</td>' +
+            '<td>' + escHtml(d.iccid || '-') + '</td>' +
+            '<td>' + escHtml(d.apn || '-') + '</td>';
+
+        tr.addEventListener('click', () => selectRow(tr, d.tbKey, d.imei, d.memberTbKey));
+        tr.addEventListener('dblclick', () => window.openTrackerModal(d.tbKey, d.imei));
+        return tr;
+    }
+
+    // ── Row selection ─────────────────────────────────────────────────────
+    function selectRow(tr, tbKey, imei, memberTbKey) {
+        document.querySelectorAll('#tracker-tbody tr.table-primary').forEach(r => r.classList.remove('table-primary'));
+        tr.classList.add('table-primary');
+        loadMemberTrackers(memberTbKey, tbKey);
+        loadPayLogs(imei);
+    }
+
+    // ── Bottom-left: member trackers ──────────────────────────────────────
+    function loadMemberTrackers(memberTbKey, selTbKey) {
+        const tbody = document.getElementById('member-tbody');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + _T.loading + '</td></tr>';
+        document.getElementById('member-info').textContent = '';
+
+        const url = (memberTbKey > 0)
+            ? '/Admin/Tracker/GetMemberTrackers?memberTbKey=' + memberTbKey
+            : '/Admin/Tracker/GetMemberTrackers?memberTbKey=0&trackerTbKey=' + selTbKey;
+
+        fetch(url)
+            .then(r => r.json())
+            .then(list => {
+                document.getElementById('member-info').textContent = '(' + list.length + ' 台)';
+                if (!list.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + _T.noData + '</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = list.map(t => {
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const nextMonth = new Date(today); nextMonth.setMonth(nextMonth.getMonth() + 1);
+                    let edateCell = '-';
+                    if (t.serviceEndDate) {
+                        const ed = new Date(t.serviceEndDate);
+                        if (ed < today) edateCell = '<span class="svc-expired">' + t.serviceEndDate + '</span>';
+                        else if (ed < nextMonth) edateCell = '<span class="svc-soon">' + t.serviceEndDate + '</span>';
+                        else edateCell = t.serviceEndDate;
+                    }
+                    let statusBadge;
+                    if (t.currentStatus === 'Y') {
+                        statusBadge = '<span class="badge bg-success">' + _T.online + '</span>';
+                    } else if (t.isSleep === 'Y') {
+                        statusBadge = '<span class="badge bg-warning text-dark">' + _T.offline + '</span>';
+                    } else {
+                        statusBadge = '<span class="badge bg-secondary">' + _T.disconnected + '</span>';
+                    }
+                    return '<tr' + (t.tbKey === selTbKey ? ' class="table-warning"' : '') + '>' +
+                        '<td><code>' + t.imei + '</code></td>' +
+                        '<td>' + escHtml(t.cname) + '</td>' +
+                        '<td>' + (t.createDate ?? '-') + '</td>' +
+                        '<td>' + edateCell + '</td>' +
+                        '<td>' + (t.lastReportTime ?? '-') + '</td>' +
+                        '<td>' + statusBadge + '</td>' +
+                        '</tr>';
+                }).join('');
+            })
+            .catch(() => { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">' + _T.loadFail + '</td></tr>'; });
+    }
+
+    // ── Bottom-right: PayLogs ─────────────────────────────────────────────
+    function loadPayLogs(imei) {
+        const tbody = document.getElementById('paylog-tbody');
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + _T.loading + '</td></tr>';
+        document.getElementById('paylog-info').textContent = '';
+        fetch('/Admin/Tracker/GetPayLogs?imei=' + encodeURIComponent(imei))
+            .then(r => r.json())
+            .then(list => {
+                document.getElementById('paylog-info').textContent = '(' + list.length + ' 筆)';
+                if (!list.length) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + _T.noOrders + '</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = list.map(l =>
+                    '<tr>' +
+                    '<td>' + (l.cDate ?? '-') + '</td>' +
+                    '<td>' + escHtml(l.orderNo ?? '') + '</td>' +
+                    '<td title="' + escHtml(l.memo ?? '') + '">' + escHtml(l.memo ?? '') + '</td>' +
+                    '<td>' + escHtml(l.op ?? '') + '</td>' +
+                    '<td>' + escHtml(l.saleType || (saleModelLabel[l.saleModel] ?? String(l.saleModel))) + '</td>' +
+                    '<td>' + (l.valueAdded === 1 ? '網頁平台' : '無') + '</td>' +
+                    '<td>' + l.amount + '</td>' +
+                    '<td>' + (l.sDate ?? '-') + '</td>' +
+                    '<td>' + (l.eDate ?? '-') + '</td>' +
+                    '</tr>'
+                ).join('');
+            })
+            .catch(() => { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">' + _T.loadFail + '</td></tr>'; });
+    }
+
+    // ── Column filters (client-side) ─────────────────────────────────────
+    function applyColumnFilters() {
+        const fObm      = (document.getElementById('f-obm')?.value      || '').toLowerCase();
+        const fImei     = (document.getElementById('f-imei')?.value     || '').toLowerCase();
+        const fCname    = (document.getElementById('f-cname')?.value    || '').toLowerCase();
+        const fAccount  = (document.getElementById('f-account')?.value  || '').toLowerCase();
+        const fFirmware = (document.getElementById('f-firmware')?.value || '').toLowerCase();
+        const fIccid    = (document.getElementById('f-iccid')?.value    || '').toLowerCase();
+        const fApn      = (document.getElementById('f-apn')?.value      || '').toLowerCase();
+        const fStatus   = document.getElementById('f-cur-status')?.value || '';
+
+        document.querySelectorAll('#tracker-tbody tr[data-tbkey]').forEach(row => {
+            const c = row.cells;
+            const show =
+                (!fObm      || (c[0].textContent || '').toLowerCase().includes(fObm))   &&
+                (!fImei     || (c[1].textContent || '').toLowerCase().includes(fImei))  &&
+                (!fCname    || (c[2].textContent || '').toLowerCase().includes(fCname)) &&
+                (!fAccount  || (c[6].textContent || '').toLowerCase().includes(fAccount)) &&
+                (!fFirmware || (c[8].textContent || '').toLowerCase().includes(fFirmware)) &&
+                (!fIccid    || (c[9].textContent || '').toLowerCase().includes(fIccid)) &&
+                (!fApn      || (c[10].textContent|| '').toLowerCase().includes(fApn))  &&
+                (!fStatus   || row.dataset.status === fStatus);
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    // Wire filter inputs
+    ['f-obm','f-imei','f-cname','f-account','f-firmware','f-iccid','f-apn'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', applyColumnFilters);
+    });
+    const statusSel = document.getElementById('f-cur-status');
+    if (statusSel) statusSel.addEventListener('change', applyColumnFilters);
+
+    // ── Helpers ───────────────────────────────────────────────────────────
+    function showSpinner(show) {
+        document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+    }
+    function escHtml(s) {
+        return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+})();
+
+// ── Edit Tracker Modal ────────────────────────────────────────────────────
+(function () {
+    let _emData = null, _emTbKey = 0, _emImei = '', _emPlRaw = [];
+
+    function escHtml(s) {
+        return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function setSelVal(id, val) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = String(val ?? '');
+        if (el.selectedIndex < 0 && el.options.length) el.selectedIndex = 0;
+    }
+    function showEmSpin(show) {
+        const el = document.getElementById('em-loading');
+        if (el) el.style.display = show ? 'flex' : 'none';
+    }
+
+    window.openTrackerModal = function(tbKey, imei) {
+        _emTbKey = tbKey; _emImei = imei; _emData = null; _emPlRaw = [];
+        document.getElementById('em-imei-hdr').textContent = imei;
+        document.getElementById('em-imei-val').textContent = imei;
+        document.getElementById('em-pl-tbody').innerHTML = '<tr><td colspan="9" class="text-center text-muted py-3">請等候…</td></tr>';
+        document.getElementById('em-pl-date').value = '';
+        document.getElementById('em-pl-op').innerHTML = '<option value="">操作者</option>';
+
+        // Reset to first tab
+        const firstBtn = document.querySelector('#trackerEditModal .nav-link');
+        if (firstBtn && !firstBtn.classList.contains('active'))
+            bootstrap.Tab.getOrCreateInstance(firstBtn).show();
+
+        new bootstrap.Modal(document.getElementById('trackerEditModal')).show();
+        loadEmSettings(tbKey);
+        loadEmPayLogs(imei);
+    };
+
+    function loadEmSettings(tbKey) {
+        showEmSpin(true);
+        fetch('/Admin/Tracker/GetAdminDeviceSettings?tbKey=' + tbKey)
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+            .then(d => { _emData = d; fillModal(d); })
+            .catch(() => alert('載入裝置設定失敗'))
+            .finally(() => showEmSpin(false));
+    }
+
+    function fillModal(d) {
+        // Tab 1
+        document.getElementById('em-imei-val').textContent = d.imei ?? '';
+        document.getElementById('em-imei-hdr').textContent = d.imei ?? '';
+        document.getElementById('em-cname').value = d.cName ?? '';
+
+        const udCol = document.getElementById('em-udfields-col');
+        udCol.innerHTML = (d.udFields || []).map(f =>
+            `<div class="mb-2"><label class="form-label small mb-1">${escHtml(f.fieldName)}</label>` +
+            `<input type="text" class="form-control form-control-sm em-udfield" data-ftbkey="${f.fieldTbKey}" value="${escHtml(f.value)}"></div>`
+        ).join('');
+
+        const lblRow = document.getElementById('em-labels-row');
+        const lbls = d.labels || [];
+        lblRow.innerHTML = lbls.length
+            ? '<label class="form-label small fw-semibold mb-1">隸屬群組指定</label><div class="d-flex flex-wrap gap-3">' +
+              lbls.map(l => `<div class="form-check"><input class="form-check-input em-label" type="checkbox" id="em-lbl-${l.tbKey}" value="${l.tbKey}"${l.assigned?' checked':''}><label class="form-check-label small" for="em-lbl-${l.tbKey}">${escHtml(l.name)}</label></div>`).join('') + '</div>'
+            : '';
+
+        const iconRadio = document.getElementById('em-icon-' + (d.iconFile ?? 'A').toUpperCase());
+        if (iconRadio) iconRadio.checked = true;
+
+        // Tab 2
+        document.getElementById('em-sos1').value = d.sosNumber ?? '';
+        document.getElementById('em-gps-time').value = d.gpsReportTime ?? 30;
+        document.getElementById('em-password').value = d.sharePassword || '12345678';
+        setSelVal('em-shock-mode', d.shockMode ?? 1);
+        setSelVal('em-shock-sens', d.shockSensitive ?? 5);
+        document.getElementById('em-power-saving').value = d.powerSavingMode === 'Y' ? 'Y' : 'N';
+
+        // Tab 3
+        setSelVal('em-ap-minute', d.apMinute ?? 0);
+        document.getElementById('em-ap-msg').value = d.apMsg ?? '';
+        setSelVal('em-as-minute', d.asMinute ?? 0);
+        document.getElementById('em-as-msg').value = d.asMsg ?? '';
+        document.getElementById('em-share-pwd').value = d.sharePassword ?? '0000';
+        document.getElementById('em-share-enabled').checked = !!d.shareEnabled;
+        setSelVal('em-alert-mode', d.alertMode ?? 0);
+    }
+
+    function loadEmPayLogs(imei) {
+        fetch('/Admin/Tracker/GetPayLogs?imei=' + encodeURIComponent(imei))
+            .then(r => r.json())
+            .then(list => {
+                _emPlRaw = list;
+                const ops = [...new Set(list.map(l => l.op || '').filter(Boolean))].sort();
+                const opSel = document.getElementById('em-pl-op');
+                opSel.innerHTML = '<option value="">操作者</option>' + ops.map(o => `<option>${escHtml(o)}</option>`).join('');
+                renderEmPayLogs(list);
+            })
+            .catch(() => {
+                document.getElementById('em-pl-tbody').innerHTML =
+                    '<tr><td colspan="9" class="text-center text-danger">載入失敗</td></tr>';
+            });
+    }
+
+    window.filterModalPayLogs = function() {
+        const fDate = (document.getElementById('em-pl-date')?.value || '').toLowerCase();
+        const fOp   = document.getElementById('em-pl-op')?.value || '';
+        renderEmPayLogs(_emPlRaw.filter(l =>
+            (!fDate || (l.cDate || '').toLowerCase().includes(fDate)) &&
+            (!fOp   || (l.op || '') === fOp)
+        ));
+    };
+
+    function renderEmPayLogs(list) {
+        const smlMap = {1:'續費',4:'國際',5:'特殊',6:'退款',7:'自動啟用',21:'多月'};
+        const todayStr = new Date().toISOString().slice(0,10);
+        const tbody = document.getElementById('em-pl-tbody');
+        if (!list.length) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-2">無訂單資料</td></tr>';
+            return;
+        }
+        tbody.innerHTML = list.map(l => {
+            const active = l.sDate && l.eDate && l.sDate <= todayStr && l.eDate >= todayStr;
+            const bg = active ? ' style="background:#ffff99"' : '';
+            return `<tr${bg}><td>${l.cDate??'-'}</td><td>${escHtml(l.orderNo??'')}</td>` +
+                `<td>${escHtml(l.memo??'')}</td><td>${escHtml(l.op??'')}</td>` +
+                `<td>${escHtml(l.saleType||(smlMap[l.saleModel]??String(l.saleModel??'')))}</td>` +
+                `<td>${l.valueAdded===1?'網頁平台':'無'}</td>` +
+                `<td class="text-end">${l.amount??0}</td>` +
+                `<td>${l.sDate??'-'}</td><td>${l.eDate??'-'}</td></tr>`;
+        }).join('');
+    }
+
+    window.saveTrackerModal = function() {
+        if (!_emTbKey) return;
+        const udFields = [...document.querySelectorAll('.em-udfield')].map(el => ({
+            fieldTbKey: parseInt(el.dataset.ftbkey), value: el.value
+        }));
+        const labelTbKeys = [...document.querySelectorAll('.em-label:checked')].map(el => parseInt(el.value));
+        const iconChecked = document.querySelector('input[name="em-icon"]:checked');
+        const req = {
+            tbKey: _emTbKey,
+            cName: document.getElementById('em-cname').value,
+            iconFile: iconChecked ? iconChecked.value : 'A',
+            udFields, labelTbKeys,
+            sosNumber: document.getElementById('em-sos1').value,
+            powerSavingMode: document.getElementById('em-power-saving').value,
+            gpsReportTime: parseInt(document.getElementById('em-gps-time').value) || 30,
+            shockMode: parseInt(document.getElementById('em-shock-mode').value) || 1,
+            shockSensitive: parseInt(document.getElementById('em-shock-sens').value) || 5,
+            apMinute: parseInt(document.getElementById('em-ap-minute').value) || 0,
+            apMsg: document.getElementById('em-ap-msg').value,
+            asMinute: parseInt(document.getElementById('em-as-minute').value) || 0,
+            asMsg: document.getElementById('em-as-msg').value,
+            shareEnabled: document.getElementById('em-share-enabled').checked,
+            sharePassword: document.getElementById('em-share-pwd').value,
+            alertMode: parseInt(document.getElementById('em-alert-mode').value) || 0
+        };
+        showEmSpin(true);
+        fetch('/Admin/Tracker/SaveAdminDeviceSettings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(req)
+        })
+        .then(r => r.json())
+        .then(result => {
+            if (result.success) {
+                bootstrap.Modal.getInstance(document.getElementById('trackerEditModal'))?.hide();
+                window.doSearch();
+            } else {
+                alert('儲存失敗：' + (result.message || '未知錯誤'));
+            }
+        })
+        .catch(() => alert('儲存失敗，請重試'))
+        .finally(() => showEmSpin(false));
+    };
+
+    window.resetTrackerModal = function() {
+        if (_emData) fillModal(_emData);
+    };
+})();
+
+// ── Resizable Splitters ───────────────────────────────────────────────────
+(function () {
+    const topPanel    = document.querySelector('.adm-top-panel');
+    const bottomPanels = document.querySelector('.adm-bottom-panels');
+    const leftPane    = document.getElementById('leftPane');
+    const rightPane   = document.getElementById('rightPane');
+    const vSplitter   = document.getElementById('vSplitter');
+    const hSplitter   = document.getElementById('hSplitter');
+
+    // Vertical splitter (top vs bottom)
+    let vDrag = false, vStartY = 0, vStartH = 0;
+    vSplitter.addEventListener('mousedown', e => {
+        vDrag = true;
+        vStartY = e.clientY;
+        vStartH = topPanel.getBoundingClientRect().height;
+        vSplitter.classList.add('dragging');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'ns-resize';
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+        if (!vDrag) return;
+        const pageH = document.querySelector('.adm-tracker-page').getBoundingClientRect().height;
+        const newH = Math.max(80, Math.min(pageH - 80, vStartH + (e.clientY - vStartY)));
+        topPanel.style.flex = 'none';
+        topPanel.style.height = newH + 'px';
+        bottomPanels.style.flex = '1';
+    });
+    document.addEventListener('mouseup', () => {
+        if (!vDrag) return;
+        vDrag = false;
+        vSplitter.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+    });
+
+    // Horizontal splitter (left vs right bottom pane)
+    let hDrag = false, hStartX = 0, hStartW = 0;
+    hSplitter.addEventListener('mousedown', e => {
+        hDrag = true;
+        hStartX = e.clientX;
+        hStartW = leftPane.getBoundingClientRect().width;
+        hSplitter.classList.add('dragging');
+        document.body.style.userSelect = 'none';
+        document.body.style.cursor = 'ew-resize';
+        e.preventDefault();
+    });
+    document.addEventListener('mousemove', e => {
+        if (!hDrag) return;
+        const totalW = bottomPanels.getBoundingClientRect().width;
+        const newW = Math.max(120, Math.min(totalW - 120, hStartW + (e.clientX - hStartX)));
+        leftPane.style.flex = 'none';
+        leftPane.style.width = newW + 'px';
+        rightPane.style.flex = '1';
+        rightPane.style.width = '';
+    });
+    document.addEventListener('mouseup', () => {
+        if (!hDrag) return;
+        hDrag = false;
+        hSplitter.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+    });
+})();
+</script>
+}

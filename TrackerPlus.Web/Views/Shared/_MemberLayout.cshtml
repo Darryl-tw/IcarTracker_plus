@@ -31,18 +31,9 @@
     </div>
     <nav class="flex-grow-1">
         <div class="nav-label">@L["Nav_MainMenu"]</div>
-        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Tracker" ? "active" : "")"
-           asp-controller="Tracker" asp-action="Index">
-            @L["Nav_DeviceList"]
-        </a>
         <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Map" ? "active" : "")"
            asp-controller="Map" asp-action="Live">
             @L["Nav_LiveMap"]
-        </a>
-        <div class="nav-label mt-2">@L["Nav_HistorySection"]</div>
-        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")"
-           asp-controller="History" asp-action="Index">
-            @L["Nav_History"]
         </a>
     </nav>
     <div class="p-3 border-top border-secondary">

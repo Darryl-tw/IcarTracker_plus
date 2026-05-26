@@ -1,6 +1,4 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
@@ -11,13 +9,13 @@ namespace TrackerPlus.Services.Services;
 public class AuthService : IAuthService
 {
     private readonly IMemberRepository _memberRepo;
-    private readonly IConfiguration _config;
+    private readonly IAdminUserRepository _adminUserRepo;
     private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IMemberRepository memberRepo, IConfiguration config, ILogger<AuthService> logger)
+    public AuthService(IMemberRepository memberRepo, IAdminUserRepository adminUserRepo, ILogger<AuthService> logger)
     {
         _memberRepo = memberRepo;
-        _config = config;
+        _adminUserRepo = adminUserRepo;
         _logger = logger;
     }
 
@@ -113,16 +111,22 @@ public class AuthService : IAuthService
         return string.Equals(input, stored, StringComparison.Ordinal);
     }
 
-    public Task<(bool Success, string ErrorMessage)> AdminLoginAsync(string account, string password)
+    public async Task<(bool Success, string ErrorMessage)> AdminLoginAsync(string account, string password)
     {
-        var adminAccount = _config["AdminAuth:Account"];
-        var adminPassword = _config["AdminAuth:Password"];
-        if (string.IsNullOrEmpty(adminAccount))
-            return Task.FromResult<(bool, string)>((false, "後台未設定管理員帳號"));
-        if (!string.Equals(account, adminAccount, StringComparison.Ordinal))
-            return Task.FromResult<(bool, string)>((false, "帳號或密碼錯誤"));
-        if (!string.Equals(password, adminPassword, StringComparison.Ordinal))
-            return Task.FromResult<(bool, string)>((false, "帳號或密碼錯誤"));
-        return Task.FromResult<(bool, string)>((true, string.Empty));
+        if (string.IsNullOrWhiteSpace(account) || string.IsNullOrWhiteSpace(password))
+            return (false, "帳號或密碼錯誤");
+
+        try
+        {
+            if (await _adminUserRepo.ValidateAsync(account, password))
+                return (true, string.Empty);
+            return (false, "帳號或密碼錯誤");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "後台 Userdb 驗證失敗 UserID={UserId}", account);
+            return (false, "系統錯誤");
+        }
     }
 }
+                                                      
