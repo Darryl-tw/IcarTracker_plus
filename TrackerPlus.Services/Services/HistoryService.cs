@@ -253,6 +253,36 @@ public class HistoryService : IHistoryService
         }
     }
 
+    public async Task<OperationResult> DeleteAllHistoryAsync(string imei)
+    {
+        try
+        {
+            var utcStart = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var utcEnd = DateTime.UtcNow.AddDays(1);
+            await _historyRepo.DeleteHistoryAsync(imei, utcStart, utcEnd);
+            return OperationResult.Ok("歷史資料已全部清除");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "清除全部歷史失敗 IMEI={IMEI}", imei);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> QueueMoveHistoryAsync(string sourceImei, string destImei)
+    {
+        try
+        {
+            var ok = await _historyRepo.QueueMoveHistoryAsync(sourceImei, destImei);
+            return ok ? OperationResult.Ok("已加入轉移佇列，系統背景排程執行") : OperationResult.Fail("加入佇列失敗");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "排入歷史軌跡轉移失敗 {Src}->{Dest}", sourceImei, destImei);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
     private static (DateTime utcStart, DateTime utcEnd) ToUtc(DateTime localStart, DateTime localEnd, int timezoneMinutes)
     {
         var offset = TimeSpan.FromMinutes(timezoneMinutes);

@@ -11,6 +11,7 @@ public interface IPayLogRepository
     Task<PagedResult<PayLog>> GetPagedAsync(QueryFilter filter);
     Task<int> CreateAsync(PayLog payLog);
     Task<bool> UpdateAsync(PayLog payLog);
+    Task<bool> MoveByImeiAsync(int tbKey, string newImei);
     Task<bool> DeleteAsync(int tbKey);
     Task<PayLog?> GetLatestByIMEIAsync(string imei);
     Task<IEnumerable<PayLog>> GetRenewalListAsync(DateTime startDate, DateTime endDate);

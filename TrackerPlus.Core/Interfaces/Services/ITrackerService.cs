@@ -19,4 +19,9 @@ public interface ITrackerService
     Task<OperationResult> SaveDeviceSettingsAsync(int tbKey, int memberTbKey, string cname, string memo, string iconFile, IEnumerable<int> labelTbKeys);
     Task<IEnumerable<Tracker>> GetLiveLocationsAsync(int memberTbKey);
     Task<int> GetTrackerCountAsync(int? memberTbKey = null);
+    Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey);
+    Task<OperationResult> FactoryResetAsync(int tbKey);
+    Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys);
+    Task<OperationResult> UnbindDeviceAsync(int tbKey);
+    Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey);
 }

@@ -18,4 +18,9 @@ public interface ITrackerRepository
     Task<bool> UpdateLiveLocationAsync(string imei, double lat, double lng, double speed, int direction, DateTime utcTime);
     Task<IEnumerable<Tracker>> GetByGroupAsync(int memberTbKey, string groupName);
     Task<int> GetCountAsync(int? memberTbKey = null);
+    Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey);
+    Task<OperationResult> FactoryResetAsync(int tbKey);
+    Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys);
+    Task<OperationResult> UnbindAsync(int tbKey);
+    Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey);
 }

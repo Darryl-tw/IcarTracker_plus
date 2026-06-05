@@ -46,6 +46,12 @@ public class MapController : Controller
         return int.TryParse(val, out var key) ? key : 0;
     }
 
+    private int GetAdminPreviewTbKey()
+    {
+        var val = User.FindFirstValue("AdminPreviewTbKey");
+        return int.TryParse(val, out var key) ? key : 0;
+    }
+
     private int GetMemberTimezone()
     {
         var val = User.FindFirstValue("Timezoom");
@@ -53,14 +59,29 @@ public class MapController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Live()
+    public async Task<IActionResult> Live(int focus = 0)
     {
         var memberTbKey = GetMemberTbKey();
-        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        var previewTbKey = GetAdminPreviewTbKey();
+        var focusTbKey = focus > 0 ? focus : previewTbKey;
+
+        IEnumerable<Tracker> trackers;
+        if (memberTbKey == 0 && previewTbKey > 0)
+        {
+            // 管理員預覽未綁定裝置：只載入該裝置
+            var single = await _trackerService.GetTrackerAsync(previewTbKey);
+            trackers = single != null ? new[] { single } : Enumerable.Empty<Tracker>();
+        }
+        else
+        {
+            trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        }
+
         ViewBag.GoogleApiJs = _googleApiKeyService.GetMapsJavaScriptUrl(Request.Host.Host);
         ViewBag.MemberName = User.FindFirstValue("CName") ?? User.Identity?.Name ?? "";
         ViewBag.MemberTimezone = GetMemberTimezone();
         ViewBag.MaxMultiWindows = _appSettings.MaxMultiWindows;
+        ViewBag.FocusTbKey = focusTbKey;
         return View(trackers);
     }
 

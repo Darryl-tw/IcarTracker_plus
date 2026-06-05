@@ -89,6 +89,20 @@ public class PayLogService : IPayLogService
         }
     }
 
+    public async Task<OperationResult> MovePayLogByImeiAsync(int tbKey, string newImei)
+    {
+        try
+        {
+            var ok = await _payLogRepo.MoveByImeiAsync(tbKey, newImei.Trim());
+            return ok ? OperationResult.Ok("移轉成功") : OperationResult.Fail("找不到裝置或目標 IMEI 不存在");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "依 IMEI 移轉付款記錄失敗 TbKey={TbKey} NewImei={IMEI}", tbKey, newImei);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
     public async Task<IEnumerable<PayLog>> GetRenewalListAsync(DateTime startDate, DateTime endDate)
         => await _payLogRepo.GetRenewalListAsync(startDate, endDate);
 

@@ -76,15 +76,25 @@ public class TrackerRepository : ITrackerRepository
         var where = BuildWhereClause(filter, memberTbKey);
 
         var countSql = $"SELECT COUNT(*) FROM dbo.Tracker t {TrackerMemberJoins} {where}";
-        var dataSql = $@"{TrackerMapper.SelectColumns},
+
+        // 先用 CTE 取出分頁的 tbKey（不含昂貴的 PayLog 子查詢），
+        // 再 INNER JOIN 回來只對這 PageSize 筆執行完整欄位查詢，避免全表掃描效能問題。
+        var dataSql = $@"
+WITH _PageKeys AS (
+    SELECT t.tbKey
+    FROM dbo.Tracker t
+    {TrackerMemberJoins}
+    {where}
+    ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC
+    OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
+){TrackerMapper.SelectColumns},
             RTRIM(ISNULL(m.CName,'')) AS MemberName,
             RTRIM(ISNULL(u.UserName,'')) AS OBMName,
             RTRIM(ISNULL(m.ID,'')) AS MemberAccount
-            {TrackerMapper.FromClause}
-            {TrackerMemberJoins}
-            {where}
-            ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+{TrackerMapper.FromClause}
+INNER JOIN _PageKeys pk ON t.tbKey = pk.tbKey
+{TrackerMemberJoins}
+ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC";
 
         var param = new
         {
@@ -99,7 +109,7 @@ public class TrackerRepository : ITrackerRepository
         };
         using var conn = _db.CreateMainConnection();
         var total = await conn.ExecuteScalarAsync<int>(countSql, param);
-        var rows = await conn.QueryAsync<TrackerDbRow>(dataSql, param);
+        var rows = await conn.QueryAsync<TrackerDbRow>(dataSql, param, commandTimeout: 60);
 
         return new PagedResult<Tracker>
         {
@@ -233,6 +243,74 @@ public class TrackerRepository : ITrackerRepository
             : "SELECT COUNT(*) FROM dbo.Tracker";
         using var conn = _db.CreateMainConnection();
         return await conn.ExecuteScalarAsync<int>(sql, new { MemberTbKey = memberTbKey });
+    }
+
+    public async Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey)
+    {
+        var list = imeis.Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
+        if (list.Count == 0) return OperationResult.Fail("無 IMEI");
+        using var conn = _db.CreateMainConnection();
+        int count = 0;
+        foreach (var imei in list)
+        {
+            count += await conn.ExecuteAsync(
+                "UPDATE dbo.Tracker SET OBM_tbKey=@OBM WHERE RTRIM(IMEICode)=@IMEI",
+                new { OBM = obmTbKey, IMEI = imei });
+            await conn.ExecuteAsync(
+                "UPDATE dbo.IMEITable SET OBM_tbKey=@OBM WHERE RTRIM(IMEICODE)=@IMEI",
+                new { OBM = obmTbKey, IMEI = imei });
+        }
+        return OperationResult.Ok($"已轉移 {count} 台", count);
+    }
+
+    public async Task<OperationResult> FactoryResetAsync(int tbKey)
+    {
+        _logger.LogWarning("恢復出廠 TbKey={TbKey}", tbKey);
+        using var conn = _db.CreateMainConnection();
+        await conn.ExecuteAsync("DELETE FROM dbo.AlertModule WHERE Tracker_tbKey=@TbKey", new { TbKey = tbKey });
+        await conn.ExecuteAsync("DELETE FROM dbo.UDFieldsValue WHERE Tracker_tbKey=@TbKey", new { TbKey = tbKey });
+        await conn.ExecuteAsync("DELETE FROM dbo.UDLabelValue WHERE Tracker_tbKey=@TbKey", new { TbKey = tbKey });
+        var rows = await conn.ExecuteAsync(
+            "UPDATE dbo.Tracker SET Member_tbKey=0, CName='', Password='12345678' WHERE tbKey=@TbKey",
+            new { TbKey = tbKey });
+        return rows > 0 ? OperationResult.Ok("恢復出廠成功") : OperationResult.Fail("找不到裝置");
+    }
+
+    public async Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys)
+    {
+        var list = tbKeys.ToList();
+        if (list.Count == 0) return 0;
+        using var conn = _db.CreateMainConnection();
+        int deleted = 0;
+        foreach (var key in list)
+            deleted += await conn.ExecuteAsync("DELETE FROM dbo.Tracker WHERE tbKey=@TbKey", new { TbKey = key });
+        return deleted;
+    }
+
+    public async Task<OperationResult> UnbindAsync(int tbKey)
+    {
+        _logger.LogWarning("解除裝置綁定 TbKey={TbKey}", tbKey);
+        using var conn = _db.CreateMainConnection();
+        await conn.ExecuteAsync(
+            "UPDATE dbo.AlertModule SET Member_tbKey=0 WHERE Tracker_tbKey=@TbKey",
+            new { TbKey = tbKey });
+        var rows = await conn.ExecuteAsync(
+            "UPDATE dbo.Tracker SET Member_tbKey=0, Password='12345678' WHERE tbKey=@TbKey",
+            new { TbKey = tbKey });
+        return rows > 0 ? OperationResult.Ok("解除裝置成功") : OperationResult.Fail("找不到裝置");
+    }
+
+    public async Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey)
+    {
+        _logger.LogWarning("解除會員所有裝置綁定 MemberTbKey={Key}", memberTbKey);
+        using var conn = _db.CreateMainConnection();
+        await conn.ExecuteAsync(
+            "UPDATE dbo.AlertModule SET Member_tbKey=0 WHERE Tracker_tbKey IN (SELECT tbKey FROM dbo.Tracker WHERE Member_tbKey=@MemberTbKey)",
+            new { MemberTbKey = memberTbKey });
+        var rows = await conn.ExecuteAsync(
+            "UPDATE dbo.Tracker SET Member_tbKey=0, Password='12345678' WHERE Member_tbKey=@MemberTbKey",
+            new { MemberTbKey = memberTbKey });
+        return rows > 0 ? OperationResult.Ok($"已解除 {rows} 台裝置") : OperationResult.Fail("找不到裝置或該會員無綁定裝置");
     }
 
     private static string BuildWhereClause(QueryFilter filter, int? memberTbKey)

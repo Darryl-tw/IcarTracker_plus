@@ -121,7 +121,8 @@
         landmarkMemoRequired = L["Live_LandmarkMemoRequired"].Value,
         landmarkAdded = L["Live_LandmarkAdded"].Value,
         landmarkDeleted = L["Live_LandmarkDeleted"].Value,
-        landmarkCoords = L["Live_LandmarkCoords"].Value
+        landmarkCoords = L["Live_LandmarkCoords"].Value,
+        noGpsPosition = L["Live_NoGpsPosition"].Value
     });
     var initialJson = JsonSerializer.Serialize(Model.Select(t => new
     {
@@ -1015,6 +1016,7 @@ const TEXT_DASH = '\u2014';
 
 const initialTrackers = @Html.Raw(initialJson);
 const i18n = @Html.Raw(liveI18nJson);
+const autoFocusTbKey = @((int)(ViewBag.FocusTbKey ?? 0));
 const ICON_LABELS = {
     A: i18n.iconA, B: i18n.iconB, C: i18n.iconC, D: i18n.iconD,
     E: i18n.iconE, F: i18n.iconF, G: i18n.iconG, H: i18n.iconH
@@ -1044,6 +1046,12 @@ function initMap() {
     });
     fitAll();
     startRefresh();
+    if (autoFocusTbKey > 0) {
+        selectDeviceOnMap(autoFocusTbKey);
+        if (!markers[autoFocusTbKey]) {
+            showRefreshStatus(i18n.noGpsPosition || '此裝置目前無 GPS 位置資料');
+        }
+    }
     } catch (e) {
         console.error('initMap failed', e);
         showMapLoadError(i18n.mapLoadFailed.replace('{0}', e.message || e));
@@ -2232,6 +2240,14 @@ function switchTab(tab) {
         Object.values(markers).forEach(m => m.setMap(map));
         Object.values(polylines).forEach(p => p.setMap(map));
         startRefresh();
+        setTimeout(() => {
+            if (selectedTbKey && markers[selectedTbKey]) {
+                map.panTo(markers[selectedTbKey].getPosition());
+                map.setZoom(15);
+            } else {
+                fitAll();
+            }
+        }, 80);
     }
     if (map) {
         setTimeout(() => google.maps.event.trigger(map, 'resize'), 50);

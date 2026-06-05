@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using TrackerPlus.Core.Common;
@@ -12,17 +13,39 @@ public class TrackerController : AdminBaseController
     private readonly IMemberService _memberService;
     private readonly IPayLogService _payLogService;
     private readonly IDeviceSettingsService _deviceSettingsService;
+    private readonly IHistoryService _historyService;
+    private readonly IFirmwareService _firmwareService;
+    private readonly IOBMService _obmService;
+    private readonly IDataProtectionProvider _dataProtection;
 
     public TrackerController(ITrackerService trackerService, IMemberService memberService,
-        IPayLogService payLogService, IDeviceSettingsService deviceSettingsService)
+        IPayLogService payLogService, IDeviceSettingsService deviceSettingsService,
+        IHistoryService historyService, IFirmwareService firmwareService, IOBMService obmService,
+        IDataProtectionProvider dataProtection)
     {
         _trackerService = trackerService;
         _memberService = memberService;
         _payLogService = payLogService;
         _deviceSettingsService = deviceSettingsService;
+        _historyService = historyService;
+        _firmwareService = firmwareService;
+        _obmService = obmService;
+        _dataProtection = dataProtection;
     }
 
     public IActionResult Index() => View();
+
+    // ── 產生前台預覽 Token（5 分鐘有效，讓管理員免登入查看前台地圖） ────────
+    [HttpGet]
+    public IActionResult GetPreviewToken(int trackerTbKey, int memberTbKey)
+    {
+        if (trackerTbKey <= 0)
+            return Json(new { success = false, message = "未選取裝置" });
+        var protector = _dataProtection.CreateProtector("AdminPreview");
+        var expiry = DateTimeOffset.UtcNow.AddMinutes(5).ToUnixTimeSeconds();
+        var token = protector.Protect($"{trackerTbKey}:{memberTbKey}:{expiry}");
+        return Json(new { success = true, token });
+    }
 
     [HttpGet]
     public async Task TrackerStream(string? obm, string? imei, string? account, string? keyword, string? status, int page = 1, int pageSize = 20, CancellationToken ct = default)
@@ -179,6 +202,147 @@ public class TrackerController : AdminBaseController
         return RedirectToAction(nameof(Index));
     }
 
+    // ── 新增裝置 ─────────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> CreateTracker([FromBody] CreateTrackerRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Imei))
+            return Json(new { success = false, message = "IMEI 不可空白" });
+        if (req.Imei.Trim().Length != 15)
+            return Json(new { success = false, message = "IMEI 需為 15 碼" });
+
+        var tracker = new Core.Models.Tracker
+        {
+            IMEICODE = req.Imei.Trim(),
+            CName = req.CName?.Trim() ?? string.Empty,
+            Member_TbKey = 0,
+            TrackerStatus = "Y"
+        };
+        var result = await _trackerService.CreateTrackerAsync(tracker);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 清除歷史資料 ─────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> ClearHistory([FromBody] ClearHistoryRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Imei))
+            return Json(new { success = false, message = "請選擇裝置" });
+
+        OperationResult result;
+        if (req.DeleteAll)
+        {
+            result = await _historyService.DeleteAllHistoryAsync(req.Imei.Trim());
+        }
+        else
+        {
+            if (!DateTime.TryParse(req.StartDate, out var localStart) ||
+                !DateTime.TryParse(req.EndDate, out var localEnd))
+                return Json(new { success = false, message = "日期格式錯誤" });
+            localEnd = localEnd.Date.AddDays(1).AddSeconds(-1);
+            result = await _historyService.DeleteHistoryAsync(req.Imei.Trim(), localStart, localEnd, 480);
+        }
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 批次轉移 OBM ─────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> BatchTransfer([FromBody] BatchTransferRequest req)
+    {
+        if (req == null || req.Imeis == null || !req.Imeis.Any() || req.OBMTbKey <= 0)
+            return Json(new { success = false, message = "參數不正確" });
+        var result = await _trackerService.BatchTransferToOBMAsync(req.Imeis, req.OBMTbKey);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 韌體昇級 ─────────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> BatchFirmwareUpgrade([FromBody] BatchFirmwareRequest req)
+    {
+        if (req == null || req.Imeis == null || !req.Imeis.Any() || string.IsNullOrWhiteSpace(req.TargetVersion))
+            return Json(new { success = false, message = "參數不正確" });
+        var result = await _firmwareService.BatchQueueFirmwareUpdateAsync(req.TargetVersion, req.Imeis);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 整批刪除裝置（刪除選取的 tbKey 列表） ─────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> BatchDeleteDevices([FromBody] BatchDeleteRequest req)
+    {
+        if (req == null || req.TbKeys == null || !req.TbKeys.Any())
+            return Json(new { success = false, message = "未選取裝置" });
+        var deleted = await _trackerService.BatchDeleteByKeysAsync(req.TbKeys);
+        return Json(new { success = true, message = $"已刪除 {deleted} 台裝置" });
+    }
+
+    // ── 整批刪除（刪除某會員所有裝置） ──────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> DeleteAllByMember([FromBody] DeleteAllByMemberRequest req)
+    {
+        if (req == null || req.MemberTbKey <= 0)
+            return Json(new { success = false, message = "請先選擇有綁定會員的裝置" });
+        var result = await _trackerService.DeleteAllTrackersByMemberAsync(req.MemberTbKey);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 解除裝置綁定 ─────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> UnbindDevice([FromBody] SingleTbKeyRequest req)
+    {
+        if (req == null || req.TbKey <= 0)
+            return Json(new { success = false, message = "未選取裝置" });
+        var result = await _trackerService.UnbindDeviceAsync(req.TbKey);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 解除會員所有裝置綁定 ─────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> UnbindAllByMember([FromBody] DeleteAllByMemberRequest req)
+    {
+        if (req == null || req.MemberTbKey <= 0)
+            return Json(new { success = false, message = "請先選擇有綁定會員的裝置" });
+        var result = await _trackerService.UnbindAllByMemberAsync(req.MemberTbKey);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 恢復出廠 ─────────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> FactoryReset([FromBody] SingleTbKeyRequest req)
+    {
+        if (req == null || req.TbKey <= 0)
+            return Json(new { success = false, message = "未選取裝置" });
+        var result = await _trackerService.FactoryResetAsync(req.TbKey);
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 轉移歷史軌跡 ─────────────────────────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> MoveHistory([FromBody] MoveHistoryRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.SourceImei) || string.IsNullOrWhiteSpace(req.DestImei))
+            return Json(new { success = false, message = "來源與目標 IMEI 不可空白" });
+        if (req.SourceImei.Trim() == req.DestImei.Trim())
+            return Json(new { success = false, message = "來源與目標不可相同" });
+        var result = await _historyService.QueueMoveHistoryAsync(req.SourceImei.Trim(), req.DestImei.Trim());
+        return Json(new { success = result.Success, message = result.Message });
+    }
+
+    // ── 取得 OBM 列表 ─────────────────────────────────────────────────────────
+    [HttpGet]
+    public async Task<IActionResult> GetOBMList()
+    {
+        var list = await _obmService.GetAllOBMsAsync();
+        return Json(list.OrderBy(o => o.CName).Select(o => new { tbKey = o.TbKey, name = o.CName }));
+    }
+
+    // ── 取得韌體版本列表 ──────────────────────────────────────────────────────
+    [HttpGet]
+    public async Task<IActionResult> GetFirmwareVersions()
+    {
+        var list = await _firmwareService.GetAllFirmwaresAsync();
+        return Json(list.OrderByDescending(f => f.FWVERSION).Select(f => new { version = f.FWVERSION, memo = f.NewFwVersion }));
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAdminDeviceSettings(int tbKey)
     {
@@ -253,6 +417,15 @@ public class TrackerController : AdminBaseController
         catch (OperationCanceledException) { }
     }
 }
+
+public class CreateTrackerRequest { public string? Imei { get; set; } public string? CName { get; set; } }
+public class ClearHistoryRequest { public string? Imei { get; set; } public bool DeleteAll { get; set; } public string? StartDate { get; set; } public string? EndDate { get; set; } }
+public class BatchTransferRequest { public List<string>? Imeis { get; set; } public int OBMTbKey { get; set; } }
+public class BatchFirmwareRequest { public List<string>? Imeis { get; set; } public string? TargetVersion { get; set; } }
+public class BatchDeleteRequest { public List<int>? TbKeys { get; set; } }
+public class DeleteAllByMemberRequest { public int MemberTbKey { get; set; } }
+public class SingleTbKeyRequest { public int TbKey { get; set; } }
+public class MoveHistoryRequest { public string? SourceImei { get; set; } public string? DestImei { get; set; } }
 
 public class AdminDeviceSettingsSaveRequest
 {

@@ -466,6 +466,14 @@ public class HistoryRepository : IHistoryRepository
         }
     }
 
+    public async Task<bool> QueueMoveHistoryAsync(string sourceImei, string destImei)
+    {
+        _logger.LogInformation("排入歷史軌跡轉移佇列 {Src} -> {Dest}", sourceImei, destImei);
+        const string sql = "INSERT INTO dbo.MoveHistoryData(sourceimeicode, destinationimeicode) VALUES(@Src, @Dest)";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteAsync(sql, new { Src = sourceImei.Trim(), Dest = destImei.Trim() }) > 0;
+    }
+
     private static TrackingHistoryResult EmptyResult(int pageIndex, int pageSize) =>
         new() { PageIndex = pageIndex, PageSize = pageSize };
 }

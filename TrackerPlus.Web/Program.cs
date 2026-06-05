@@ -53,6 +53,7 @@ builder.Services.AddScoped<IFirmwareService, FirmwareService>();
 builder.Services.AddScoped<IHistoryService, HistoryService>();
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
+builder.Services.AddScoped<IOBMService, OBMService>();
 builder.Services.AddSingleton<IGoogleApiKeyService, GoogleApiKeyService>();
 
 // Authentication - member cookie

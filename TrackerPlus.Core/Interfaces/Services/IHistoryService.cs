@@ -19,4 +19,6 @@ public interface IHistoryService
     IAsyncEnumerable<TrackingLog> StreamCombinedHistoryAsync(string imei, DateTime localStart, DateTime localEnd, int memberTimezone, CancellationToken ct = default);
     IAsyncEnumerable<DailyHistorySummary> StreamDailySummaryAsync(string imei, DateTime localEnd, int memberTimezone, int days = 7, CancellationToken ct = default);
     IAsyncEnumerable<DailyHistorySummary> StreamCombinedDailySummaryAsync(string imei, DateTime localEnd, int memberTimezone, int days = 7, CancellationToken ct = default);
+    Task<OperationResult> DeleteAllHistoryAsync(string imei);
+    Task<OperationResult> QueueMoveHistoryAsync(string sourceImei, string destImei);
 }

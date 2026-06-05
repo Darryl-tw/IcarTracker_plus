@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -14,10 +16,13 @@ public class AccountController : Controller
 {
     private readonly IAuthService _authService;
     private readonly IMemberService _memberService;
+    private readonly IDataProtectionProvider _dataProtection;
 
-    public AccountController(IAuthService authService, IMemberService memberService)
+    public AccountController(IAuthService authService, IMemberService memberService,
+        IDataProtectionProvider dataProtection)
     {
         _authService = authService;
+        _dataProtection = dataProtection;
         _memberService = memberService;
     }
 
@@ -114,4 +119,67 @@ public class AccountController : Controller
 
     [HttpGet]
     public IActionResult AccessDenied() => View();
+
+    // ── 管理員前台預覽：解碼 token 後以對應會員身份簽入，跳轉至即時地圖 ────
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> AdminPreview(string t)
+    {
+        if (string.IsNullOrWhiteSpace(t))
+            return BadRequest();
+        try
+        {
+            var protector = _dataProtection.CreateProtector("AdminPreview");
+            var payload = protector.Unprotect(t);
+            var parts = payload.Split(':');
+            if (parts.Length != 3) return BadRequest();
+
+            var trackerTbKey = int.Parse(parts[0]);
+            var memberTbKey  = int.Parse(parts[1]);
+            var expiry       = long.Parse(parts[2]);
+
+            if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiry)
+                return Content("<html><body><p>預覽連結已過期，請在後台重新點擊「前台」按鈕。</p></body></html>", "text/html");
+
+            List<Claim> claims;
+            if (memberTbKey > 0)
+            {
+                var member = await _memberService.GetMemberAsync(memberTbKey);
+                if (member == null) return NotFound();
+                claims = new List<Claim>
+                {
+                    new(ClaimTypes.Name, member.ID),
+                    new(ClaimTypes.NameIdentifier, member.TbKey.ToString()),
+                    new("Timezoom", member.Timezoom.ToString()),
+                    new("CName", member.CName),
+                    new("UserLanguage", member.UserLanguage),
+                    new("AdminPreviewTbKey", trackerTbKey.ToString())
+                };
+            }
+            else
+            {
+                // 未綁定裝置：建立只含該裝置的預覽身份
+                claims = new List<Claim>
+                {
+                    new(ClaimTypes.Name, "admin-preview"),
+                    new(ClaimTypes.NameIdentifier, "0"),
+                    new("Timezoom", "480"),
+                    new("CName", "Admin Preview"),
+                    new("UserLanguage", "zh-TW"),
+                    new("AdminPreviewTbKey", trackerTbKey.ToString())
+                };
+            }
+
+            var identity  = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+                new AuthenticationProperties { IsPersistent = false });
+
+            return Redirect($"/Map/Live?focus={trackerTbKey}");
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
 }

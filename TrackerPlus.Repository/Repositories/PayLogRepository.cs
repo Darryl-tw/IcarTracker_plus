@@ -101,18 +101,33 @@ public class PayLogRepository : IPayLogRepository
     public async Task<bool> UpdateAsync(PayLog payLog)
     {
         const string sql = @"UPDATE dbo.PayLog SET
-            Amount = @Amount, SDate = @SDate, EDate = @EDate, CMemo = @CMemo, Model = @Model
+            OrderNumber = @OrderNumber, Amount = @Amount, SDate = @SDate, EDate = @EDate,
+            CMemo = @CMemo, Model = @Model, ValueAddedWeb = @ValueAddedWeb
             WHERE tbKey = @TbKey";
         using var conn = _db.CreateMainConnection();
         return await conn.ExecuteAsync(sql, new
         {
             payLog.TbKey,
+            OrderNumber = payLog.OrderNo,
             payLog.Amount,
             payLog.SDate,
             payLog.EDate,
             CMemo = payLog.Memo,
-            Model = payLog.SaleModel
+            Model = payLog.SaleModel,
+            payLog.ValueAddedWeb
         }) > 0;
+    }
+
+    public async Task<bool> MoveByImeiAsync(int tbKey, string newImei)
+    {
+        const string sql = @"
+            UPDATE dbo.PayLog SET
+                IMEICode     = @NewImei,
+                Tracker_tbKey = ISNULL((SELECT TOP 1 tbKey        FROM dbo.Tracker WHERE RTRIM(IMEICode) = @NewImei), 0),
+                Member_tbKey  = ISNULL((SELECT TOP 1 Member_tbKey FROM dbo.Tracker WHERE RTRIM(IMEICode) = @NewImei), 0)
+            WHERE tbKey = @TbKey";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteAsync(sql, new { TbKey = tbKey, NewImei = newImei }) > 0;
     }
 
     public async Task<bool> DeleteAsync(int tbKey)

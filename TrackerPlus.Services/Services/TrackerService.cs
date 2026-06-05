@@ -177,4 +177,54 @@ public class TrackerService : ITrackerService
 
     public async Task<int> GetTrackerCountAsync(int? memberTbKey = null)
         => await _trackerRepo.GetCountAsync(memberTbKey);
+
+    public async Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey)
+    {
+        try { return await _trackerRepo.BatchTransferToOBMAsync(imeis, obmTbKey); }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "批次轉移 OBM 失敗 OBM={OBM}", obmTbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> FactoryResetAsync(int tbKey)
+    {
+        try { return await _trackerRepo.FactoryResetAsync(tbKey); }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "恢復出廠失敗 TbKey={TbKey}", tbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> UnbindDeviceAsync(int tbKey)
+    {
+        try { return await _trackerRepo.UnbindAsync(tbKey); }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "解除裝置綁定失敗 TbKey={TbKey}", tbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey)
+    {
+        try { return await _trackerRepo.UnbindAllByMemberAsync(memberTbKey); }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "解除會員所有裝置失敗 MemberTbKey={Key}", memberTbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
+    public async Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys)
+    {
+        try { return await _trackerRepo.BatchDeleteByKeysAsync(tbKeys); }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "批次刪除失敗");
+            return 0;
+        }
+    }
 }
