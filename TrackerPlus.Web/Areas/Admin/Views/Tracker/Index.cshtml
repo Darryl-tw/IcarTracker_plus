@@ -8,6 +8,18 @@
 <div class="adm-tracker-page">
     <!-- ===== Top Panel: Device Grid ===== -->
     <div class="adm-top-panel">
+        <!-- Function Toolbar -->
+        <div class="adm-panel-hdr" style="background:#e9f0fb;border-bottom:1px solid #c5d5ea;flex-wrap:wrap">
+            <button class="btn btn-success btn-adm" onclick="showModal('addTrackerModal')" title="新增裝置">新增</button>
+            <button class="btn btn-danger btn-adm" onclick="cmdDelete()" title="刪除選取裝置">刪除</button>
+            <button class="btn btn-warning btn-adm" onclick="showModal('clearHistoryModal')" title="清除歷史資料">清除歷史資料</button>
+            <button class="btn btn-secondary btn-adm" onclick="openBatchTransfer()" title="批次轉移 OBM">批次轉移</button>
+            <button class="btn btn-info btn-adm text-white" onclick="openFwUpgrade()" title="韌體昇級">韌體昇級</button>
+            <button class="btn btn-dark btn-adm" onclick="cmdBatchDelete()" title="整批刪除選取裝置">整批刪除裝置</button>
+            <button class="btn btn-outline-primary btn-adm" onclick="cmdFrontend()" title="前台(單機)">前台(單機)</button>
+            <button class="btn btn-outline-danger btn-adm" onclick="showModal('factoryResetModal')" title="恢復出廠設定">恢復出廠</button>
+            <button class="btn btn-outline-secondary btn-adm" onclick="showModal('moveHistoryModal')" title="轉移歷史軌跡">轉移歷史軌跡</button>
+        </div>
         <!-- Search / Filter bar -->
         <div class="adm-panel-hdr">
             <span class="adm-panel-title">@L["Admin_Tracker_Title"]</span>
@@ -107,8 +119,15 @@
         <!-- Left: Member Tracker List -->
         <div class="adm-bottom-pane" id="leftPane">
             <div class="adm-panel-hdr">
-                <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_DeviceList"]</span>
-                <span id="member-info" class="text-muted" style="font-size:.8rem"></span>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_DeviceList"]</span>
+                    <span id="member-info" class="text-muted" style="font-size:.8rem"></span>
+                </div>
+                <div class="d-flex gap-1 mt-1">
+                    <button class="btn btn-outline-warning btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdUnbindAll()" title="@L["Admin_Tracker_BtnUnbindAllTitle"]">@L["Admin_Tracker_BtnUnbindAll"]</button>
+                    <button class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdUnbind()" title="@L["Admin_Tracker_BtnUnbindTitle"]">@L["Admin_Tracker_BtnUnbind"]</button>
+                    <button class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdFrontend()" title="@L["Admin_Tracker_BtnFrontendTitle"]">@L["Admin_Tracker_BtnFrontend"]</button>
+                </div>
             </div>
             <div class="adm-pane-body">
                 <table class="table table-sm table-hover mb-0">
@@ -133,8 +152,16 @@
         <!-- Right: PayLog -->
         <div class="adm-bottom-pane" id="rightPane">
             <div class="adm-panel-hdr">
-                <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_Orders"]</span>
-                <span id="paylog-info" class="text-muted" style="font-size:.8rem"></span>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <span class="adm-panel-title">@L["Admin_Tracker_SubTitle_Orders"]</span>
+                    <span id="paylog-info" class="text-muted" style="font-size:.8rem"></span>
+                </div>
+                <div class="d-flex gap-1 mt-1">
+                    <button class="btn btn-success btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogAdd()" title="@L["Admin_PayLog_BtnAddTitle"]">@L["Admin_PayLog_BtnAdd"]</button>
+                    <button class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogEdit()" title="@L["Admin_PayLog_BtnEditTitle"]">@L["Admin_PayLog_BtnEdit"]</button>
+                    <button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogDelete()" title="@L["Admin_PayLog_BtnDeleteTitle"]">@L["Admin_PayLog_BtnDelete"]</button>
+                    <button class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogMove()" title="@L["Admin_PayLog_BtnMoveTitle"]">@L["Admin_PayLog_BtnMove"]</button>
+                </div>
             </div>
             <div class="adm-pane-body">
                 <table class="table table-sm table-hover mb-0">
@@ -354,6 +381,243 @@
   </div>
 </div>
 
+<!-- ===== 新增裝置 Modal ===== -->
+<div class="modal fade" id="addTrackerModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">新增裝置</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-2"><label class="form-label small mb-1">IMEI（15碼）</label><input type="text" id="add-imei" class="form-control form-control-sm" maxlength="15" placeholder="000000000000000" /></div>
+        <div class="mb-2"><label class="form-label small mb-1">識別名稱</label><input type="text" id="add-cname" class="form-control form-control-sm" /></div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-success btn-sm" onclick="doAddTracker()">確定新增</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 清除歷史資料 Modal ===== -->
+<div class="modal fade" id="clearHistoryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">清除歷史資料</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-2 small text-muted">選取裝置 IMEI：<strong id="ch-imei-lbl">（未選取）</strong></div>
+        <div class="mb-2">
+          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeAll" value="all" checked><label class="form-check-label small" for="chModeAll">刪除全部歷史資料</label></div>
+          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeRange" value="range"><label class="form-check-label small" for="chModeRange">刪除指定區間</label></div>
+        </div>
+        <div id="chRangeRow" style="display:none">
+          <div class="row g-2">
+            <div class="col-6"><label class="form-label small mb-1">開始日期</label><input type="date" id="ch-start" class="form-control form-control-sm" /></div>
+            <div class="col-6"><label class="form-label small mb-1">結束日期</label><input type="date" id="ch-end" class="form-control form-control-sm" /></div>
+          </div>
+        </div>
+        <div class="mt-2 small text-danger">注意：刪除後無法復原</div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-danger btn-sm" onclick="doClearHistory()">確定清除</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 批次轉移 Modal ===== -->
+<div class="modal fade" id="batchTransferModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">批次轉移 OBM</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-2"><label class="form-label small fw-semibold mb-1">要轉移的 IMEI（每行一筆，或留空使用選取列）</label><textarea id="bt-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;123456789012346&#10;..."></textarea></div>
+        <div class="mb-2"><label class="form-label small mb-1">目標 OBM 經銷商</label><select id="bt-obm" class="form-select form-select-sm"><option value="">載入中…</option></select></div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-secondary btn-sm" onclick="doBatchTransfer()">確定轉移</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 韌體昇級 Modal ===== -->
+<div class="modal fade" id="fwUpgradeModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">韌體昇級</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-2"><label class="form-label small fw-semibold mb-1">要昇級的 IMEI（每行一筆，或留空使用選取列）</label><textarea id="fw-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;..."></textarea></div>
+        <div class="mb-2"><label class="form-label small mb-1">目標韌體版本</label><select id="fw-ver" class="form-select form-select-sm"><option value="">載入中…</option></select></div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-info btn-sm text-white" onclick="doFwUpgrade()">確定排程昇級</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 恢復出廠 Modal ===== -->
+<div class="modal fade" id="factoryResetModal" tabindex="-1">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0 text-danger">恢復出廠設定</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="small text-muted mb-2">選取裝置 IMEI：<strong id="fr-imei-lbl">（未選取）</strong></div>
+        <div class="small">此操作將：<ul class="mb-1"><li>解除會員綁定</li><li>清除裝置名稱</li><li>清除警報設定</li><li>清除自訂欄位與群組標籤</li></ul></div>
+        <div class="text-danger small fw-bold">確定要恢復出廠嗎？此動作無法復原。</div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-danger btn-sm" onclick="doFactoryReset()">確定恢復出廠</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 轉移歷史軌跡 Modal ===== -->
+<div class="modal fade" id="moveHistoryModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">轉移歷史軌跡</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <div class="mb-2"><label class="form-label small mb-1">來源 IMEI（舊裝置）</label><input type="text" id="mh-src" class="form-control form-control-sm" maxlength="15" /></div>
+        <div class="mb-2"><label class="form-label small mb-1">目標 IMEI（新裝置）</label><input type="text" id="mh-dest" class="form-control form-control-sm" maxlength="15" /></div>
+        <div class="small text-muted">歷史軌跡轉移由系統背景排程執行，完成後資料將歸屬至目標 IMEI。</div>
+      </div>
+      <div class="modal-footer py-2">
+        <button class="btn btn-secondary btn-sm" onclick="doMoveHistory()">確定轉移</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PayLog Add Modal ===== -->
+<div class="modal fade" id="paylogAddModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2 bg-light"><h6 class="modal-title mb-0">@L["Admin_PayLog_BtnAdd"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="pl-add-imei" />
+        <div class="row g-2">
+          <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_OrderNo"]</label>
+            <input type="text" id="pl-add-orderno" class="form-control form-control-sm" readonly /></div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_SaleModel"]</label>
+            <select id="pl-add-model" class="form-select form-select-sm" onchange="plSaleModeChange()">
+              <option value="">　</option>
+              <option value="1">@L["Admin_PayLog_SM_1"]</option>
+              <option value="2">@L["Admin_PayLog_SM_2"]</option>
+              <option value="3">@L["Admin_PayLog_SM_3"]</option>
+              <option value="16">@L["Admin_PayLog_SM_16"]</option>
+              <option value="17">@L["Admin_PayLog_SM_17"]</option>
+              <option value="18">@L["Admin_PayLog_SM_18"]</option>
+              <option value="6">@L["Admin_PayLog_SM_6"]</option>
+              <option value="7">@L["Admin_PayLog_SM_7"]</option>
+              <option value="4">@L["Admin_PayLog_SM_4"]</option>
+              <option value="5">@L["Admin_PayLog_SM_5"]</option>
+              <option value="13">@L["Admin_PayLog_SM_13"]</option>
+              <option value="14">@L["Admin_PayLog_SM_14"]</option>
+              <option value="15">@L["Admin_PayLog_SM_15"]</option>
+              <option value="20">@L["Admin_PayLog_SM_20"]</option>
+              <option value="21">@L["Admin_PayLog_SM_21"]</option>
+              <option value="22">@L["Admin_PayLog_SM_22"]</option>
+            </select>
+          </div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceStart"]</label>
+            <input type="date" id="pl-add-sdate" class="form-control form-control-sm" oninput="plEdsCaclEdate()" /></div>
+          <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_EndDateStatus"]</label>
+            <div class="d-flex gap-1">
+              <select id="pl-add-eds" class="form-select form-select-sm" onchange="plEdsCaclEdate()">
+                <option value="0">@L["Admin_PayLog_EDS_Week"]</option>
+                <option value="1">@L["Admin_PayLog_EDS_Month1"]</option>
+                <option value="8">@L["Admin_PayLog_EDS_8days"]</option>
+                <option value="6">@L["Admin_PayLog_EDS_HalfYear"]</option>
+                <option value="12">@L["Admin_PayLog_EDS_Year1"]</option>
+                <option value="S">@L["Admin_PayLog_EDS_Unlimited"]</option>
+                <option value="A">@L["Admin_PayLog_EDS_Custom"]</option>
+                <option value="13">@L["Admin_PayLog_EDS_Month13"]</option>
+                <option value="24">@L["Admin_PayLog_EDS_Year2"]</option>
+                <option value="36">@L["Admin_PayLog_EDS_Year3"]</option>
+                <option value="B">@L["Admin_PayLog_EDS_Months"]</option>
+              </select>
+              <select id="pl-add-fmonth" class="form-select form-select-sm" style="display:none;width:70px" onchange="plEdsCaclEdate()">
+                @for(int m=1;m<=12;m++){<option value="@m">@m</option>}
+              </select>
+            </div>
+          </div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceEnd"]</label>
+            <input type="date" id="pl-add-edate" class="form-control form-control-sm" readonly /></div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_Amount"]</label>
+            <input type="number" id="pl-add-amount" class="form-control form-control-sm" step="0.01" value="0" /></div>
+          <div class="col-12"><label class="form-label small mb-0">@L["Admin_Tracker_Col_SaleMemo"]</label>
+            <input type="text" id="pl-add-memo" class="form-control form-control-sm" /></div>
+          <div class="col-12"><div class="form-check"><input type="checkbox" id="pl-add-vaw" class="form-check-input"><label for="pl-add-vaw" class="form-check-label small">@L["Admin_Tracker_Col_ValueAdded"]</label></div></div>
+        </div>
+      </div>
+      <div class="modal-footer py-2"><button class="btn btn-success btn-sm" onclick="doPayLogAdd()">@L["Common_Save"]</button><button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PayLog Edit Modal ===== -->
+<div class="modal fade" id="paylogEditModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2 bg-light"><h6 class="modal-title mb-0">@L["Admin_PayLog_BtnEdit"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <input type="hidden" id="pl-edit-tbkey" />
+        <div class="row g-2">
+          <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_OrderNo"]</label><input type="text" id="pl-edit-orderno" class="form-control form-control-sm" /></div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_Amount"]</label><input type="number" id="pl-edit-amount" class="form-control form-control-sm" step="0.01" /></div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_SaleModel"]</label>
+            <select id="pl-edit-model" class="form-select form-select-sm">
+              <option value="">　</option>
+              <option value="1">@L["Admin_PayLog_SM_1"]</option>
+              <option value="2">@L["Admin_PayLog_SM_2"]</option>
+              <option value="3">@L["Admin_PayLog_SM_3"]</option>
+              <option value="16">@L["Admin_PayLog_SM_16"]</option>
+              <option value="17">@L["Admin_PayLog_SM_17"]</option>
+              <option value="18">@L["Admin_PayLog_SM_18"]</option>
+              <option value="6">@L["Admin_PayLog_SM_6"]</option>
+              <option value="7">@L["Admin_PayLog_SM_7"]</option>
+              <option value="4">@L["Admin_PayLog_SM_4"]</option>
+              <option value="5">@L["Admin_PayLog_SM_5"]</option>
+              <option value="13">@L["Admin_PayLog_SM_13"]</option>
+              <option value="14">@L["Admin_PayLog_SM_14"]</option>
+              <option value="15">@L["Admin_PayLog_SM_15"]</option>
+              <option value="20">@L["Admin_PayLog_SM_20"]</option>
+              <option value="21">@L["Admin_PayLog_SM_21"]</option>
+              <option value="22">@L["Admin_PayLog_SM_22"]</option>
+            </select>
+          </div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceStart"]</label><input type="date" id="pl-edit-sdate" class="form-control form-control-sm" /></div>
+          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceEnd"]</label><input type="date" id="pl-edit-edate" class="form-control form-control-sm" /></div>
+          <div class="col-12"><label class="form-label small mb-0">@L["Admin_Tracker_Col_SaleMemo"]</label><input type="text" id="pl-edit-memo" class="form-control form-control-sm" /></div>
+          <div class="col-12"><div class="form-check"><input type="checkbox" id="pl-edit-vaw" class="form-check-input"><label for="pl-edit-vaw" class="form-check-label small">@L["Admin_Tracker_Col_ValueAdded"]</label></div></div>
+        </div>
+      </div>
+      <div class="modal-footer py-2"><button class="btn btn-primary btn-sm" onclick="doPayLogEdit()">@L["Common_Save"]</button><button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PayLog Move Modal ===== -->
+<div class="modal fade" id="paylogMoveModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2 bg-light"><h6 class="modal-title mb-0">@L["Admin_PayLog_BtnMove"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-body">
+        <label class="form-label small mb-1">@L["Admin_PayLog_MoveTarget"]</label>
+        <input type="text" id="pl-move-imei" class="form-control form-control-sm" maxlength="15" placeholder="@L["Admin_PayLog_Imei15Ph"]" />
+      </div>
+      <div class="modal-footer py-2"><button class="btn btn-secondary btn-sm" onclick="doPayLogMove()">@L["Admin_PayLog_BtnMove"]</button><button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button></div>
+    </div>
+  </div>
+</div>
+
 <style>
     .adm-tracker-page {
         height: calc(100vh - 76px);
@@ -512,10 +776,19 @@ var _T = {
     noBoundMember: '@Html.Raw(L["Admin_Tracker_NoBoundMember"].Value)',
     loading:       '@Html.Raw(L["Admin_Tracker_Loading"].Value)',
     loadFail:      '@Html.Raw(L["Admin_Tracker_LoadFail"].Value)',
-    confirmDel:    '@Html.Raw(L["Admin_Tracker_ConfirmDelete"].Value)',
-    deleteFail:    '@Html.Raw(L["Admin_Tracker_DeleteFail"].Value)',
-    details:       '@Html.Raw(L["Common_Details"].Value)',
-    delete_:       '@Html.Raw(L["Common_Delete"].Value)'
+    confirmDel:       '@Html.Raw(L["Admin_Tracker_ConfirmDelete"].Value)',
+    deleteFail:       '@Html.Raw(L["Admin_Tracker_DeleteFail"].Value)',
+    details:          '@Html.Raw(L["Common_Details"].Value)',
+    delete_:          '@Html.Raw(L["Common_Delete"].Value)',
+    confirmUnbind:    '@Html.Raw(L["Admin_Tracker_ConfirmUnbind"].Value)',
+    confirmUnbindAll: '@Html.Raw(L["Admin_Tracker_ConfirmUnbindAll"].Value)',
+    noMemberBound:    '@Html.Raw(L["Admin_Tracker_NoMemberBound"].Value)',
+    plSelectFirst:    '@Html.Raw(L["Admin_PayLog_SelectFirst"].Value)',
+    plSelectDevice:   '@Html.Raw(L["Admin_PayLog_SelectDevice"].Value)',
+    plConfirmDelete:  '@Html.Raw(L["Admin_PayLog_ConfirmDelete"].Value)',
+    plImei15:         '@Html.Raw(L["Admin_PayLog_Imei15"].Value)',
+    plConfirmMove:       '@Html.Raw(L["Admin_PayLog_ConfirmMove"].Value)',
+    plEdateBeforeSdate:  '@Html.Raw(L["Admin_PayLog_EdateBeforeSdate"].Value)'
 };
 (function () {
     // ── State ─────────────────────────────────────────────────────────────
@@ -524,7 +797,16 @@ var _T = {
     let activeEs = null;
     const today = new Date(); today.setHours(0,0,0,0);
 
-    const saleModelLabel = { 1:'續費', 4:'國際', 5:'特殊', 6:'退款', 7:'自動啟用', 21:'多月' };
+    const saleModelLabel = {
+        1:'@L["Admin_PayLog_SM_1"].Value', 2:'@L["Admin_PayLog_SM_2"].Value',
+        3:'@L["Admin_PayLog_SM_3"].Value', 4:'@L["Admin_PayLog_SM_4"].Value',
+        5:'@L["Admin_PayLog_SM_5"].Value', 6:'@L["Admin_PayLog_SM_6"].Value',
+        7:'@L["Admin_PayLog_SM_7"].Value', 13:'@L["Admin_PayLog_SM_13"].Value',
+        14:'@L["Admin_PayLog_SM_14"].Value', 15:'@L["Admin_PayLog_SM_15"].Value',
+        16:'@L["Admin_PayLog_SM_16"].Value', 17:'@L["Admin_PayLog_SM_17"].Value',
+        18:'@L["Admin_PayLog_SM_18"].Value', 20:'@L["Admin_PayLog_SM_20"].Value',
+        21:'@L["Admin_PayLog_SM_21"].Value', 22:'@L["Admin_PayLog_SM_22"].Value'
+    };
 
     // ── Init ──────────────────────────────────────────────────────────────
     loadPage(1);
@@ -610,6 +892,7 @@ var _T = {
 
         const tr = document.createElement('tr');
         tr.dataset.tbkey = d.tbKey;
+        tr.dataset.memberTbkey = d.memberTbKey || 0;
         tr.dataset.status = statusKey;
         tr.style.cursor = 'pointer';
         tr.innerHTML =
@@ -701,7 +984,7 @@ var _T = {
                     return;
                 }
                 tbody.innerHTML = list.map(l =>
-                    '<tr>' +
+                    '<tr data-pl-tbkey="' + l.tbKey + '" data-pl-imei="' + escHtml(l.imei ?? '') + '" style="cursor:pointer" onclick="selectPayLogRow(this)">' +
                     '<td>' + (l.cDate ?? '-') + '</td>' +
                     '<td>' + escHtml(l.orderNo ?? '') + '</td>' +
                     '<td title="' + escHtml(l.memo ?? '') + '">' + escHtml(l.memo ?? '') + '</td>' +
@@ -937,6 +1220,484 @@ var _T = {
     window.resetTrackerModal = function() {
         if (_emData) fillModal(_emData);
     };
+})();
+
+// ── Toolbar helpers ───────────────────────────────────────────────────────
+(function () {
+    // ── State shared with toolbar ────────────────────────────────────────
+    let _selTbKey = 0, _selImei = '', _selMemberTbKey = 0;
+    let _selPlTbKey = 0;
+
+    function getAntiForgeryToken() {
+        return document.querySelector('#af-form [name=__RequestVerificationToken]')?.value ?? '';
+    }
+    function postJson(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': getAntiForgeryToken() },
+            body: JSON.stringify(data)
+        }).then(r => r.json());
+    }
+    function showModal(id) {
+        new bootstrap.Modal(document.getElementById(id)).show();
+    }
+    window.showModal = showModal;
+
+    // Track selected row
+    document.addEventListener('click', e => {
+        const tr = e.target.closest('#tracker-tbody tr[data-tbkey]');
+        if (tr) {
+            _selTbKey = parseInt(tr.dataset.tbkey) || 0;
+            _selImei = tr.cells[1]?.textContent?.trim() ?? '';
+            _selMemberTbKey = parseInt(tr.dataset.memberTbkey || '0') || 0;
+        }
+    });
+
+    function requireSelection(label) {
+        if (!_selTbKey) { alert('請先點選一台裝置'); return false; }
+        return true;
+    }
+
+    // ── 刪除 ────────────────────────────────────────────────────────────
+    window.cmdDelete = function () {
+        if (!requireSelection()) return;
+        if (!confirm('確定刪除此裝置（IMEI: ' + _selImei + '）？')) return;
+        postJson('/Admin/Tracker/Delete', null)
+            .catch(() => {});
+        // Fall back to form POST for anti-forgery
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/Admin/Tracker/Delete';
+        const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'id'; inp.value = _selTbKey; form.appendChild(inp);
+        const tok = document.createElement('input'); tok.type = 'hidden'; tok.name = '__RequestVerificationToken'; tok.value = getAntiForgeryToken(); form.appendChild(tok);
+        document.body.appendChild(form);
+        fetch('/Admin/Tracker/Delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': getAntiForgeryToken() },
+            body: `id=${_selTbKey}&__RequestVerificationToken=${encodeURIComponent(getAntiForgeryToken())}`
+        }).then(r => {
+            if (r.ok) { alert('刪除成功'); window.doSearch(); _selTbKey = 0; _selImei = ''; }
+            else r.text().then(t => alert('刪除失敗：' + t));
+        });
+    };
+
+    // ── 清除歷史資料 ────────────────────────────────────────────────────
+    window.showModal = function(id) {
+        if ((id === 'clearHistoryModal' || id === 'factoryResetModal') && !_selTbKey) {
+            alert('請先點選一台裝置'); return;
+        }
+        if (id === 'clearHistoryModal') {
+            document.getElementById('ch-imei-lbl').textContent = _selImei || '（未選取）';
+            document.getElementById('ch-start').value = '';
+            document.getElementById('ch-end').value = '';
+            document.querySelector('[name=chMode][value=all]').checked = true;
+            document.getElementById('chRangeRow').style.display = 'none';
+        }
+        if (id === 'factoryResetModal') {
+            document.getElementById('fr-imei-lbl').textContent = _selImei || '（未選取）';
+        }
+        new bootstrap.Modal(document.getElementById(id)).show();
+    };
+    document.querySelectorAll('[name=chMode]').forEach(r =>
+        r.addEventListener('change', () => {
+            document.getElementById('chRangeRow').style.display =
+                document.getElementById('chModeRange').checked ? '' : 'none';
+        })
+    );
+
+    window.doClearHistory = function () {
+        const deleteAll = document.getElementById('chModeAll').checked;
+        const payload = { imei: _selImei, deleteAll };
+        if (!deleteAll) {
+            payload.startDate = document.getElementById('ch-start').value;
+            payload.endDate = document.getElementById('ch-end').value;
+            if (!payload.startDate || !payload.endDate) { alert('請輸入日期區間'); return; }
+        }
+        if (!confirm('確定' + (deleteAll ? '清除全部' : '清除區間') + '歷史資料？此動作無法復原。')) return;
+        postJson('/Admin/Tracker/ClearHistory', payload)
+            .then(r => { alert(r.message || (r.success ? '成功' : '失敗')); if (r.success) bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal'))?.hide(); });
+    };
+
+    // ── 批次轉移 ────────────────────────────────────────────────────────
+    window.openBatchTransfer = async function () {
+        const sel = document.getElementById('bt-obm');
+        if (sel.options.length <= 1) {
+            const list = await fetch('/Admin/Tracker/GetOBMList').then(r => r.json());
+            sel.innerHTML = '<option value="">選擇 OBM</option>' +
+                list.map(o => `<option value="${o.tbKey}">${escHtml(o.name)}</option>`).join('');
+        }
+        const imeis = getCheckedImeis();
+        document.getElementById('bt-imeis').value = imeis.join('\n');
+        new bootstrap.Modal(document.getElementById('batchTransferModal')).show();
+    };
+    window.doBatchTransfer = function () {
+        const raw = document.getElementById('bt-imeis').value;
+        const imeis = raw.split(/[\n,\r]+/).map(s => s.trim()).filter(s => s.length === 15);
+        const obmTbKey = parseInt(document.getElementById('bt-obm').value) || 0;
+        if (!imeis.length) { alert('請輸入 IMEI'); return; }
+        if (!obmTbKey) { alert('請選擇目標 OBM'); return; }
+        if (!confirm(`確定將 ${imeis.length} 台裝置轉移至選取的 OBM？`)) return;
+        postJson('/Admin/Tracker/BatchTransfer', { imeis, obmTbKey })
+            .then(r => { alert(r.message); if (r.success) { bootstrap.Modal.getInstance(document.getElementById('batchTransferModal'))?.hide(); window.doSearch(); } });
+    };
+
+    // ── 韌體昇級 ────────────────────────────────────────────────────────
+    window.openFwUpgrade = async function () {
+        const sel = document.getElementById('fw-ver');
+        if (sel.options.length <= 1) {
+            const list = await fetch('/Admin/Tracker/GetFirmwareVersions').then(r => r.json());
+            sel.innerHTML = '<option value="">選擇版本</option>' +
+                list.map(f => `<option value="${escHtml(f.version)}">${escHtml(f.version)}${f.memo ? ' - ' + escHtml(f.memo) : ''}</option>`).join('');
+        }
+        const imeis = getCheckedImeis();
+        document.getElementById('fw-imeis').value = imeis.join('\n');
+        new bootstrap.Modal(document.getElementById('fwUpgradeModal')).show();
+    };
+    window.doFwUpgrade = function () {
+        const raw = document.getElementById('fw-imeis').value;
+        const imeis = raw.split(/[\n,\r]+/).map(s => s.trim()).filter(s => s.length === 15);
+        const targetVersion = document.getElementById('fw-ver').value.trim();
+        if (!imeis.length) { alert('請輸入 IMEI'); return; }
+        if (!targetVersion) { alert('請選擇韌體版本'); return; }
+        if (!confirm(`確定排程 ${imeis.length} 台裝置昇級至 ${targetVersion}？`)) return;
+        postJson('/Admin/Tracker/BatchFirmwareUpgrade', { imeis, targetVersion })
+            .then(r => { alert(r.message); if (r.success) bootstrap.Modal.getInstance(document.getElementById('fwUpgradeModal'))?.hide(); });
+    };
+
+    // ── 整批刪除裝置 ────────────────────────────────────────────────────
+    window.cmdBatchDelete = function () {
+        const tbKeys = getCheckedTbKeys();
+        if (!tbKeys.length) { alert('請先勾選要刪除的裝置（或選取後使用下方整批功能）\n\n若要刪除會員所有裝置，請先點選有綁定會員的裝置。'); return; }
+        if (!confirm(`確定刪除選取的 ${tbKeys.length} 台裝置？此動作無法復原。`)) return;
+        postJson('/Admin/Tracker/BatchDeleteDevices', { tbKeys })
+            .then(r => { alert(r.message); if (r.success) window.doSearch(); });
+    };
+
+    // ── PayLog 列選取 ────────────────────────────────────────────────────
+    window.selectPayLogRow = function (tr) {
+        document.querySelectorAll('#paylog-tbody tr.table-info').forEach(r => r.classList.remove('table-info'));
+        tr.classList.add('table-info');
+        _selPlTbKey = parseInt(tr.dataset.plTbkey) || 0;
+    };
+
+    function requirePayLogSelection() {
+        if (!_selPlTbKey) { alert(_T.plSelectFirst); return false; }
+        return true;
+    }
+
+    // ── 訂單期限自動計算邏輯（對應舊系統 PayLog_New.aspx JS） ────────────
+    // SaleModel → 允許的 EndDateStatus options + 預設值
+    const PL_EDS_ALLOWED = {
+        '1': { allowed: ['0','1'], def: '1' },                                    // 生產維修
+        '2': { allowed: ['12','24'], def: '12' },                                 // 國內零售
+        '3': { allowed: ['12','24'], def: '12' },                                 // 國內租貸
+        '4': { allowed: null, def: null, auto1900: true, amt: '999999', amtDis: true }, // 國外經銷
+        '5': { allowed: null, def: null, auto1900: true, amt0: true },            // 國外零售
+        '6': { allowed: null, def: null, refund: true },                          // 到期退貨
+        '7': { allowed: null, def: null, auto1900: true, amt0: true },            // 自動開通
+        '13':{ allowed: ['12'], def: '12' },                                      // 國外續約
+        '14':{ allowed: ['B'], def: 'B' },                                        // 國外贈送
+        '15':{ allowed: ['0','1'], def: '1' },                                    // 國外銷售測試
+        '16':{ allowed: ['8'], def: '8' },                                        // 國內經銷銷售
+        '17':{ allowed: ['B'], def: 'B' },                                        // 國內經銷續約
+        '18':{ allowed: ['0','1'], def: '1' },                                    // 國內銷售測試
+        '20':{ allowed: ['12'], def: '12' },                                      // 內測訂單
+        '21':{ allowed: ['8'], def: '8' },                                        // 國際sim卡
+        '22':{ allowed: ['1'], def: '1', amt0: true, setToday: true }             // app tracker 試用單
+    };
+
+    window.plSaleModeChange = function plSaleModeChange() {
+        const mode = document.getElementById('pl-add-model').value;
+        const cfg  = PL_EDS_ALLOWED[mode] || { allowed: ['12','24','36','13','6','1','0','S','A'], def: '12' };
+        const edsEl   = document.getElementById('pl-add-eds');
+        const edateEl = document.getElementById('pl-add-edate');
+        const amtEl   = document.getElementById('pl-add-amount');
+        const fmonthEl= document.getElementById('pl-add-fmonth');
+
+        // 啟用/禁用所有 options
+        Array.from(edsEl.options).forEach(o => {
+            o.disabled = cfg.allowed ? !cfg.allowed.includes(o.value) : true;
+        });
+        edsEl.disabled = !cfg.allowed;
+        fmonthEl.style.display = 'none';
+
+        if (cfg.refund) {
+            edateEl.value  = document.getElementById('pl-add-sdate').value;
+            edateEl.readOnly = false;
+            amtEl.value = '0'; amtEl.disabled = true;
+        } else if (cfg.auto1900) {
+            document.getElementById('pl-add-sdate').value = '1900-01-01';
+            edateEl.value = '1900-01-01';
+            edateEl.readOnly = true;
+            if (cfg.amt0)    { amtEl.value = '0'; amtEl.disabled = true; }
+            else if (cfg.amt){ amtEl.value = cfg.amt; amtEl.disabled = !!cfg.amtDis; }
+            else             { amtEl.disabled = false; }
+        } else {
+            edateEl.readOnly = true;
+            amtEl.disabled = false;
+            if (cfg.setToday) {
+                const today = new Date();
+                document.getElementById('pl-add-sdate').value = plFmtDate(today);
+            }
+            if (cfg.amt0) { amtEl.value = '0'; }
+            if (cfg.def) { edsEl.value = cfg.def; plEdsCaclEdate(); }
+        }
+
+        plCalcOrderNo();
+    }
+
+    window.plEdsCaclEdate = function plEdsCaclEdate() {
+        const eds   = document.getElementById('pl-add-eds').value;
+        const sdate = document.getElementById('pl-add-sdate').value;
+        const fmonthEl = document.getElementById('pl-add-fmonth');
+        const edateEl  = document.getElementById('pl-add-edate');
+
+        // 月數子選單顯示控制
+        fmonthEl.style.display = eds === 'B' ? 'block' : 'none';
+
+        if (!sdate || document.getElementById('pl-add-eds').disabled) return;
+
+        const base = new Date(sdate);
+        let edate = new Date(base);
+
+        if (eds === 'S') {
+            edateEl.value = '2070-01-01';
+        } else if (eds === 'A') {
+            edateEl.readOnly = false;
+        } else if (eds === '0') {
+            edate.setDate(edate.getDate() + 7);
+            edateEl.readOnly = true;
+            edateEl.value = plFmtDate(edate);
+        } else if (eds === '8') {
+            edate.setDate(edate.getDate() + 8);
+            edateEl.readOnly = true;
+            edateEl.value = plFmtDate(edate);
+        } else if (eds === 'B') {
+            const months = parseInt(fmonthEl.value) || 1;
+            edate.setMonth(edate.getMonth() + months);
+            edateEl.readOnly = true;
+            edateEl.value = plFmtDate(edate);
+        } else {
+            const n = parseInt(eds);
+            if (!isNaN(n)) { edate.setMonth(edate.getMonth() + n); }
+            edateEl.readOnly = true;
+            edateEl.value = plFmtDate(edate);
+        }
+        plCalcOrderNo();
+    }
+
+    window.plCalcOrderNo = function plCalcOrderNo() {
+        const mode = document.getElementById('pl-add-model').value;
+        const eds  = document.getElementById('pl-add-eds').value;
+        const today = new Date();
+        const yy = today.getFullYear().toString().slice(-2);
+        const MM = ('0'+(today.getMonth()+1)).slice(-2);
+        const dd = ('0'+today.getDate()).slice(-2);
+
+        if (mode === '6') {
+            document.getElementById('pl-add-orderno').value = 'BAK_' + today.getFullYear() + MM + dd;
+            return;
+        }
+        // 純前綴（不加 EDS 後綴的銷售類型）
+        const noSuffix = ['4','5','13','21','22'];
+        const prefixMap = {
+            '1':'C7','2':'A2','3':'A1','4':'B3F','5':'B2F',
+            '7':'Z8','13':'B4C','14':'B5','15':'B6','16':'A3',
+            '17':'A4','18':'A6','20':'D6','21':'IS','22':'TRIAL'
+        };
+        const prefix = prefixMap[mode] || 'C7';
+        const suffix = noSuffix.includes(mode) ? ''
+            : ({'1':'B','8':'H','12':'C','24':'D','36':'E','B':'A','A':'G','0':'B','13':'C'}[eds] || 'C');
+        document.getElementById('pl-add-orderno').value = prefix + suffix + yy + MM + dd;
+    }
+
+    window.plFmtDate = function plFmtDate(d) {
+        const MM = ('0'+(d.getMonth()+1)).slice(-2);
+        const dd = ('0'+d.getDate()).slice(-2);
+        return d.getFullYear() + '-' + MM + '-' + dd;
+    }
+
+    // ── 訂單管理：新增 ───────────────────────────────────────────────────
+    window.cmdPayLogAdd = function () {
+        if (!_selImei) { alert(_T.plSelectDevice); return; }
+        document.getElementById('pl-add-imei').value  = _selImei;
+        document.getElementById('pl-add-model').value = '1';
+        document.getElementById('pl-add-memo').value  = '';
+        document.getElementById('pl-add-vaw').checked = false;
+        document.getElementById('pl-add-amount').value= '0';
+        document.getElementById('pl-add-amount').disabled = false;
+        document.getElementById('pl-add-eds').disabled = false;
+        const today = new Date();
+        document.getElementById('pl-add-sdate').value = plFmtDate(today);
+        plSaleModeChange();
+        showModal('paylogAddModal');
+    };
+
+    window.doPayLogAdd = function () {
+        const edate = document.getElementById('pl-add-edate').value;
+        const sdate = document.getElementById('pl-add-sdate').value;
+        if (edate && sdate && edate < sdate) { alert(_T.plEdateBeforeSdate); return; }
+        const req = {
+            imei        : document.getElementById('pl-add-imei').value.trim(),
+            orderNo     : document.getElementById('pl-add-orderno').value.trim(),
+            amount      : parseFloat(document.getElementById('pl-add-amount').value) || 0,
+            saleModel   : parseInt(document.getElementById('pl-add-model').value) || 1,
+            sDate       : sdate || null,
+            eDate       : edate || null,
+            memo        : document.getElementById('pl-add-memo').value.trim(),
+            valueAddedWeb: document.getElementById('pl-add-vaw').checked ? 1 : 0
+        };
+        postJson('/Admin/PayLog/CreateJson', req).then(r => {
+            alert(r.message);
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogAddModal'))?.hide(); loadPayLogs(_selImei); }
+        });
+    };
+
+    // ── 訂單管理：修改 ───────────────────────────────────────────────────
+    window.cmdPayLogEdit = function () {
+        if (!requirePayLogSelection()) return;
+        fetch('/Admin/PayLog/GetJson?id=' + _selPlTbKey).then(r => r.json()).then(d => {
+            if (!d.success) { alert(d.message); return; }
+            document.getElementById('pl-edit-tbkey').value  = d.tbKey;
+            document.getElementById('pl-edit-orderno').value= d.orderNo ?? '';
+            document.getElementById('pl-edit-amount').value = d.amount;
+            document.getElementById('pl-edit-model').value  = d.saleModel;
+            document.getElementById('pl-edit-sdate').value  = d.sDate ?? '';
+            document.getElementById('pl-edit-edate').value  = d.eDate ?? '';
+            document.getElementById('pl-edit-memo').value   = d.memo ?? '';
+            document.getElementById('pl-edit-vaw').checked  = d.valueAddedWeb === 1;
+            showModal('paylogEditModal');
+        });
+    };
+
+    window.doPayLogEdit = function () {
+        const req = {
+            tbKey       : parseInt(document.getElementById('pl-edit-tbkey').value),
+            orderNo     : document.getElementById('pl-edit-orderno').value.trim(),
+            amount      : parseFloat(document.getElementById('pl-edit-amount').value) || 0,
+            saleModel   : parseInt(document.getElementById('pl-edit-model').value) || 1,
+            sDate       : document.getElementById('pl-edit-sdate').value || null,
+            eDate       : document.getElementById('pl-edit-edate').value || null,
+            memo        : document.getElementById('pl-edit-memo').value.trim(),
+            valueAddedWeb: document.getElementById('pl-edit-vaw').checked ? 1 : 0
+        };
+        postJson('/Admin/PayLog/UpdateJson', req).then(r => {
+            alert(r.message);
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogEditModal'))?.hide(); loadPayLogs(_selImei); }
+        });
+    };
+
+    // ── 訂單管理：刪除 ───────────────────────────────────────────────────
+    window.cmdPayLogDelete = function () {
+        if (!requirePayLogSelection()) return;
+        if (!confirm(_T.plConfirmDelete)) return;
+        postJson('/Admin/PayLog/DeleteJson', { id: _selPlTbKey }).then(r => {
+            alert(r.message);
+            if (r.success) { _selPlTbKey = 0; loadPayLogs(_selImei); }
+        });
+    };
+
+    // ── 訂單管理：轉移 ───────────────────────────────────────────────────
+    window.cmdPayLogMove = function () {
+        if (!requirePayLogSelection()) return;
+        document.getElementById('pl-move-imei').value = '';
+        showModal('paylogMoveModal');
+    };
+
+    window.doPayLogMove = function () {
+        const newImei = document.getElementById('pl-move-imei').value.trim();
+        if (!newImei || newImei.length !== 15) { alert(_T.plImei15); return; }
+        if (!confirm(_T.plConfirmMove.replace('{0}', newImei))) return;
+        postJson('/Admin/PayLog/MoveJson', { id: _selPlTbKey, newImei }).then(r => {
+            alert(r.message);
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogMoveModal'))?.hide(); _selPlTbKey = 0; loadPayLogs(_selImei); }
+        });
+    };
+
+    // ── 前台(單機)：產生 5 分鐘 token 後以新 tab 開啟前台即時地圖 ──────────
+    window.cmdFrontend = function () {
+        if (!requireSelection()) return;
+        fetch('/Admin/Tracker/GetPreviewToken?trackerTbKey=' + _selTbKey + '&memberTbKey=' + _selMemberTbKey)
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) window.open('/Account/AdminPreview?t=' + encodeURIComponent(d.token), '_blank');
+                else alert(d.message);
+            });
+    };
+
+    // ── 解除裝置（解除目前選取裝置的會員綁定） ─────────────────────────────
+    window.cmdUnbind = function () {
+        if (!requireSelection()) return;
+        if (!confirm(_T.confirmUnbind.replace('{0}', _selImei).replace('\\n', '\n'))) return;
+        postJson('/Admin/Tracker/UnbindDevice', { tbKey: _selTbKey })
+            .then(r => {
+                alert(r.message);
+                if (r.success) { window.doSearch(); loadMemberTrackers(0, _selTbKey); }
+            });
+    };
+
+    // ── 解除所有裝置（解除此會員所有裝置的綁定） ────────────────────────────
+    window.cmdUnbindAll = function () {
+        if (!requireSelection()) return;
+        if (_selMemberTbKey <= 0) { alert(_T.noMemberBound); return; }
+        if (!confirm(_T.confirmUnbindAll.replace('\\n', '\n'))) return;
+        postJson('/Admin/Tracker/UnbindAllByMember', { memberTbKey: _selMemberTbKey })
+            .then(r => {
+                alert(r.message);
+                if (r.success) { window.doSearch(); loadMemberTrackers(0, _selTbKey); }
+            });
+    };
+
+    // ── 恢復出廠 ────────────────────────────────────────────────────────
+    window.doFactoryReset = function () {
+        if (!confirm('再次確認：確定要恢復出廠嗎？')) return;
+        postJson('/Admin/Tracker/FactoryReset', { tbKey: _selTbKey })
+            .then(r => {
+                alert(r.message);
+                if (r.success) { bootstrap.Modal.getInstance(document.getElementById('factoryResetModal'))?.hide(); window.doSearch(); }
+            });
+    };
+
+    // ── 轉移歷史軌跡 ────────────────────────────────────────────────────
+    window.doMoveHistory = function () {
+        const sourceImei = document.getElementById('mh-src').value.trim();
+        const destImei = document.getElementById('mh-dest').value.trim();
+        if (!sourceImei || sourceImei.length !== 15) { alert('來源 IMEI 需為 15 碼'); return; }
+        if (!destImei || destImei.length !== 15) { alert('目標 IMEI 需為 15 碼'); return; }
+        if (!confirm(`確定將 ${sourceImei} 的歷史軌跡轉移至 ${destImei}？`)) return;
+        postJson('/Admin/Tracker/MoveHistory', { sourceImei, destImei })
+            .then(r => { alert(r.message); if (r.success) bootstrap.Modal.getInstance(document.getElementById('moveHistoryModal'))?.hide(); });
+    };
+
+    // ── 新增裝置 ────────────────────────────────────────────────────────
+    window.doAddTracker = function () {
+        const imei = document.getElementById('add-imei').value.trim();
+        const cName = document.getElementById('add-cname').value.trim();
+        if (!imei || imei.length !== 15) { alert('IMEI 需為 15 碼'); return; }
+        postJson('/Admin/Tracker/CreateTracker', { imei, cName })
+            .then(r => {
+                alert(r.message);
+                if (r.success) { bootstrap.Modal.getInstance(document.getElementById('addTrackerModal'))?.hide(); window.doSearch(); }
+            });
+    };
+
+    // ── 工具函式 ────────────────────────────────────────────────────────
+    function getCheckedImeis() {
+        return Array.from(document.querySelectorAll('#tracker-tbody tr.table-primary[data-tbkey]'))
+            .map(tr => tr.cells[1]?.textContent?.trim() ?? '').filter(s => s.length === 15);
+    }
+    function getCheckedTbKeys() {
+        return Array.from(document.querySelectorAll('#tracker-tbody tr.table-primary[data-tbkey]'))
+            .map(tr => parseInt(tr.dataset.tbkey) || 0).filter(k => k > 0);
+    }
+    function escHtml(s) {
+        return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // 開啟 moveHistoryModal 時預填選取裝置的 IMEI
+    document.getElementById('moveHistoryModal').addEventListener('show.bs.modal', () => {
+        if (_selImei) document.getElementById('mh-src').value = _selImei;
+    });
 })();
 
 // ── Resizable Splitters ───────────────────────────────────────────────────

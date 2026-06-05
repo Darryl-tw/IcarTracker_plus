@@ -1776,6 +1776,7 @@
   <data name="Live_LandmarkDeleted" xml:space="preserve"><value>Landmark deleted</value></data>
   <data name="Live_LandmarkQuickAdd" xml:space="preserve"><value>Add landmark</value></data>
   <data name="Live_LandmarkCoords" xml:space="preserve"><value>Coordinates</value></data>
+  <data name="Live_NoGpsPosition" xml:space="preserve"><value>No GPS position data available for this device</value></data>
   <data name="AccessDenied_Message" xml:space="preserve"><value>You do not have permission to access this page.</value></data>
   <data name="AccessDenied_BackDevices" xml:space="preserve"><value>Back to devices</value></data>
   <data name="AccessDenied_Relogin" xml:space="preserve"><value>Sign in again</value></data>
@@ -1853,4 +1854,63 @@
   <data name="Admin_Tracker_DeleteFail" xml:space="preserve"><value>Delete failed</value></data>
   <data name="Common_PerPage" xml:space="preserve"><value>Per page</value></data>
   <data name="Common_JumpTo" xml:space="preserve"><value>Jump to</value></data>
+  <data name="Admin_Tracker_BtnUnbindAll" xml:space="preserve"><value>Unbind All</value></data>
+  <data name="Admin_PayLog_SM_1" xml:space="preserve"><value>Production/Repair</value></data>
+  <data name="Admin_PayLog_SM_2" xml:space="preserve"><value>Domestic Retail</value></data>
+  <data name="Admin_PayLog_SM_3" xml:space="preserve"><value>Domestic Rental</value></data>
+  <data name="Admin_PayLog_SM_4" xml:space="preserve"><value>Overseas Distributor</value></data>
+  <data name="Admin_PayLog_SM_5" xml:space="preserve"><value>Overseas Retail</value></data>
+  <data name="Admin_PayLog_SM_6" xml:space="preserve"><value>Expired Return</value></data>
+  <data name="Admin_PayLog_SM_7" xml:space="preserve"><value>Auto Activate</value></data>
+  <data name="Admin_PayLog_SM_13" xml:space="preserve"><value>Overseas Renewal</value></data>
+  <data name="Admin_PayLog_SM_14" xml:space="preserve"><value>Overseas Gift</value></data>
+  <data name="Admin_PayLog_SM_15" xml:space="preserve"><value>Overseas Sales Test</value></data>
+  <data name="Admin_PayLog_SM_16" xml:space="preserve"><value>Domestic Dist. Sale</value></data>
+  <data name="Admin_PayLog_SM_17" xml:space="preserve"><value>Domestic Dist. Renewal</value></data>
+  <data name="Admin_PayLog_SM_18" xml:space="preserve"><value>Domestic Sales Test</value></data>
+  <data name="Admin_PayLog_SM_20" xml:space="preserve"><value>Internal Test</value></data>
+  <data name="Admin_PayLog_SM_21" xml:space="preserve"><value>Intl SIM Card</value></data>
+  <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>App Tracker Trial</value></data>
+  <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>Edit</value></data>
+  <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>Delete</value></data>
+  <data name="Admin_PayLog_BtnMove" xml:space="preserve"><value>Transfer</value></data>
+  <data name="Admin_PayLog_BtnAddTitle" xml:space="preserve"><value>Add new order</value></data>
+  <data name="Admin_PayLog_BtnEditTitle" xml:space="preserve"><value>Edit selected order</value></data>
+  <data name="Admin_PayLog_BtnDeleteTitle" xml:space="preserve"><value>Delete selected order</value></data>
+  <data name="Admin_PayLog_BtnMoveTitle" xml:space="preserve"><value>Transfer order to another device</value></data>
+  <data name="Admin_PayLog_MoveTarget" xml:space="preserve"><value>Target device IMEI</value></data>
+  <data name="Admin_PayLog_Model_Renewal" xml:space="preserve"><value>Renewal</value></data>
+  <data name="Admin_PayLog_Model_Intl" xml:space="preserve"><value>International</value></data>
+  <data name="Admin_PayLog_Model_Special" xml:space="preserve"><value>Special</value></data>
+  <data name="Admin_PayLog_Model_Refund" xml:space="preserve"><value>Refund</value></data>
+  <data name="Admin_PayLog_Model_Auto" xml:space="preserve"><value>Auto Activate</value></data>
+  <data name="Admin_PayLog_Model_Multi" xml:space="preserve"><value>Multi-month</value></data>
+  <data name="Admin_PayLog_SelectFirst" xml:space="preserve"><value>Please select an order first</value></data>
+  <data name="Admin_PayLog_SelectDevice" xml:space="preserve"><value>Please select a device from the list above</value></data>
+  <data name="Admin_PayLog_ConfirmDelete" xml:space="preserve"><value>Delete this order?</value></data>
+  <data name="Admin_PayLog_Imei15" xml:space="preserve"><value>Target IMEI must be 15 digits</value></data>
+  <data name="Admin_PayLog_ConfirmMove" xml:space="preserve"><value>Transfer this order to IMEI: {0}?</value></data>
+  <data name="Admin_PayLog_Imei15Ph" xml:space="preserve"><value>15-digit IMEI</value></data>
+  <data name="Admin_PayLog_EndDateStatus" xml:space="preserve"><value>Order Duration</value></data>
+  <data name="Admin_PayLog_EDS_Week" xml:space="preserve"><value>Test (1 week)</value></data>
+  <data name="Admin_PayLog_EDS_Month1" xml:space="preserve"><value>Test (1 month)</value></data>
+  <data name="Admin_PayLog_EDS_8days" xml:space="preserve"><value>8 days</value></data>
+  <data name="Admin_PayLog_EDS_HalfYear" xml:space="preserve"><value>Half year</value></data>
+  <data name="Admin_PayLog_EDS_Year1" xml:space="preserve"><value>1 year</value></data>
+  <data name="Admin_PayLog_EDS_Unlimited" xml:space="preserve"><value>Unlimited (until 2070/01/01)</value></data>
+  <data name="Admin_PayLog_EDS_Custom" xml:space="preserve"><value>Custom</value></data>
+  <data name="Admin_PayLog_EDS_Month13" xml:space="preserve"><value>13 months</value></data>
+  <data name="Admin_PayLog_EDS_Year2" xml:space="preserve"><value>2 years</value></data>
+  <data name="Admin_PayLog_EDS_Year3" xml:space="preserve"><value>3 years</value></data>
+  <data name="Admin_PayLog_EDS_Months" xml:space="preserve"><value>N months</value></data>
+  <data name="Admin_PayLog_EdateBeforeSdate" xml:space="preserve"><value>End date cannot be before start date</value></data>
+  <data name="Admin_Tracker_BtnUnbind" xml:space="preserve"><value>Unbind</value></data>
+  <data name="Admin_Tracker_BtnFrontend" xml:space="preserve"><value>Frontend</value></data>
+  <data name="Admin_Tracker_BtnUnbindAllTitle" xml:space="preserve"><value>Unbind all devices from this member's account</value></data>
+  <data name="Admin_Tracker_BtnUnbindTitle" xml:space="preserve"><value>Unbind the selected device from its member account</value></data>
+  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>Open device frontend page in new window</value></data>
+  <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>Unbind device IMEI: {0} from its member account?\n(Device will be kept, only member binding and password will be reset)</value></data>
+  <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>Unbind all devices from this member's account?\n(All devices will be kept, only member binding and password will be reset)</value></data>
+  <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>This device is not bound to any member</value></data>
 </root>
