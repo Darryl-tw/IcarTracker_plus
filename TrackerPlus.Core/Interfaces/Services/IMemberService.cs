@@ -17,4 +17,5 @@ public interface IMemberService
     Task<IEnumerable<Member>> GetMembersByOBMAsync(int obmTbKey);
     Task<int> GetMemberCountAsync(QueryFilter filter);
     Task<bool> UpdateMemberLanguageAsync(int tbKey, string userLanguage);
+    Task<OperationResult> ChangePasswordAsync(int tbKey, string newPassword);
 }

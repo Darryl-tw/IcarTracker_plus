@@ -127,4 +127,21 @@ public class MemberService : IMemberService
 
     public Task<bool> UpdateMemberLanguageAsync(int tbKey, string userLanguage)
         => _memberRepo.UpdateLanguageAsync(tbKey, userLanguage);
+
+    public async Task<OperationResult> ChangePasswordAsync(int tbKey, string newPassword)
+    {
+        if (string.IsNullOrWhiteSpace(newPassword))
+            return OperationResult.Fail("密碼不可為空");
+        try
+        {
+            var hashed = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            var ok = await _memberRepo.UpdatePasswordAsync(tbKey, hashed);
+            return ok ? OperationResult.Ok("密碼已更新") : OperationResult.Fail("更新失敗");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "更改密碼失敗 TbKey={TbKey}", tbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
 }

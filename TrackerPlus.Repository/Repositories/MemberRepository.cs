@@ -152,6 +152,28 @@ public class MemberRepository : IMemberRepository
         return await conn.ExecuteAsync(sql, new { TbKey = tbKey, Password = hashedPassword }) > 0;
     }
 
+    public async Task<bool> UpdateSystemParamsAsync(int tbKey, string userUnit, int timeZoneTbKey)
+    {
+        const string sql = "UPDATE dbo.Member SET Unit = @UserUnit, TimeZone_tbkey = @TimeZoneTbKey WHERE tbKey = @TbKey";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteAsync(sql, new { TbKey = tbKey, UserUnit = userUnit, TimeZoneTbKey = timeZoneTbKey }) > 0;
+    }
+
+    public async Task<bool> UpdateProfileAsync(int tbKey, string cName, string tel, string addr, bool isSendEmail, bool isPush)
+    {
+        const string sql = @"UPDATE dbo.Member SET CName = @CName, Tel = @Tel, Addr = @Addr,
+            issendemail = @IsSendEmail, ispush = @IsPush WHERE tbKey = @TbKey";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteAsync(sql, new { TbKey = tbKey, CName = cName, Tel = tel, Addr = addr, IsSendEmail = isSendEmail, IsPush = isPush }) > 0;
+    }
+
+    public async Task<int> GetTimeZoneTbKeyAsync(int tbKey)
+    {
+        const string sql = "SELECT TimeZone_tbkey FROM dbo.Member WHERE tbKey = @TbKey";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteScalarAsync<int>(sql, new { TbKey = tbKey });
+    }
+
     public async Task<int> GetCountAsync(QueryFilter filter)
     {
         var where = BuildWhereClause(filter);

@@ -1,0 +1,57 @@
+@{
+    Layout = "_MemberLayout";
+    ViewData["Title"] = "系統參數";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white fw-semibold">系統參數設定</div>
+            <div class="card-body">
+                <form method="post" asp-action="SystemParams">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">系統單位</label>
+                        <div class="d-flex gap-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="userUnit" id="unitK"
+                                       value="K" @(ViewBag.UserUnit == "K" ? "checked" : "") />
+                                <label class="form-check-label" for="unitK">公制（公里）</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="userUnit" id="unitM"
+                                       value="M" @(ViewBag.UserUnit == "M" ? "checked" : "") />
+                                <label class="form-check-label" for="unitM">英制（英里）</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold" for="timeZoneTbKey">時區校正設定</label>
+                        @{
+                            var currentTz = ViewBag.TimeZoneTbKey.ToString();
+                        }
+                        <select class="form-select" id="timeZoneTbKey" name="timeZoneTbKey">
+                            @foreach (var tz in (List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.TimeZones)
+                            {
+                                if (tz.Value == currentTz)
+                                {
+                                    <option value="@tz.Value" selected>@tz.Text</option>
+                                }
+                                else
+                                {
+                                    <option value="@tz.Value">@tz.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="submit" class="btn btn-primary">確定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

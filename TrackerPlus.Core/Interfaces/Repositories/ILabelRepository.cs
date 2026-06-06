@@ -11,4 +11,5 @@ public interface ILabelRepository
     Task<int> CreateLabelAsync(int memberTbKey, string labelName);
     Task<bool> DeleteLabelAsync(int labelTbKey, int memberTbKey);
     Task<string> GetLabelNamesDisplayAsync(int trackerTbKey, int memberTbKey);
+    Task<bool> UpdateLabelNameAsync(int labelTbKey, int memberTbKey, string labelName);
 }

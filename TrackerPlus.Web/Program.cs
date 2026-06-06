@@ -40,6 +40,8 @@ builder.Services.AddScoped<IOBMRepository, OBMRepository>();
 builder.Services.AddScoped<IMapMarkRepository, MapMarkRepository>();
 builder.Services.AddScoped<IDeviceSettingsRepository, DeviceSettingsRepository>();
 builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
+builder.Services.AddScoped<IUdFieldRepository, UdFieldRepository>();
+builder.Services.AddScoped<IReportFieldsRepository, ReportFieldsRepository>();
 
 // Services
 builder.Services.AddScoped<ITrackerService, TrackerService>();
@@ -54,6 +56,7 @@ builder.Services.AddScoped<IHistoryService, HistoryService>();
 builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
 builder.Services.AddScoped<IOBMService, OBMService>();
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddSingleton<IGoogleApiKeyService, GoogleApiKeyService>();
 
 // Authentication - member cookie

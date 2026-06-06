@@ -104,6 +104,13 @@ public class LabelRepository : ILabelRepository
         }
     }
 
+    public async Task<bool> UpdateLabelNameAsync(int labelTbKey, int memberTbKey, string labelName)
+    {
+        const string sql = "UPDATE dbo.UDLabel SET LabelName = @LabelName WHERE tbKey = @TbKey AND Member_tbKey = @MemberTbKey";
+        using var conn = _db.CreateMainConnection();
+        return await conn.ExecuteAsync(sql, new { TbKey = labelTbKey, MemberTbKey = memberTbKey, LabelName = labelName }) > 0;
+    }
+
     public async Task<string> GetLabelNamesDisplayAsync(int trackerTbKey, int memberTbKey)
     {
         var labels = await GetLabelsByTrackerAsync(trackerTbKey, memberTbKey);
