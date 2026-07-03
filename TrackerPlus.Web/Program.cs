@@ -40,6 +40,7 @@ builder.Services.AddScoped<IOBMRepository, OBMRepository>();
 builder.Services.AddScoped<IMapMarkRepository, MapMarkRepository>();
 builder.Services.AddScoped<IDeviceSettingsRepository, DeviceSettingsRepository>();
 builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
+builder.Services.AddScoped<IDealerRepository, DealerRepository>();
 builder.Services.AddScoped<IUdFieldRepository, UdFieldRepository>();
 builder.Services.AddScoped<IReportFieldsRepository, ReportFieldsRepository>();
 
@@ -57,10 +58,25 @@ builder.Services.AddScoped<ILabelService, LabelService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
 builder.Services.AddScoped<IOBMService, OBMService>();
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IDealerService, DealerService>();
 builder.Services.AddSingleton<IGoogleApiKeyService, GoogleApiKeyService>();
 
 // Authentication - member cookie
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie("ExternalCookie", options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(10);
+        options.Cookie.Name = "TrackerPlus.External";
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["AppSettings:OAuth:GmailClientId"] ?? "";
+        options.ClientSecret = builder.Configuration["AppSettings:OAuth:GmailKey"] ?? "";
+        options.SignInScheme = "ExternalCookie";
+        options.CallbackPath = "/signin-google";
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/Account/Login";

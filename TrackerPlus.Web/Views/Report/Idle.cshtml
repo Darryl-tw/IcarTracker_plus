@@ -1,0 +1,40 @@
+@{
+    Layout = null;
+    var today = ViewBag.Today as string ?? DateTime.Today.ToString("yyyy-MM-dd");
+}
+<form data-report-download="/Report/DownloadIdle">
+    <input type="hidden" name="imei" value="" />
+
+    <div class="mb-2 row">
+        <label class="col-sm-4 col-form-label fw-semibold">@L["Report_StartDate"]</label>
+        <div class="col-sm-8">
+            <input type="datetime-local" class="form-control form-control-sm"
+                   name="startDate" value="@(today)T00:00" required />
+        </div>
+    </div>
+
+    <div class="mb-2 row">
+        <label class="col-sm-4 col-form-label fw-semibold">@L["Report_EndDate"]</label>
+        <div class="col-sm-8">
+            <input type="datetime-local" class="form-control form-control-sm"
+                   name="endDate" value="@(today)T23:59" required />
+        </div>
+    </div>
+
+    <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label fw-semibold">@L["Report_OutputMode"]</label>
+        <div class="col-sm-8">
+            <select name="format" class="form-select form-select-sm">
+                <option value="csv">@L["Report_OutputCsv"]</option>
+                <option value="xls">@L["Report_OutputXls"]</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="text-muted" style="font-size:11px;margin-bottom:10px;">@L["Report_IdleNote"]</div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="reset" class="btn btn-outline-secondary btn-sm">@L["Common_Reset"]</button>
+        <button type="submit" class="btn btn-primary btn-sm">@L["Common_Ok"]</button>
+    </div>
+</form>

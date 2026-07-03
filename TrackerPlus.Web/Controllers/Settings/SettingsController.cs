@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
+using TrackerPlus.Web.Resources;
 
 namespace TrackerPlus.Web.Controllers.Settings;
 
@@ -17,21 +19,25 @@ public class SettingsController : Controller
     private readonly IMemberService _memberService;
     private readonly IMemberRepository _memberRepo;
     private readonly ISettingsService _settingsService;
+    private readonly IStringLocalizer<SharedResources> _L;
 
-    public SettingsController(IMemberService memberService, IMemberRepository memberRepo, ISettingsService settingsService)
+    public SettingsController(IMemberService memberService, IMemberRepository memberRepo,
+        ISettingsService settingsService, IStringLocalizer<SharedResources> localizer)
     {
         _memberService = memberService;
         _memberRepo = memberRepo;
         _settingsService = settingsService;
+        _L = localizer;
     }
 
     private int MemberTbKey => int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var k) ? k : 0;
+    private bool IsPopupPost => Request.Form["popup"] == "1";
 
     // ── 系統參數 ────────────────────────────────────────────────
     [HttpGet]
     public async Task<IActionResult> SystemParams()
     {
-        ViewData["Title"] = "系統參數";
+        ViewData["Title"] = _L["Settings_SystemParams"].Value;
         var member = await _memberService.GetMemberAsync(MemberTbKey);
         if (member == null) return NotFound();
 
@@ -49,10 +55,10 @@ public class SettingsController : Controller
     public async Task<IActionResult> SystemParams(string userUnit, int timeZoneTbKey)
     {
         var result = await _settingsService.UpdateSystemParamsAsync(MemberTbKey, userUnit, timeZoneTbKey);
-        if (result.Success)
-            TempData["Success"] = "系統參數已儲存。";
-        else
-            TempData["Error"] = result.Message;
+        if (IsPopupPost)
+            return Json(new { success = result.Success, message = result.Message });
+        if (result.Success) TempData["Success"] = _L["Settings_SystemParamsSaved"].Value;
+        else TempData["Error"] = result.Message;
         return RedirectToAction(nameof(SystemParams));
     }
 
@@ -60,7 +66,7 @@ public class SettingsController : Controller
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
-        ViewData["Title"] = "基本資料維護";
+        ViewData["Title"] = _L["Settings_Profile"].Value;
         var member = await _memberService.GetMemberAsync(MemberTbKey);
         if (member == null) return NotFound();
         return View(member);
@@ -74,7 +80,8 @@ public class SettingsController : Controller
         var ok = await _memberRepo.UpdateProfileAsync(MemberTbKey, cName, tel, addr, isSendEmail, isPush);
         if (!ok)
         {
-            TempData["Error"] = "更新失敗。";
+            if (IsPopupPost) return Json(new { success = false, message = _L["Settings_UpdateFailed"].Value });
+            TempData["Error"] = _L["Settings_UpdateFailed"].Value;
             return RedirectToAction(nameof(Profile));
         }
 
@@ -93,7 +100,8 @@ public class SettingsController : Controller
                 new AuthenticationProperties { IsPersistent = true });
         }
 
-        TempData["Success"] = "基本資料已儲存。";
+        if (IsPopupPost) return Json(new { success = true });
+        TempData["Success"] = _L["Settings_ProfileSaved"].Value;
         return RedirectToAction(nameof(Profile));
     }
 
@@ -101,7 +109,7 @@ public class SettingsController : Controller
     [HttpGet]
     public async Task<IActionResult> LabelGroup()
     {
-        ViewData["Title"] = "自定義群組與欄位名稱";
+        ViewData["Title"] = _L["Settings_LabelGroup"].Value;
         ViewBag.Fields = (await _settingsService.GetUdFieldsAsync(MemberTbKey)).ToList();
         ViewBag.Labels = (await _settingsService.GetUdLabelsAsync(MemberTbKey)).ToList();
         return View();
@@ -122,7 +130,9 @@ public class SettingsController : Controller
             .ToList();
 
         var result = await _settingsService.SaveLabelGroupAsync(MemberTbKey, fields, labels);
-        TempData[result.Success ? "Success" : "Error"] = result.Success ? "已儲存。" : result.Message;
+        if (form["popup"] == "1")
+            return Json(new { success = result.Success, message = result.Message });
+        TempData[result.Success ? "Success" : "Error"] = result.Success ? _L["Settings_Saved"].Value : result.Message;
         return RedirectToAction(nameof(LabelGroup));
     }
 
@@ -130,7 +140,7 @@ public class SettingsController : Controller
     [HttpGet]
     public async Task<IActionResult> ReportFields()
     {
-        ViewData["Title"] = "報表欄位";
+        ViewData["Title"] = _L["Settings_ReportFields"].Value;
         var dto = await _settingsService.GetReportFieldsAsync(MemberTbKey);
         return View(dto);
     }
@@ -140,7 +150,9 @@ public class SettingsController : Controller
     public async Task<IActionResult> ReportFields(ReportFieldsDto dto)
     {
         var result = await _settingsService.SaveReportFieldsAsync(MemberTbKey, dto);
-        TempData[result.Success ? "Success" : "Error"] = result.Success ? "報表欄位已儲存。" : result.Message;
+        if (IsPopupPost)
+            return Json(new { success = result.Success, message = result.Message });
+        TempData[result.Success ? "Success" : "Error"] = result.Success ? _L["Settings_ReportFieldsSaved"].Value : result.Message;
         return RedirectToAction(nameof(ReportFields));
     }
 }

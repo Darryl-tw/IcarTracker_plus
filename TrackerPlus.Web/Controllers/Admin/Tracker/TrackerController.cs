@@ -40,7 +40,7 @@ public class TrackerController : AdminBaseController
     public IActionResult GetPreviewToken(int trackerTbKey, int memberTbKey)
     {
         if (trackerTbKey <= 0)
-            return Json(new { success = false, message = "未選取裝置" });
+            return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
         var protector = _dataProtection.CreateProtector("AdminPreview");
         var expiry = DateTimeOffset.UtcNow.AddMinutes(5).ToUnixTimeSeconds();
         var token = protector.Protect($"{trackerTbKey}:{memberTbKey}:{expiry}");
@@ -207,9 +207,9 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> CreateTracker([FromBody] CreateTrackerRequest req)
     {
         if (req == null || string.IsNullOrWhiteSpace(req.Imei))
-            return Json(new { success = false, message = "IMEI 不可空白" });
+            return Json(new { success = false, message = L["Admin_Error_ImeiRequired"].Value });
         if (req.Imei.Trim().Length != 15)
-            return Json(new { success = false, message = "IMEI 需為 15 碼" });
+            return Json(new { success = false, message = L["Admin_Error_Imei15Digits"].Value });
 
         var tracker = new Core.Models.Tracker
         {
@@ -227,7 +227,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> ClearHistory([FromBody] ClearHistoryRequest req)
     {
         if (req == null || string.IsNullOrWhiteSpace(req.Imei))
-            return Json(new { success = false, message = "請選擇裝置" });
+            return Json(new { success = false, message = L["Admin_Error_SelectDevice"].Value });
 
         OperationResult result;
         if (req.DeleteAll)
@@ -238,7 +238,7 @@ public class TrackerController : AdminBaseController
         {
             if (!DateTime.TryParse(req.StartDate, out var localStart) ||
                 !DateTime.TryParse(req.EndDate, out var localEnd))
-                return Json(new { success = false, message = "日期格式錯誤" });
+                return Json(new { success = false, message = L["Admin_Error_InvalidDateFormat"].Value });
             localEnd = localEnd.Date.AddDays(1).AddSeconds(-1);
             result = await _historyService.DeleteHistoryAsync(req.Imei.Trim(), localStart, localEnd, 480);
         }
@@ -250,7 +250,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> BatchTransfer([FromBody] BatchTransferRequest req)
     {
         if (req == null || req.Imeis == null || !req.Imeis.Any() || req.OBMTbKey <= 0)
-            return Json(new { success = false, message = "參數不正確" });
+            return Json(new { success = false, message = L["Admin_Error_InvalidParams"].Value });
         var result = await _trackerService.BatchTransferToOBMAsync(req.Imeis, req.OBMTbKey);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -260,7 +260,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> BatchFirmwareUpgrade([FromBody] BatchFirmwareRequest req)
     {
         if (req == null || req.Imeis == null || !req.Imeis.Any() || string.IsNullOrWhiteSpace(req.TargetVersion))
-            return Json(new { success = false, message = "參數不正確" });
+            return Json(new { success = false, message = L["Admin_Error_InvalidParams"].Value });
         var result = await _firmwareService.BatchQueueFirmwareUpdateAsync(req.TargetVersion, req.Imeis);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -270,9 +270,9 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> BatchDeleteDevices([FromBody] BatchDeleteRequest req)
     {
         if (req == null || req.TbKeys == null || !req.TbKeys.Any())
-            return Json(new { success = false, message = "未選取裝置" });
+            return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
         var deleted = await _trackerService.BatchDeleteByKeysAsync(req.TbKeys);
-        return Json(new { success = true, message = $"已刪除 {deleted} 台裝置" });
+        return Json(new { success = true, message = string.Format(L["Admin_Error_BatchDeleted"].Value, deleted) });
     }
 
     // ── 整批刪除（刪除某會員所有裝置） ──────────────────────────────────────
@@ -280,7 +280,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> DeleteAllByMember([FromBody] DeleteAllByMemberRequest req)
     {
         if (req == null || req.MemberTbKey <= 0)
-            return Json(new { success = false, message = "請先選擇有綁定會員的裝置" });
+            return Json(new { success = false, message = L["Admin_Error_SelectMemberBoundDevice"].Value });
         var result = await _trackerService.DeleteAllTrackersByMemberAsync(req.MemberTbKey);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -290,7 +290,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> UnbindDevice([FromBody] SingleTbKeyRequest req)
     {
         if (req == null || req.TbKey <= 0)
-            return Json(new { success = false, message = "未選取裝置" });
+            return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
         var result = await _trackerService.UnbindDeviceAsync(req.TbKey);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -300,7 +300,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> UnbindAllByMember([FromBody] DeleteAllByMemberRequest req)
     {
         if (req == null || req.MemberTbKey <= 0)
-            return Json(new { success = false, message = "請先選擇有綁定會員的裝置" });
+            return Json(new { success = false, message = L["Admin_Error_SelectMemberBoundDevice"].Value });
         var result = await _trackerService.UnbindAllByMemberAsync(req.MemberTbKey);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -310,7 +310,7 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> FactoryReset([FromBody] SingleTbKeyRequest req)
     {
         if (req == null || req.TbKey <= 0)
-            return Json(new { success = false, message = "未選取裝置" });
+            return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
         var result = await _trackerService.FactoryResetAsync(req.TbKey);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -320,9 +320,9 @@ public class TrackerController : AdminBaseController
     public async Task<IActionResult> MoveHistory([FromBody] MoveHistoryRequest req)
     {
         if (req == null || string.IsNullOrWhiteSpace(req.SourceImei) || string.IsNullOrWhiteSpace(req.DestImei))
-            return Json(new { success = false, message = "來源與目標 IMEI 不可空白" });
+            return Json(new { success = false, message = L["Admin_Error_ImeiSourceTargetRequired"].Value });
         if (req.SourceImei.Trim() == req.DestImei.Trim())
-            return Json(new { success = false, message = "來源與目標不可相同" });
+            return Json(new { success = false, message = L["Admin_Error_ImeiSourceTargetSame"].Value });
         var result = await _historyService.QueueMoveHistoryAsync(req.SourceImei.Trim(), req.DestImei.Trim());
         return Json(new { success = result.Success, message = result.Message });
     }

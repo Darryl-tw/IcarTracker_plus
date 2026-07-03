@@ -1,67 +1,235 @@
 @using System.Globalization
 @{
     Layout = null;
-    ViewData["Title"] = L["Login_Title"].Value;
     var returnUrl = ViewBag.ReturnUrl as string;
+    var error = ViewBag.Error as string;
+    var current = CultureInfo.CurrentUICulture.Name;
+    var loginReturnUrl = $"{Context.Request.Path}{Context.Request.QueryString}";
 }
 <!DOCTYPE html>
-<html lang="@CultureInfo.CurrentUICulture.Name">
+<html lang="@current">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@L["Login_Title"] - @L["AppName"]</title>
+    <title>@L["Login_Title"] - @L["Live_Brand"]</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <style>
-        body { background: #1a1d23; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 100%; max-width: 420px; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .card-header { background: linear-gradient(135deg, #2563eb, #1d4ed8); border-radius: 12px 12px 0 0 !important; padding: 1.5rem; }
-        .brand-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+        /* Full-screen login background (same as old Login.aspx: img/bg-01.png) */
+        #map-bg {
+            position: fixed; inset: 0; z-index: 0;
+            background: #e8eaed url('/images/bg-01.png') center center no-repeat;
+            background-size: cover;
+        }
+        @@media screen and (max-width: 576px) {
+            #map-bg { background-size: auto; }
+        }
+
+        /* Centered overlay: logo + title + lang + card */
+        #login-overlay {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 20px 16px;
+            overflow-y: auto;
+        }
+
+        /* Logo image */
+        .login-logo {
+            display: block; width: 200px; height: auto;
+            margin-bottom: 10px;
+        }
+
+        /* App title */
+        .login-title {
+            font-size: 22px; font-weight: 400; color: #555;
+            margin-bottom: 10px; text-align: center;
+            text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+        }
+
+        /* Language selector row */
+        .lang-row {
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 14px; font-size: 13px; color: #444;
+        }
+        .lang-row label { font-weight: 500; }
+        .lang-select {
+            font-size: 13px; padding: 3px 6px; border: 1px solid #ccc;
+            border-radius: 3px; background: #fff; cursor: pointer;
+        }
+
+        /* Login card */
+        .login-card {
+            width: 100%; max-width: 356px;
+            background: #fff; border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+        .login-card-header {
+            background: #4285f4; color: #fff;
+            padding: 12px 20px; text-align: center;
+            font-size: 14px; font-weight: 600;
+        }
+        .login-card-body { padding: 16px 20px 14px; }
+
+        .field-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .field-icon { width: 32px; text-align: center; color: #888; font-size: 16px; flex-shrink: 0; }
+        .field-input {
+            flex: 1; font-size: 13px; padding: 7px 8px;
+            border: 1px solid #ccc; border-radius: 3px;
+            background: #f5f8ff;
+        }
+        .field-input:focus { border-color: #4285f4; outline: none; background: #fff; }
+
+        .btn-submit {
+            display: block; width: 90px; margin: 10px auto 0;
+            padding: 7px 0; background: #4285f4; color: #fff;
+            border: none; border-radius: 3px; font-size: 13px;
+            font-weight: 500; cursor: pointer; text-align: center;
+            transition: background 0.15s;
+        }
+        .btn-submit:hover { background: #3367d6; }
+
+        .links-row {
+            text-align: center; margin-top: 8px; font-size: 12px;
+        }
+        .links-row a { color: #4285f4; text-decoration: none; }
+        .links-row a:hover { text-decoration: underline; }
+        .links-row .sep { color: #ccc; margin: 0 6px; }
+
+        .divider {
+            display: flex; align-items: center; gap: 8px;
+            color: #bbb; font-size: 11px; margin: 12px 0 8px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e8e8e8; }
+
+        .btn-apple, .btn-google {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 8px 12px; border-radius: 3px;
+            font-size: 13px; font-weight: 500; cursor: pointer;
+            text-decoration: none; border: none; margin-bottom: 6px;
+            transition: opacity 0.15s, box-shadow 0.15s;
+        }
+        .btn-apple { background: #1d1d1f; color: #fff; }
+        .btn-apple:hover { opacity: 0.85; color: #fff; }
+        .btn-google { background: #fff; color: #444; border: 1px solid #ddd; }
+        .btn-google:hover { box-shadow: 0 1px 6px rgba(0,0,0,0.15); color: #444; }
+        .oauth-icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+        .privacy-btn {
+            display: block; width: 100%; margin-top: 8px;
+            padding: 8px; background: #fff; color: #555;
+            border: 1px solid #ccc; border-radius: 3px; font-size: 13px;
+            text-align: center; text-decoration: none; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .privacy-btn:hover { background: #f5f5f5; color: #333; }
+
+        .login-alert {
+            background: #fff0f0; color: #c62828; border: 1px solid #ffcdd2;
+            border-radius: 3px; padding: 7px 11px; font-size: 12px; margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-<div class="login-card">
-    <div class="card">
-        <div class="card-header text-white text-center">
-            <div class="brand-icon">📡</div>
-            <h4 class="mb-0 fw-bold">@L["AppName"]</h4>
-            <small class="opacity-75">@L["AppSubtitle"]</small>
-            @{
-                ViewData["LangSwitcherVariant"] = "pills";
-            }
-            <partial name="_LanguageSwitcher" />
-        </div>
-        <div class="card-body p-4">
-            @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+
+<div id="map-bg" aria-hidden="true"></div>
+
+<!-- Centered login panel -->
+<div id="login-overlay">
+
+    <!-- iCAR Logo -->
+    <img src="~/images/icar-logo.png" class="login-logo" alt="iCAR" />
+
+    <!-- App title -->
+    <div class="login-title">@L["Live_Title"]</div>
+
+    <!-- Language selector -->
+    <div class="lang-row">
+        <label>@L["Lang_Switch"]：</label>
+        <select id="langSelect" class="lang-select" onchange="changeLang(this.value)">
+            <option value="zh-TW">@L["Lang_CHT"]</option>
+            <option value="zh-CN">@L["Lang_CHS"]</option>
+            <option value="en-US">@L["Lang_ENG"]</option>
+        </select>
+        <script>document.getElementById('langSelect').value = '@current';</script>
+    </div>
+
+    <!-- Login card -->
+    <div class="login-card">
+        <div class="login-card-header">@L["Login_Header"]</div>
+        <div class="login-card-body">
+            @if (!string.IsNullOrEmpty(error))
             {
-                <div class="alert alert-danger py-2">@ViewBag.Error</div>
+                <div class="login-alert">@error</div>
             }
+
             <form method="post" asp-controller="Account" asp-action="Login">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">@L["Login_Account"]</label>
-                    <input type="text" name="id" class="form-control" placeholder="@L["Login_PlaceholderAccount"]" required autofocus />
+                <div class="field-row">
+                    <div class="field-icon">&#x1F464;</div>
+                    <input type="text" name="id" class="field-input"
+                           placeholder="@L["Login_PlaceholderAccount"]" required autofocus />
                 </div>
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">@L["Login_Password"]</label>
-                    <input type="password" name="password" class="form-control" placeholder="@L["Login_PlaceholderPassword"]" required />
+                <div class="field-row">
+                    <div class="field-icon">&#x1F511;</div>
+                    <input type="password" name="password" class="field-input"
+                           placeholder="@L["Login_PlaceholderPassword"]" required />
                 </div>
-                <button type="submit" class="btn btn-primary w-100 btn-with-icon">@Html.UiIcon("login")<span>@L["Login_Submit"]</span></button>
+                <button type="submit" class="btn-submit">@L["Login_Submit"]</button>
             </form>
-            <hr class="my-3" />
-            <div class="text-center">
-                <a asp-controller="Account" asp-action="Register" class="text-decoration-none me-3">
-                    <small>@L["Login_NoAccount"]</small>
-                </a>
-                <a asp-controller="Account" asp-action="ForgotPassword" class="text-decoration-none">
-                    <small>@L["Login_ForgotPassword"]</small>
-                </a>
+
+            <div class="links-row">
+                <a asp-controller="Account" asp-action="Register">@L["Login_NoAccount"]</a>
+                <span class="sep">|</span>
+                <a asp-controller="Account" asp-action="ForgotPassword">@L["Login_ForgotPassword"]</a>
             </div>
+
+            <div class="divider"></div>
+
+            <!-- Apple Login -->
+            <form method="post" asp-controller="Account" asp-action="ExternalLogin">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Apple" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button type="submit" class="btn-apple">
+                    <svg class="oauth-icon" viewBox="0 0 24 24" fill="white">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.14-2.19 1.28-2.17 3.81.03 3.02 2.65 4.03 2.68 4.04l-.06.27zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                    </svg>
+                    @L["Login_LoginWithApple"]
+                </button>
+            </form>
+
+            <!-- Google Login -->
+            <form method="post" asp-controller="Account" asp-action="ExternalLogin">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="provider" value="Google" />
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+                <button type="submit" class="btn-google">
+                    <svg class="oauth-icon" viewBox="0 0 24 24">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    @L["Login_LoginWithGoogle"]
+                </button>
+            </form>
+
+            <a href="https://intro.traceez.com/icar/privacy_policy/app_privacy_policy_tw.html"
+               target="_blank" class="privacy-btn">@L["Login_PrivacyPolicy"]</a>
         </div>
     </div>
 </div>
+
+<script>
+function changeLang(culture) {
+    location.href = '/Culture/Set?culture=' + encodeURIComponent(culture) +
+        '&returnUrl=' + encodeURIComponent('@Html.Raw(loginReturnUrl)');
+}
+</script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

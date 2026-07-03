@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using System.Security.Claims;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
+using TrackerPlus.Web.Resources;
 
 namespace TrackerPlus.Web.Controllers;
 
@@ -17,13 +19,20 @@ public class AccountController : Controller
     private readonly IAuthService _authService;
     private readonly IMemberService _memberService;
     private readonly IDataProtectionProvider _dataProtection;
+    private readonly IStringLocalizer<SharedResources> _L;
+    private readonly IGoogleApiKeyService _googleApiKey;
+    private readonly IConfiguration _config;
 
     public AccountController(IAuthService authService, IMemberService memberService,
-        IDataProtectionProvider dataProtection)
+        IDataProtectionProvider dataProtection, IStringLocalizer<SharedResources> localizer,
+        IGoogleApiKeyService googleApiKey, IConfiguration config)
     {
         _authService = authService;
         _dataProtection = dataProtection;
         _memberService = memberService;
+        _L = localizer;
+        _googleApiKey = googleApiKey;
+        _config = config;
     }
 
     [HttpGet]
@@ -32,6 +41,7 @@ public class AccountController : Controller
         if (User.Identity?.IsAuthenticated == true)
             return RedirectToAction("Live", "Map");
         ViewBag.ReturnUrl = returnUrl;
+        ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
         return View();
     }
 
@@ -44,31 +54,77 @@ public class AccountController : Controller
         {
             ViewBag.Error = errorMsg;
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
             return View();
         }
 
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.Name, member.ID),
-            new(ClaimTypes.NameIdentifier, member.TbKey.ToString()),
-            new("Timezoom", member.Timezoom.ToString()),
-            new("CName", member.CName),
-            new("UserLanguage", member.UserLanguage)
-        };
-        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var principal = new ClaimsPrincipal(identity);
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-            new AuthenticationProperties { IsPersistent = true });
-
-        var culture = LocalizationCulture.ToCultureName(member.UserLanguage);
-        Response.Cookies.Append(
-            CookieRequestCultureProvider.DefaultCookieName,
-            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-            new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true });
+        await SignInMemberAsync(member);
 
         if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             return Redirect(returnUrl);
         return RedirectToAction("Live", "Map");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+    {
+        if (string.Equals(provider, "Apple", StringComparison.OrdinalIgnoreCase))
+        {
+            var callbackUrl = Url.Action("AppleLoginCallback", "Account", null, Request.Scheme);
+            var appleProxyUrl = _config["AppSettings:OAuth:AppleRedirectURL"] ?? "https://OAuth2.traceez.com/appleid.aspx";
+            var clientId = _config["AppSettings:OAuth:AppleClientId"] ?? "";
+            return Redirect($"{appleProxyUrl}?clientId={Uri.EscapeDataString(clientId)}&redirectUri={Uri.EscapeDataString(callbackUrl ?? "")}");
+        }
+
+        var redirectUrl = Url.Action("ExternalLoginCallback", "Account", new { returnUrl });
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        return Challenge(properties, provider);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null)
+    {
+        var result = await HttpContext.AuthenticateAsync("ExternalCookie");
+        if (!result.Succeeded)
+        {
+            ViewBag.Error = _L["Login_ExternalFailed"].Value;
+            ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
+            return View("Login");
+        }
+
+        var email = result.Principal?.FindFirstValue(ClaimTypes.Email);
+        if (string.IsNullOrEmpty(email))
+        {
+            ViewBag.Error = _L["Login_ExternalNoEmail"].Value;
+            ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
+            return View("Login");
+        }
+
+        var (success, member, errorMsg) = await _authService.LoginByEmailAsync(email);
+        if (!success || member == null)
+        {
+            ViewBag.Error = errorMsg;
+            ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
+            return View("Login");
+        }
+
+        await HttpContext.SignOutAsync("ExternalCookie");
+        await SignInMemberAsync(member);
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return Redirect(returnUrl);
+        return RedirectToAction("Live", "Map");
+    }
+
+    [HttpGet]
+    public IActionResult AppleLoginCallback(string? token = null, string? email = null)
+    {
+        // Apple proxy sends back token/email — handled similarly to ExternalLoginCallback
+        // Full implementation depends on proxy response format
+        ViewBag.Error = _L["Login_ExternalFailed"].Value;
+        ViewBag.GoogleApiJs = _googleApiKey.GetMapsJavaScriptUrl(Request.Host.Host);
+        return View("Login");
     }
 
     [HttpPost]
@@ -96,7 +152,7 @@ public class AccountController : Controller
             return View(member);
         }
 
-        ViewBag.Success = "註冊成功，請等待帳號審核啟用。";
+        ViewBag.Success = _L["Register_Success"].Value;
         return View();
     }
 
@@ -109,11 +165,11 @@ public class AccountController : Controller
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            ViewBag.Error = "請輸入電子郵件";
+            ViewBag.Error = _L["ForgotPassword_EmailRequired"].Value;
             return View();
         }
         await _authService.SendPasswordResetEmailAsync(email);
-        ViewBag.Success = "若此信箱已註冊，重設密碼信件已寄出，請檢查您的信箱。";
+        ViewBag.Success = _L["ForgotPassword_Sent"].Value;
         return View();
     }
 
@@ -139,7 +195,7 @@ public class AccountController : Controller
             var expiry       = long.Parse(parts[2]);
 
             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiry)
-                return Content("<html><body><p>預覽連結已過期，請在後台重新點擊「前台」按鈕。</p></body></html>", "text/html");
+                return Content($"<html><body><p>{_L["Account_AdminPreviewExpired"].Value}</p></body></html>", "text/html");
 
             List<Claim> claims;
             if (memberTbKey > 0)
@@ -158,7 +214,6 @@ public class AccountController : Controller
             }
             else
             {
-                // 未綁定裝置：建立只含該裝置的預覽身份
                 claims = new List<Claim>
                 {
                     new(ClaimTypes.Name, "admin-preview"),
@@ -180,6 +235,33 @@ public class AccountController : Controller
         catch
         {
             return BadRequest();
+        }
+    }
+
+    private async Task SignInMemberAsync(Member member)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, member.ID),
+            new(ClaimTypes.NameIdentifier, member.TbKey.ToString()),
+            new("Timezoom", member.Timezoom.ToString()),
+            new("CName", member.CName),
+            new("UserLanguage", member.UserLanguage)
+        };
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            new AuthenticationProperties { IsPersistent = true });
+
+        // Only set culture cookie if user hasn't already selected one (preserve pre-login language selection)
+        var existingCulture = Request.Cookies[CookieRequestCultureProvider.DefaultCookieName];
+        if (string.IsNullOrEmpty(existingCulture))
+        {
+            var culture = LocalizationCulture.ToCultureName(member.UserLanguage);
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1), IsEssential = true });
         }
     }
 }

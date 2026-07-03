@@ -44,27 +44,7 @@ public class TrackerRepository : ITrackerRepository
     public async Task<IEnumerable<Tracker>> GetByMemberAsync(int memberTbKey)
     {
         _logger.LogDebug("取得會員追蹤器列表 Member={Member}", memberTbKey);
-        const string sql = @"
-            SELECT
-                t.tbKey       AS TbKey,
-                RTRIM(ISNULL(t.IMEICode,'')) AS IMEICode,
-                t.Member_tbKey,
-                RTRIM(ISNULL(t.CName,''))    AS CName,
-                ISNULL(t.TrackerEnabled,'N') AS TrackerEnabled,
-                t.CDate,
-                t.LastReportDate,
-                t.LastConnectedDate,
-                t.Lastlogintime,
-                ISNULL(t.CurrentStatus,'N') AS CurrentStatus,
-                ISNULL(t.issleep,'N')       AS IsSleep,
-                (SELECT TOP 1 pl.EDate
-                    FROM dbo.PayLog pl
-                    WHERE pl.Tracker_tbKey = t.tbKey
-                      AND pl.SDate <> pl.EDate
-                    ORDER BY pl.EDate DESC) AS PayLogEndDate
-            FROM dbo.Tracker t
-            WHERE t.Member_tbKey = @MemberTbKey
-            ORDER BY t.CName";
+        var sql = $"{TrackerMapper.SelectColumns} {TrackerMapper.FromClause} WHERE t.Member_tbKey = @MemberTbKey ORDER BY RTRIM(ISNULL(t.CName,''))";
         using var conn = _db.CreateMainConnection();
         var rows = await conn.QueryAsync<TrackerDbRow>(sql, new { MemberTbKey = memberTbKey });
         return rows.Select(TrackerMapper.ToModel);

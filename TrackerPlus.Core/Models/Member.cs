@@ -26,4 +26,6 @@ public class Member
     public bool IsSendEmail { get; set; }
     public bool IsPush { get; set; }
     public DateTime CDate { get; set; } = DateTime.UtcNow;
+    /// <summary>裝置數（綁定的 Tracker 數量）</summary>
+    public int TrackerCount { get; set; }
 }

@@ -311,12 +311,18 @@
   </data>
   
   
+  <data name="Common_FirstPage" xml:space="preserve">
+    <value>First page</value>
+  </data>
+  <data name="Common_LastPage" xml:space="preserve">
+    <value>Last page</value>
+  </data>
   <data name="Common_NextPage" xml:space="preserve">
-    
-    
+
+
     <value>Next</value>
-    
-  
+
+
   </data>
   
   
@@ -1032,14 +1038,41 @@
   
   
   <data name="Login_Title" xml:space="preserve">
-    
-    
+
+
     <value>Sign In</value>
-    
-  
+
+
   </data>
-  
-  
+
+  <data name="Login_Header" xml:space="preserve">
+    <value>Sign in with Traceez Account</value>
+  </data>
+
+  <data name="Login_Or" xml:space="preserve">
+    <value>or</value>
+  </data>
+
+  <data name="Login_LoginWithApple" xml:space="preserve">
+    <value>Sign in with Apple</value>
+  </data>
+
+  <data name="Login_LoginWithGoogle" xml:space="preserve">
+    <value>Sign in with Google</value>
+  </data>
+
+  <data name="Login_PrivacyPolicy" xml:space="preserve">
+    <value>Privacy Policy</value>
+  </data>
+
+  <data name="Login_ExternalFailed" xml:space="preserve">
+    <value>Third-party sign in failed, please try again</value>
+  </data>
+
+  <data name="Login_ExternalNoEmail" xml:space="preserve">
+    <value>Could not retrieve email address, please sign in with account and password</value>
+  </data>
+
   <data name="Msg_AdvancedUpdated" xml:space="preserve">
     
     
@@ -1400,6 +1433,51 @@
   <data name="Admin_Member_Unit" xml:space="preserve">
     <value>Unit</value>
   </data>
+  <data name="Admin_Member_FilterTitle" xml:space="preserve">
+    <value>Member filter</value>
+  </data>
+  <data name="Admin_Member_FilterAccount" xml:space="preserve">
+    <value>Account:</value>
+  </data>
+  <data name="Admin_Member_Col_LastOnline" xml:space="preserve">
+    <value>Last online</value>
+  </data>
+  <data name="Admin_Member_Col_TrackerCount" xml:space="preserve">
+    <value>Devices</value>
+  </data>
+  <data name="Admin_Member_Col_Tel" xml:space="preserve">
+    <value>Contact phone</value>
+  </data>
+  <data name="Admin_Member_Col_Email" xml:space="preserve">
+    <value>Backup email</value>
+  </data>
+  <data name="Admin_Member_Col_Addr" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="Admin_Member_Status_Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Admin_Member_Status_Unverified" xml:space="preserve">
+    <value>Unverified</value>
+  </data>
+  <data name="Admin_Member_Status_Suspended" xml:space="preserve">
+    <value>Suspended</value>
+  </data>
+  <data name="Admin_Member_Status_Demo" xml:space="preserve">
+    <value>Demo</value>
+  </data>
+  <data name="Admin_Member_EditBtn" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Admin_Member_PreviewBtn" xml:space="preserve">
+    <value>Frontend</value>
+  </data>
+  <data name="Admin_Member_MatchCount" xml:space="preserve">
+    <value>Matching records</value>
+  </data>
+  <data name="Admin_Member_CurrentPage" xml:space="preserve">
+    <value>Current page</value>
+  </data>
   <data name="Admin_PayLog_Add" xml:space="preserve">
     <value>Add record</value>
   </data>
@@ -1601,8 +1679,8 @@
   <data name="Unit_Mile" xml:space="preserve">
     <value>Miles</value>
   </data>
-  <data name="Live_Title" xml:space="preserve"><value>iCar Fleet Tracking</value></data>
-  <data name="Live_Brand" xml:space="preserve"><value>iCar Tracking</value></data>
+  <data name="Live_Title" xml:space="preserve"><value>iCar Auto Guard | Vehicle GPS Tracker</value></data>
+  <data name="Live_Brand" xml:space="preserve"><value>iCar Auto Guard</value></data>
   <data name="Live_Menu_System" xml:space="preserve"><value>System Settings</value></data>
   <data name="Live_Menu_AfterSelectDevice" xml:space="preserve"><value>Device actions</value></data>
   <data name="Live_Menu_Geofence" xml:space="preserve"><value>Geofence</value></data>
@@ -1913,4 +1991,138 @@
   <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>Unbind device IMEI: {0} from its member account?\n(Device will be kept, only member binding and password will be reset)</value></data>
   <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>Unbind all devices from this member's account?\n(All devices will be kept, only member binding and password will be reset)</value></data>
   <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>This device is not bound to any member</value></data>
+  <!-- ── Report ── -->
+  <data name="Common_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Report_Travel" xml:space="preserve"><value>Travel Records</value></data>
+  <data name="Report_SpeedDetection" xml:space="preserve"><value>Speed Detection</value></data>
+  <data name="Report_Idle" xml:space="preserve"><value>Idle Records</value></data>
+  <data name="Report_Mileage" xml:space="preserve"><value>Mileage Records</value></data>
+  <data name="Report_StartDate" xml:space="preserve"><value>Start Date</value></data>
+  <data name="Report_EndDate" xml:space="preserve"><value>End Date</value></data>
+  <data name="Report_GpsStatus" xml:space="preserve"><value>GPS Status</value></data>
+  <data name="Report_AllGpsRecords" xml:space="preserve"><value>All records</value></data>
+  <data name="Report_GpsOnlyRecords" xml:space="preserve"><value>GPS only</value></data>
+  <data name="Report_GpsFilterAll" xml:space="preserve"><value>All</value></data>
+  <data name="Report_GpsFilterGps" xml:space="preserve"><value>GPS only</value></data>
+  <data name="Report_GpsFilterNoGps" xml:space="preserve"><value>Non-GPS only</value></data>
+  <data name="Report_SpeedUnit" xml:space="preserve"><value>Speed Unit</value></data>
+  <data name="Report_SpeedLimit" xml:space="preserve"><value>Speed Filter</value></data>
+  <data name="Report_SpeedAllData" xml:space="preserve"><value>All data</value></data>
+  <data name="Report_SpeedIdleOnly" xml:space="preserve"><value>Idle only</value></data>
+  <data name="Report_SpeedRangePre" xml:space="preserve"><value>Show speeds from</value></data>
+  <data name="Report_SpeedRangePost" xml:space="preserve"><value>in the records</value></data>
+  <data name="Report_OutputMode" xml:space="preserve"><value>Output Mode</value></data>
+  <data name="Report_OutputCsv" xml:space="preserve"><value>Text file (.CSV)</value></data>
+  <data name="Report_OutputXls" xml:space="preserve"><value>Excel (.XLS)</value></data>
+  <data name="Report_IdleNote" xml:space="preserve"><value>Idle: speed below 5 km/h for 3+ consecutive minutes.</value></data>
+  <data name="Report_MileageNote" xml:space="preserve"><value>Exports daily mileage for the selected month.</value></data>
+  <data name="Report_Col_Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Report_Col_Lat" xml:space="preserve"><value>Latitude</value></data>
+  <data name="Report_Col_Lng" xml:space="preserve"><value>Longitude</value></data>
+  <data name="Report_Col_SpeedKmh" xml:space="preserve"><value>Speed (km/h)</value></data>
+  <data name="Report_Col_SpeedMph" xml:space="preserve"><value>Speed (mph)</value></data>
+  <data name="Report_Col_Direction" xml:space="preserve"><value>Direction</value></data>
+  <data name="Report_Col_DistKm" xml:space="preserve"><value>Distance (km)</value></data>
+  <data name="Report_Col_Satellites" xml:space="preserve"><value>Satellites</value></data>
+  <data name="Report_Col_Voltage" xml:space="preserve"><value>Voltage</value></data>
+  <data name="Report_Col_StartTime" xml:space="preserve"><value>Start Time</value></data>
+  <data name="Report_Col_EndTime" xml:space="preserve"><value>End Time</value></data>
+  <data name="Report_Col_Duration" xml:space="preserve"><value>Duration (min)</value></data>
+  <data name="Report_Col_Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Report_Col_InitTime" xml:space="preserve"><value>Start</value></data>
+  <data name="Report_Col_MileageKm" xml:space="preserve"><value>Mileage (km)</value></data>
+  <data name="Report_Col_RecordCount" xml:space="preserve"><value>Records</value></data>
+  <data name="Report_Error_NoImei" xml:space="preserve"><value>Missing device IMEI</value></data>
+  <data name="Report_Error_NoDevice" xml:space="preserve"><value>Please select a device on the map first.</value></data>
+  <!-- ── Settings (frontend) ── -->
+  <data name="Settings_SystemParams" xml:space="preserve"><value>System Parameters</value></data>
+  <data name="Settings_Profile" xml:space="preserve"><value>Profile</value></data>
+  <data name="Settings_LabelGroup" xml:space="preserve"><value>Custom Groups &amp; Field Names</value></data>
+  <data name="Settings_ReportFields" xml:space="preserve"><value>Report Fields</value></data>
+  <data name="Settings_SystemParamsTitle" xml:space="preserve"><value>System Parameters</value></data>
+  <data name="Settings_SystemUnit" xml:space="preserve"><value>Unit System</value></data>
+  <data name="Settings_UnitMetric" xml:space="preserve"><value>Metric (km)</value></data>
+  <data name="Settings_UnitImperial" xml:space="preserve"><value>Imperial (miles)</value></data>
+  <data name="Settings_TimeZone" xml:space="preserve"><value>Time Zone</value></data>
+  <data name="Settings_SystemParamsSaved" xml:space="preserve"><value>System parameters saved.</value></data>
+  <data name="Settings_ProfileSaved" xml:space="preserve"><value>Profile saved.</value></data>
+  <data name="Settings_Saved" xml:space="preserve"><value>Saved.</value></data>
+  <data name="Settings_ReportFieldsSaved" xml:space="preserve"><value>Report fields saved.</value></data>
+  <data name="Settings_UpdateFailed" xml:space="preserve"><value>Update failed.</value></data>
+  <data name="Settings_LoginTypeGoogle" xml:space="preserve"><value>Google account login</value></data>
+  <data name="Settings_LoginTypeImei" xml:space="preserve"><value>IMEI account login</value></data>
+  <data name="Settings_LoginTypeTraceez" xml:space="preserve"><value>Traceez account login</value></data>
+  <data name="Settings_PasswordPlaceholder" xml:space="preserve"><value>Leave blank to keep current</value></data>
+  <data name="Settings_PasswordHint" xml:space="preserve"><value>Enter a new password to change it, or leave blank.</value></data>
+  <data name="Settings_Tel" xml:space="preserve"><value>Phone</value></data>
+  <data name="Settings_Addr" xml:space="preserve"><value>Address</value></data>
+  <data name="Settings_AlertNotify" xml:space="preserve"><value>Alert Notifications</value></data>
+  <data name="Settings_PushNotify" xml:space="preserve"><value>Mobile push notifications</value></data>
+  <data name="Settings_EmailNotify" xml:space="preserve"><value>Email notifications</value></data>
+  <data name="Settings_CustomFieldName" xml:space="preserve"><value>Custom field name ({0})</value></data>
+  <data name="Settings_CustomGroupName" xml:space="preserve"><value>Custom group name ({0})</value></data>
+  <data name="Settings_FieldVoltage" xml:space="preserve"><value>Voltage</value></data>
+  <data name="Settings_FieldGps" xml:space="preserve"><value>GPS signal</value></data>
+  <data name="Settings_FieldLbs" xml:space="preserve"><value>LBS ID</value></data>
+  <data name="Settings_FieldGsm" xml:space="preserve"><value>GSM signal strength</value></data>
+  <data name="Settings_FieldMemo" xml:space="preserve"><value>Notes</value></data>
+  <data name="Settings_DefaultTitle" xml:space="preserve"><value>Settings</value></data>
+  <data name="Live_Saving" xml:space="preserve"><value>Saving…</value></data>
+  <data name="Live_SaveFailedRetry" xml:space="preserve"><value>Save failed. Please try again.</value></data>
+  <data name="Live_NetworkError" xml:space="preserve"><value>Network error. Please try again.</value></data>
+  <data name="Live_LoadFailedRetry" xml:space="preserve"><value>Load failed. Please try again.</value></data>
+  <data name="Live_Status_Sleeping" xml:space="preserve"><value>Sleeping</value></data>
+  <data name="Live_Status_Terminated" xml:space="preserve"><value>Expired</value></data>
+  <data name="Live_SelectDevice" xml:space="preserve"><value>Please select a device</value></data>
+  <data name="Live_Label_Voltage" xml:space="preserve"><value>Voltage</value></data>
+  <data name="Live_Resize_SidebarWidth" xml:space="preserve"><value>Drag to resize device list width</value></data>
+  <data name="Live_Resize_HistHeight" xml:space="preserve"><value>Drag to resize map and history panel height</value></data>
+  <data name="Live_Hist_DetailWithLbs" xml:space="preserve"><value>{0}  {1} (incl. LBS)</value></data>
+  <data name="Live_Unit_MeterValue" xml:space="preserve"><value>{0} m</value></data>
+  <data name="Live_Unit_KmValue" xml:space="preserve"><value>{0} km</value></data>
+  <data name="Live_Unit_KmhValue" xml:space="preserve"><value>{0} km/h</value></data>
+  <data name="Live_LandmarkCoordsInvalid" xml:space="preserve"><value>Invalid coordinates</value></data>
+  <data name="Map_Hist_ZeroKm" xml:space="preserve"><value>0 km</value></data>
+  <data name="Account_AdminPreviewExpired" xml:space="preserve"><value>Preview link has expired. Please click Frontend in the admin panel again.</value></data>
+  <data name="Admin_Error_NoDeviceSelected" xml:space="preserve"><value>No device selected</value></data>
+  <data name="Admin_Error_NoMemberSelected" xml:space="preserve"><value>No member selected</value></data>
+  <data name="Admin_Error_ImeiRequired" xml:space="preserve"><value>IMEI is required</value></data>
+  <data name="Admin_Error_Imei15Digits" xml:space="preserve"><value>IMEI must be 15 digits</value></data>
+  <data name="Admin_Error_SelectDevice" xml:space="preserve"><value>Please select a device</value></data>
+  <data name="Admin_Error_InvalidDateFormat" xml:space="preserve"><value>Invalid date format</value></data>
+  <data name="Admin_Error_InvalidParams" xml:space="preserve"><value>Invalid parameters</value></data>
+  <data name="Admin_Error_BatchDeleted" xml:space="preserve"><value>Deleted {0} device(s)</value></data>
+  <data name="Admin_Error_SelectMemberBoundDevice" xml:space="preserve"><value>Please select a device bound to a member</value></data>
+  <data name="Admin_Error_ImeiSourceTargetRequired" xml:space="preserve"><value>Source and target IMEI are required</value></data>
+  <data name="Admin_Error_ImeiSourceTargetSame" xml:space="preserve"><value>Source and target must be different</value></data>
+  <data name="Admin_PayLog_NotFound" xml:space="preserve"><value>Order not found</value></data>
+  <data name="Admin_PayLog_NotSpecified" xml:space="preserve"><value>Order not specified</value></data>
+  <data name="Admin_PayLog_TargetImeiRequired" xml:space="preserve"><value>Please enter target IMEI</value></data>
+  <data name="Admin_Dealer_SearchPh" xml:space="preserve"><value>Search code/name/account</value></data>
+  <data name="Admin_Dealer_Status_Disabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="Admin_Dealer_Col_Code" xml:space="preserve"><value>Reseller Code</value></data>
+  <data name="Admin_Dealer_Col_Company" xml:space="preserve"><value>Company Name</value></data>
+  <data name="Admin_Dealer_Col_Account" xml:space="preserve"><value>Account</value></data>
+  <data name="Admin_Dealer_Col_Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Admin_Dealer_Col_CreateDate" xml:space="preserve"><value>Created Date</value></data>
+  <data name="Admin_Dealer_Col_OnlineContract" xml:space="preserve"><value>Online Contract</value></data>
+  <data name="Admin_Dealer_Col_TotalDev" xml:space="preserve"><value>Total Dev</value></data>
+  <data name="Admin_Dealer_Col_OnlineDev" xml:space="preserve"><value>Online Dev</value></data>
+  <data name="Admin_Dealer_Col_YesterdayDev" xml:space="preserve"><value>Yest. Online</value></data>
+  <data name="Admin_Dealer_Col_YesterdayLogin" xml:space="preserve"><value>Yest. Login</value></data>
+  <data name="Admin_Dealer_Col_Offline90" xml:space="preserve"><value>90D Offline</value></data>
+  <data name="Admin_Dealer_Col_Expired" xml:space="preserve"><value>Expired Dev</value></data>
+  <data name="Admin_Dealer_Col_BoundPhone" xml:space="preserve"><value>Bound Phone</value></data>
+  <data name="Admin_Dealer_Col_BoundEmail" xml:space="preserve"><value>Bound Account</value></data>
+  <data name="Admin_Dealer_Edit_Title" xml:space="preserve"><value>Edit</value></data>
+  <data name="Admin_Dealer_Edit_Contact" xml:space="preserve"><value>Contact Person</value></data>
+  <data name="Admin_Dealer_Edit_Tel" xml:space="preserve"><value>Phone</value></data>
+  <data name="Admin_Dealer_Edit_Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Admin_Dealer_Edit_Webtitle" xml:space="preserve"><value>System Title</value></data>
+  <data name="Admin_Dealer_Edit_ServiceSender" xml:space="preserve"><value>Service Mail Sender</value></data>
+  <data name="Admin_Dealer_Edit_ServiceEmail" xml:space="preserve"><value>Service Mail Address</value></data>
+  <data name="Admin_Dealer_Edit_Memo" xml:space="preserve"><value>Memo</value></data>
+  <data name="Admin_Dealer_Edit_PwConfirm" xml:space="preserve"><value>Confirm Password</value></data>
+  <data name="Admin_Dealer_Edit_PwTooShort" xml:space="preserve"><value>Password must be at least 6 characters</value></data>
+  <data name="Admin_Dealer_Edit_PwMismatch" xml:space="preserve"><value>Passwords do not match</value></data>
 </root>

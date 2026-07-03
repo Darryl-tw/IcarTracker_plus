@@ -84,7 +84,7 @@ public class PayLogController : AdminBaseController
     public async Task<IActionResult> GetJson(int id)
     {
         var pl = await _payLogService.GetPayLogAsync(id);
-        if (pl == null) return Json(new { success = false, message = "找不到訂單" });
+        if (pl == null) return Json(new { success = false, message = L["Admin_PayLog_NotFound"].Value });
         return Json(new
         {
             success  = true,
@@ -105,7 +105,7 @@ public class PayLogController : AdminBaseController
     public async Task<IActionResult> CreateJson([FromBody] PayLogJsonRequest req)
     {
         if (req == null || string.IsNullOrWhiteSpace(req.Imei))
-            return Json(new { success = false, message = "IMEI 不可空白" });
+            return Json(new { success = false, message = L["Admin_Error_ImeiRequired"].Value });
         var pl = new Core.Models.PayLog
         {
             IMEICODE     = req.Imei.Trim(),
@@ -126,9 +126,9 @@ public class PayLogController : AdminBaseController
     public async Task<IActionResult> UpdateJson([FromBody] PayLogJsonRequest req)
     {
         if (req == null || req.TbKey <= 0)
-            return Json(new { success = false, message = "未指定訂單" });
+            return Json(new { success = false, message = L["Admin_PayLog_NotSpecified"].Value });
         var pl = await _payLogService.GetPayLogAsync(req.TbKey);
-        if (pl == null) return Json(new { success = false, message = "找不到訂單" });
+        if (pl == null) return Json(new { success = false, message = L["Admin_PayLog_NotFound"].Value });
         pl.OrderNo       = req.OrderNo?.Trim() ?? pl.OrderNo;
         pl.Amount        = req.Amount;
         pl.SaleModel     = req.SaleModel;
@@ -144,7 +144,7 @@ public class PayLogController : AdminBaseController
     public async Task<IActionResult> DeleteJson([FromBody] SingleIdRequest req)
     {
         if (req == null || req.Id <= 0)
-            return Json(new { success = false, message = "未指定訂單" });
+            return Json(new { success = false, message = L["Admin_PayLog_NotSpecified"].Value });
         var result = await _payLogService.DeletePayLogAsync(req.Id);
         return Json(new { success = result.Success, message = result.Message });
     }
@@ -153,7 +153,7 @@ public class PayLogController : AdminBaseController
     public async Task<IActionResult> MoveJson([FromBody] PayLogMoveRequest req)
     {
         if (req == null || req.Id <= 0 || string.IsNullOrWhiteSpace(req.NewImei))
-            return Json(new { success = false, message = "請填入目標 IMEI" });
+            return Json(new { success = false, message = L["Admin_PayLog_TargetImeiRequired"].Value });
         var result = await _payLogService.MovePayLogByImeiAsync(req.Id, req.NewImei.Trim());
         return Json(new { success = result.Success, message = result.Message });
     }

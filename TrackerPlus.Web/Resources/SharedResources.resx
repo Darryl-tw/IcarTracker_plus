@@ -311,12 +311,18 @@
   </data>
   
   
+  <data name="Common_FirstPage" xml:space="preserve">
+    <value>跳到首頁</value>
+  </data>
+  <data name="Common_LastPage" xml:space="preserve">
+    <value>跳到末頁</value>
+  </data>
   <data name="Common_NextPage" xml:space="preserve">
-    
-    
+
+
     <value>下一頁</value>
-    
-  
+
+
   </data>
   
   
@@ -1032,11 +1038,39 @@
   
   
   <data name="Login_Title" xml:space="preserve">
-    
-    
+
+
     <value>登入</value>
-    
-  
+
+
+  </data>
+
+  <data name="Login_Header" xml:space="preserve">
+    <value>使用Traceez帳號登入</value>
+  </data>
+
+  <data name="Login_Or" xml:space="preserve">
+    <value>或</value>
+  </data>
+
+  <data name="Login_LoginWithApple" xml:space="preserve">
+    <value>使用 Apple 帳號登入</value>
+  </data>
+
+  <data name="Login_LoginWithGoogle" xml:space="preserve">
+    <value>使用 Google 帳號登入</value>
+  </data>
+
+  <data name="Login_PrivacyPolicy" xml:space="preserve">
+    <value>隱私權政策</value>
+  </data>
+
+  <data name="Login_ExternalFailed" xml:space="preserve">
+    <value>第三方登入失敗，請稍後再試</value>
+  </data>
+
+  <data name="Login_ExternalNoEmail" xml:space="preserve">
+    <value>無法取得電子郵件地址，請使用帳號密碼登入</value>
   </data>
   
   
@@ -1400,6 +1434,51 @@
   <data name="Admin_Member_Unit" xml:space="preserve">
     <value>單位</value>
   </data>
+  <data name="Admin_Member_FilterTitle" xml:space="preserve">
+    <value>會員資料過濾器</value>
+  </data>
+  <data name="Admin_Member_FilterAccount" xml:space="preserve">
+    <value>帳號:</value>
+  </data>
+  <data name="Admin_Member_Col_LastOnline" xml:space="preserve">
+    <value>最後上線日期</value>
+  </data>
+  <data name="Admin_Member_Col_TrackerCount" xml:space="preserve">
+    <value>裝置數</value>
+  </data>
+  <data name="Admin_Member_Col_Tel" xml:space="preserve">
+    <value>連絡電話</value>
+  </data>
+  <data name="Admin_Member_Col_Email" xml:space="preserve">
+    <value>備用Email</value>
+  </data>
+  <data name="Admin_Member_Col_Addr" xml:space="preserve">
+    <value>通訊地址</value>
+  </data>
+  <data name="Admin_Member_Status_Active" xml:space="preserve">
+    <value>啟用</value>
+  </data>
+  <data name="Admin_Member_Status_Unverified" xml:space="preserve">
+    <value>未驗證</value>
+  </data>
+  <data name="Admin_Member_Status_Suspended" xml:space="preserve">
+    <value>停權</value>
+  </data>
+  <data name="Admin_Member_Status_Demo" xml:space="preserve">
+    <value>展示</value>
+  </data>
+  <data name="Admin_Member_EditBtn" xml:space="preserve">
+    <value>修改</value>
+  </data>
+  <data name="Admin_Member_PreviewBtn" xml:space="preserve">
+    <value>前台</value>
+  </data>
+  <data name="Admin_Member_MatchCount" xml:space="preserve">
+    <value>符合條件筆數</value>
+  </data>
+  <data name="Admin_Member_CurrentPage" xml:space="preserve">
+    <value>目前頁數</value>
+  </data>
   <data name="Admin_PayLog_Add" xml:space="preserve">
     <value>新增記錄</value>
   </data>
@@ -1601,8 +1680,8 @@
   <data name="Unit_Mile" xml:space="preserve">
     <value>英里</value>
   </data>
-  <data name="Live_Title" xml:space="preserve"><value>iCar 車隊追蹤平台</value></data>
-  <data name="Live_Brand" xml:space="preserve"><value>iCar 追蹤平台</value></data>
+  <data name="Live_Title" xml:space="preserve"><value>iCar 汽車保鑣 | 車用GPS協尋器</value></data>
+  <data name="Live_Brand" xml:space="preserve"><value>iCar 汽車保鑣</value></data>
   <data name="Live_Menu_System" xml:space="preserve"><value>系統設定</value></data>
   <data name="Live_Menu_AfterSelectDevice" xml:space="preserve"><value>選擇裝置後操作</value></data>
   <data name="Live_Menu_Geofence" xml:space="preserve"><value>電子柵欄</value></data>
@@ -1913,4 +1992,138 @@
   <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>確定解除裝置 IMEI: {0} 的帳號綁定？\n（裝置將保留，僅解除會員綁定並重設密碼）</value></data>
   <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>確定解除此會員所有裝置的帳號綁定？\n（所有裝置將保留，僅解除會員綁定並重設密碼）</value></data>
   <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>此裝置尚未綁定任何會員</value></data>
+  <!-- ── 統計報表 ── -->
+  <data name="Common_Ok" xml:space="preserve"><value>確定</value></data>
+  <data name="Report_Travel" xml:space="preserve"><value>行蹤紀錄</value></data>
+  <data name="Report_SpeedDetection" xml:space="preserve"><value>超速偵測紀錄</value></data>
+  <data name="Report_Idle" xml:space="preserve"><value>怠速紀錄</value></data>
+  <data name="Report_Mileage" xml:space="preserve"><value>里程紀錄</value></data>
+  <data name="Report_StartDate" xml:space="preserve"><value>起始日期</value></data>
+  <data name="Report_EndDate" xml:space="preserve"><value>結束日期</value></data>
+  <data name="Report_GpsStatus" xml:space="preserve"><value>定位狀態</value></data>
+  <data name="Report_AllGpsRecords" xml:space="preserve"><value>所有定位紀錄</value></data>
+  <data name="Report_GpsOnlyRecords" xml:space="preserve"><value>只限已定位紀錄</value></data>
+  <data name="Report_GpsFilterAll" xml:space="preserve"><value>所有</value></data>
+  <data name="Report_GpsFilterGps" xml:space="preserve"><value>只限已定位</value></data>
+  <data name="Report_GpsFilterNoGps" xml:space="preserve"><value>只限未定位</value></data>
+  <data name="Report_SpeedUnit" xml:space="preserve"><value>速度單位</value></data>
+  <data name="Report_SpeedLimit" xml:space="preserve"><value>時速限制</value></data>
+  <data name="Report_SpeedAllData" xml:space="preserve"><value>全部紀錄</value></data>
+  <data name="Report_SpeedIdleOnly" xml:space="preserve"><value>只顯示靜止狀態紀錄</value></data>
+  <data name="Report_SpeedRangePre" xml:space="preserve"><value>顯示時速在</value></data>
+  <data name="Report_SpeedRangePost" xml:space="preserve"><value>之間的紀錄</value></data>
+  <data name="Report_OutputMode" xml:space="preserve"><value>輸出模式</value></data>
+  <data name="Report_OutputCsv" xml:space="preserve"><value>文字檔(.CSV)</value></data>
+  <data name="Report_OutputXls" xml:space="preserve"><value>Excel(.XLS)</value></data>
+  <data name="Report_IdleNote" xml:space="preserve"><value>怠速定義：速度低於 5 km/h 且持續 3 分鐘以上。</value></data>
+  <data name="Report_MileageNote" xml:space="preserve"><value>依所選月份匯出當月每日里程。</value></data>
+  <data name="Report_Col_Time" xml:space="preserve"><value>時間</value></data>
+  <data name="Report_Col_Lat" xml:space="preserve"><value>緯度</value></data>
+  <data name="Report_Col_Lng" xml:space="preserve"><value>經度</value></data>
+  <data name="Report_Col_SpeedKmh" xml:space="preserve"><value>速度(km/h)</value></data>
+  <data name="Report_Col_SpeedMph" xml:space="preserve"><value>速度(mph)</value></data>
+  <data name="Report_Col_Direction" xml:space="preserve"><value>方向</value></data>
+  <data name="Report_Col_DistKm" xml:space="preserve"><value>距離(km)</value></data>
+  <data name="Report_Col_Satellites" xml:space="preserve"><value>衛星數</value></data>
+  <data name="Report_Col_Voltage" xml:space="preserve"><value>電壓</value></data>
+  <data name="Report_Col_StartTime" xml:space="preserve"><value>開始時間</value></data>
+  <data name="Report_Col_EndTime" xml:space="preserve"><value>結束時間</value></data>
+  <data name="Report_Col_Duration" xml:space="preserve"><value>持續(分)</value></data>
+  <data name="Report_Col_Date" xml:space="preserve"><value>日期</value></data>
+  <data name="Report_Col_InitTime" xml:space="preserve"><value>起始時間</value></data>
+  <data name="Report_Col_MileageKm" xml:space="preserve"><value>里程(km)</value></data>
+  <data name="Report_Col_RecordCount" xml:space="preserve"><value>紀錄數</value></data>
+  <data name="Report_Error_NoImei" xml:space="preserve"><value>缺少裝置 IMEI</value></data>
+  <data name="Report_Error_NoDevice" xml:space="preserve"><value>請先在地圖上選擇裝置。</value></data>
+  <!-- ── 系統設定（前台） ── -->
+  <data name="Settings_SystemParams" xml:space="preserve"><value>系統參數</value></data>
+  <data name="Settings_Profile" xml:space="preserve"><value>基本資料維護</value></data>
+  <data name="Settings_LabelGroup" xml:space="preserve"><value>自定義群組與欄位名稱</value></data>
+  <data name="Settings_ReportFields" xml:space="preserve"><value>報表欄位</value></data>
+  <data name="Settings_SystemParamsTitle" xml:space="preserve"><value>系統參數設定</value></data>
+  <data name="Settings_SystemUnit" xml:space="preserve"><value>系統單位</value></data>
+  <data name="Settings_UnitMetric" xml:space="preserve"><value>公制（公里）</value></data>
+  <data name="Settings_UnitImperial" xml:space="preserve"><value>英制（英里）</value></data>
+  <data name="Settings_TimeZone" xml:space="preserve"><value>時區校正設定</value></data>
+  <data name="Settings_SystemParamsSaved" xml:space="preserve"><value>系統參數已儲存。</value></data>
+  <data name="Settings_ProfileSaved" xml:space="preserve"><value>基本資料已儲存。</value></data>
+  <data name="Settings_Saved" xml:space="preserve"><value>已儲存。</value></data>
+  <data name="Settings_ReportFieldsSaved" xml:space="preserve"><value>報表欄位已儲存。</value></data>
+  <data name="Settings_UpdateFailed" xml:space="preserve"><value>更新失敗。</value></data>
+  <data name="Settings_LoginTypeGoogle" xml:space="preserve"><value>Google 帳號登入</value></data>
+  <data name="Settings_LoginTypeImei" xml:space="preserve"><value>IMEI 帳號登入</value></data>
+  <data name="Settings_LoginTypeTraceez" xml:space="preserve"><value>Traceez 帳號登入</value></data>
+  <data name="Settings_PasswordPlaceholder" xml:space="preserve"><value>留空不更改</value></data>
+  <data name="Settings_PasswordHint" xml:space="preserve"><value>如需更改密碼請輸入新密碼，否則留空。</value></data>
+  <data name="Settings_Tel" xml:space="preserve"><value>連絡電話</value></data>
+  <data name="Settings_Addr" xml:space="preserve"><value>通訊地址</value></data>
+  <data name="Settings_AlertNotify" xml:space="preserve"><value>警報通知設定</value></data>
+  <data name="Settings_PushNotify" xml:space="preserve"><value>行動裝置直通知</value></data>
+  <data name="Settings_EmailNotify" xml:space="preserve"><value>電子郵件通知</value></data>
+  <data name="Settings_CustomFieldName" xml:space="preserve"><value>自訂欄位名稱({0})</value></data>
+  <data name="Settings_CustomGroupName" xml:space="preserve"><value>自訂群組名稱({0})</value></data>
+  <data name="Settings_FieldVoltage" xml:space="preserve"><value>電壓值</value></data>
+  <data name="Settings_FieldGps" xml:space="preserve"><value>GPS訊號</value></data>
+  <data name="Settings_FieldLbs" xml:space="preserve"><value>LBS編號</value></data>
+  <data name="Settings_FieldGsm" xml:space="preserve"><value>GSM訊號強度</value></data>
+  <data name="Settings_FieldMemo" xml:space="preserve"><value>註解</value></data>
+  <data name="Settings_DefaultTitle" xml:space="preserve"><value>設定</value></data>
+  <data name="Live_Saving" xml:space="preserve"><value>儲存中…</value></data>
+  <data name="Live_SaveFailedRetry" xml:space="preserve"><value>儲存失敗，請重試。</value></data>
+  <data name="Live_NetworkError" xml:space="preserve"><value>網路錯誤，請重試。</value></data>
+  <data name="Live_LoadFailedRetry" xml:space="preserve"><value>載入失敗，請重試。</value></data>
+  <data name="Live_Status_Sleeping" xml:space="preserve"><value>休眠</value></data>
+  <data name="Live_Status_Terminated" xml:space="preserve"><value>已到期</value></data>
+  <data name="Live_SelectDevice" xml:space="preserve"><value>請選擇裝置</value></data>
+  <data name="Live_Label_Voltage" xml:space="preserve"><value>電壓</value></data>
+  <data name="Live_Resize_SidebarWidth" xml:space="preserve"><value>拖曳調整裝置列表寬度</value></data>
+  <data name="Live_Resize_HistHeight" xml:space="preserve"><value>拖曳調整地圖與歷史紀錄高度</value></data>
+  <data name="Live_Hist_DetailWithLbs" xml:space="preserve"><value>{0}  {1} (含LBS)</value></data>
+  <data name="Live_Unit_MeterValue" xml:space="preserve"><value>{0}公尺</value></data>
+  <data name="Live_Unit_KmValue" xml:space="preserve"><value>{0}公里</value></data>
+  <data name="Live_Unit_KmhValue" xml:space="preserve"><value>{0}公里/時</value></data>
+  <data name="Live_LandmarkCoordsInvalid" xml:space="preserve"><value>座標無效</value></data>
+  <data name="Map_Hist_ZeroKm" xml:space="preserve"><value>0公里</value></data>
+  <data name="Account_AdminPreviewExpired" xml:space="preserve"><value>預覽連結已過期，請在後台重新點擊「前台」按鈕。</value></data>
+  <data name="Admin_Error_NoDeviceSelected" xml:space="preserve"><value>未選取裝置</value></data>
+  <data name="Admin_Error_NoMemberSelected" xml:space="preserve"><value>未選取會員</value></data>
+  <data name="Admin_Error_ImeiRequired" xml:space="preserve"><value>IMEI 不可空白</value></data>
+  <data name="Admin_Error_Imei15Digits" xml:space="preserve"><value>IMEI 需為 15 碼</value></data>
+  <data name="Admin_Error_SelectDevice" xml:space="preserve"><value>請選擇裝置</value></data>
+  <data name="Admin_Error_InvalidDateFormat" xml:space="preserve"><value>日期格式錯誤</value></data>
+  <data name="Admin_Error_InvalidParams" xml:space="preserve"><value>參數不正確</value></data>
+  <data name="Admin_Error_BatchDeleted" xml:space="preserve"><value>已刪除 {0} 台裝置</value></data>
+  <data name="Admin_Error_SelectMemberBoundDevice" xml:space="preserve"><value>請先選擇有綁定會員的裝置</value></data>
+  <data name="Admin_Error_ImeiSourceTargetRequired" xml:space="preserve"><value>來源與目標 IMEI 不可空白</value></data>
+  <data name="Admin_Error_ImeiSourceTargetSame" xml:space="preserve"><value>來源與目標不可相同</value></data>
+  <data name="Admin_PayLog_NotFound" xml:space="preserve"><value>找不到訂單</value></data>
+  <data name="Admin_PayLog_NotSpecified" xml:space="preserve"><value>未指定訂單</value></data>
+  <data name="Admin_PayLog_TargetImeiRequired" xml:space="preserve"><value>請填入目標 IMEI</value></data>
+  <data name="Admin_Dealer_SearchPh" xml:space="preserve"><value>搜尋代碼/名稱/帳號</value></data>
+  <data name="Admin_Dealer_Status_Disabled" xml:space="preserve"><value>停用</value></data>
+  <data name="Admin_Dealer_Col_Code" xml:space="preserve"><value>經銷商代碼</value></data>
+  <data name="Admin_Dealer_Col_Company" xml:space="preserve"><value>公司名稱</value></data>
+  <data name="Admin_Dealer_Col_Account" xml:space="preserve"><value>帳號</value></data>
+  <data name="Admin_Dealer_Col_Password" xml:space="preserve"><value>密碼</value></data>
+  <data name="Admin_Dealer_Col_CreateDate" xml:space="preserve"><value>建立日期</value></data>
+  <data name="Admin_Dealer_Col_OnlineContract" xml:space="preserve"><value>線上綁約</value></data>
+  <data name="Admin_Dealer_Col_TotalDev" xml:space="preserve"><value>裝置總數</value></data>
+  <data name="Admin_Dealer_Col_OnlineDev" xml:space="preserve"><value>已上線數</value></data>
+  <data name="Admin_Dealer_Col_YesterdayDev" xml:space="preserve"><value>昨日上線</value></data>
+  <data name="Admin_Dealer_Col_YesterdayLogin" xml:space="preserve"><value>昨日登入</value></data>
+  <data name="Admin_Dealer_Col_Offline90" xml:space="preserve"><value>90日未上線</value></data>
+  <data name="Admin_Dealer_Col_Expired" xml:space="preserve"><value>裝置過期</value></data>
+  <data name="Admin_Dealer_Col_BoundPhone" xml:space="preserve"><value>綁定手機</value></data>
+  <data name="Admin_Dealer_Col_BoundEmail" xml:space="preserve"><value>綁定帳號</value></data>
+  <data name="Admin_Dealer_Edit_Title" xml:space="preserve"><value>修改</value></data>
+  <data name="Admin_Dealer_Edit_Contact" xml:space="preserve"><value>連絡人</value></data>
+  <data name="Admin_Dealer_Edit_Tel" xml:space="preserve"><value>連絡電話</value></data>
+  <data name="Admin_Dealer_Edit_Email" xml:space="preserve"><value>電子郵件</value></data>
+  <data name="Admin_Dealer_Edit_Webtitle" xml:space="preserve"><value>系統抬頭文字</value></data>
+  <data name="Admin_Dealer_Edit_ServiceSender" xml:space="preserve"><value>客服信箱-寄件者</value></data>
+  <data name="Admin_Dealer_Edit_ServiceEmail" xml:space="preserve"><value>客服信箱-郵址</value></data>
+  <data name="Admin_Dealer_Edit_Memo" xml:space="preserve"><value>備註資訊</value></data>
+  <data name="Admin_Dealer_Edit_PwConfirm" xml:space="preserve"><value>密碼確認</value></data>
+  <data name="Admin_Dealer_Edit_PwTooShort" xml:space="preserve"><value>密碼長度不可小於 6 碼</value></data>
+  <data name="Admin_Dealer_Edit_PwMismatch" xml:space="preserve"><value>密碼與確認密碼不一致</value></data>
 </root>

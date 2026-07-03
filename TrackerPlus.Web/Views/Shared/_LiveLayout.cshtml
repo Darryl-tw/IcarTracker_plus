@@ -1,0 +1,250 @@
+@using System.Globalization
+@{
+    var memberName = User.FindFirst("CName")?.Value ?? User.Identity?.Name ?? "";
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>@(ViewData["Title"] is string pt && pt.Length > 0 ? $"{pt} | {L["Live_Brand"]}" : L["Live_Title"].Value)</title>
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/btn-icons.css" asp-append-version="true" />
+<style>
+/* ======= NAVBAR ======= */
+#top-nav {
+    height: 32px; background: #1e3a5f; display: flex; align-items: center;
+    padding: 0 8px; gap: 2px; position: fixed; top: 0; left: 0; right: 0; z-index: 1050;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+}
+#top-nav .brand { color: #7ecbff; font-size: 13px; font-weight: 700; margin-right: 8px; white-space: nowrap; }
+#top-nav .nav-btn {
+    color: #d0e8ff; background: transparent; border: none; padding: 3px 8px;
+    font-size: 11px; border-radius: 3px; cursor: pointer; white-space: nowrap;
+    transition: background 0.15s;
+}
+#top-nav .nav-btn .ui-icon { width: 13px; height: 13px; }
+#top-nav .nav-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+#top-nav .dropdown-menu { font-size: 11px; min-width: 150px; }
+#top-nav .spacer { flex: 1; }
+#top-nav .user-info { color: #94c5e8; font-size: 11px; margin-right: 6px; }
+#top-nav .logout-btn {
+    color: #ff8080; background: rgba(255,80,80,0.15); border: 1px solid rgba(255,80,80,0.3);
+    padding: 2px 10px; border-radius: 3px; font-size: 11px; cursor: pointer;
+    transition: background 0.15s;
+}
+#top-nav .logout-btn .ui-icon { width: 13px; height: 13px; }
+#top-nav .logout-btn:hover { background: rgba(255,80,80,0.3); }
+body { padding-top: 32px; }
+
+/* ======= SETTINGS MODAL ======= */
+#settingsModal .modal-header {
+    background: #1e3a5f; color: #d0e8ff; padding: 6px 12px;
+    font-size: 12px; border-bottom: 1px solid #2d5080;
+}
+#settingsModal .modal-title { font-size: 13px; font-weight: 600; }
+#settingsModal .modal-body { padding: 16px; background: #fff; font-size: 13px; }
+@@keyframes settingsShake {
+    0%,100% { transform: translateX(0); }
+    20%      { transform: translateX(-9px); }
+    60%      { transform: translateX(9px); }
+}
+#settingsModalDialog.shake { animation: settingsShake 0.3s ease; }
+</style>
+@await RenderSectionAsync("HeadStyles", required: false)
+</head>
+<body>
+<!-- ===== TOP NAVBAR ===== -->
+<div id="top-nav">
+    <span class="brand">@L["Live_Brand"]</span>
+
+    <!-- 系統設定 -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("menu")<span>@L["Live_Menu_System"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="#" onclick="openSettingsModal('/Settings/SystemParams','@L["Settings_SystemParams"]');return false;">@L["Settings_SystemParams"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openSettingsModal('/Settings/Profile','@L["Settings_Profile"]');return false;">@L["Settings_Profile"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openSettingsModal('/Settings/LabelGroup','@L["Settings_LabelGroup"]');return false;">@L["Settings_LabelGroup"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openSettingsModal('/Settings/ReportFields','@L["Settings_ReportFields"]');return false;">@L["Settings_ReportFields"]</a></li>
+        </ul>
+    </div>
+
+    <!-- 統計報表 -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("reports")<span>@L["Live_Menu_Reports"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="#" onclick="openReportModal('/Report/Travel','@L["Report_Travel"]');return false;">@L["Report_Travel"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openReportModal('/Report/SpeedDetection','@L["Report_SpeedDetection"]');return false;">@L["Report_SpeedDetection"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openReportModal('/Report/Idle','@L["Report_Idle"]');return false;">@L["Report_Idle"]</a></li>
+            <li><a class="dropdown-item" href="#" onclick="openReportModal('/Report/Mileage','@L["Report_Mileage"]');return false;">@L["Report_Mileage"]</a></li>
+        </ul>
+    </div>
+
+    <!-- 說明 -->
+    <div class="dropdown">
+        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("help")<span>@L["Live_Menu_Help"]</span></button>
+        <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="https://www.traceez.com/tw/icar_webplatform.html" target="_blank">@L["Live_Menu_Manual"]</a></li>
+            <li><a class="dropdown-item" href="https://intro.traceez.com/icar/privacy_policy/app_privacy_policy_tw.html" target="_blank">@L["Live_Menu_Privacy"]</a></li>
+        </ul>
+    </div>
+
+    <div class="spacer"></div>
+    <span class="user-info">@memberName</span>
+    <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="logout-btn">@Html.UiIcon("logout")<span>@L["Live_LogoutSystem"]</span></button>
+    </form>
+</div>
+<!-- Device navigation links updated by Live page JS -->
+<a id="menu-tracker-detail" href="#" style="display:none"></a>
+<a id="menu-geofence" href="#" style="display:none"></a>
+
+<!-- ===== SETTINGS MODAL ===== -->
+<div class="modal fade" id="settingsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" id="settingsModalDialog" style="max-width:580px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="settingsModalTitle"></span>
+                <button type="button" id="settingsModalCloseBtn" class="btn-close btn-close-white btn-sm" style="font-size:10px;"></button>
+            </div>
+            <div class="modal-body" id="settingsModalBody">
+                <div class="text-center py-4">
+                    <div class="spinner-border spinner-border-sm text-secondary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@RenderBody()
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/ui-icons.js" asp-append-version="true"></script>
+<script>
+(function () {
+    const _reportI18n = { noDevice: @Html.Raw(Json.Serialize(L["Report_Error_NoDevice"].Value)) };
+    const _settingsI18n = {
+        saving: @Html.Raw(Json.Serialize(L["Live_Saving"].Value)),
+        saveFailed: @Html.Raw(Json.Serialize(L["Live_SaveFailedRetry"].Value)),
+        networkError: @Html.Raw(Json.Serialize(L["Live_NetworkError"].Value)),
+        loadFailed: @Html.Raw(Json.Serialize(L["Live_LoadFailedRetry"].Value))
+    };
+    const modalEl = document.getElementById('settingsModal');
+    const dialogEl = document.getElementById('settingsModalDialog');
+    let bsModal = null;
+
+    function getModal() {
+        if (!bsModal) bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+        return bsModal;
+    }
+
+    function shake() {
+        dialogEl.classList.remove('shake');
+        void dialogEl.offsetWidth; // reflow to restart animation
+        dialogEl.classList.add('shake');
+    }
+
+    // backdrop click → shake (Bootstrap fires hidePrevented when backdrop=static)
+    modalEl.addEventListener('hidePrevented.bs.modal', shake);
+
+    // ESC key → shake (keyboard:false stops Bootstrap from acting, so we add our own listener)
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modalEl.classList.contains('show')) shake();
+    });
+
+    // X button → close
+    document.getElementById('settingsModalCloseBtn').addEventListener('click', function () {
+        getModal().hide();
+    });
+
+    function wireForm() {
+        const form = modalEl.querySelector('#settingsModalBody form');
+        if (!form) return;
+
+        // Report form: build download URL and trigger file download
+        if (form.dataset.reportDownload) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const imei = window._selectedImei || '';
+                if (!imei) {
+                    showError(_reportI18n.noDevice);
+                    return;
+                }
+                const imeiInput = form.querySelector('[name="imei"]');
+                if (imeiInput) imeiInput.value = imei;
+
+                const params = new URLSearchParams(new FormData(form));
+                const a = document.createElement('a');
+                a.href = form.dataset.reportDownload + '?' + params.toString();
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(function () { getModal().hide(); }, 400);
+            });
+            return;
+        }
+
+        // Settings form: AJAX POST → JSON response
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const btn = form.querySelector('[type=submit]');
+            const origText = btn ? btn.textContent : '';
+            if (btn) { btn.disabled = true; btn.textContent = _settingsI18n.saving; }
+
+            try {
+                const resp = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    getModal().hide();
+                } else {
+                    showError(data.message || _settingsI18n.saveFailed);
+                    if (btn) { btn.disabled = false; btn.textContent = origText; }
+                }
+            } catch {
+                showError(_settingsI18n.networkError);
+                if (btn) { btn.disabled = false; btn.textContent = origText; }
+            }
+        });
+    }
+
+    function showError(msg) {
+        let el = modalEl.querySelector('.settings-modal-error');
+        if (!el) {
+            el = document.createElement('div');
+            el.className = 'settings-modal-error alert alert-danger py-1 px-2 mt-2 mb-0';
+            el.style.fontSize = '12px';
+            document.getElementById('settingsModalBody').appendChild(el);
+        }
+        el.textContent = msg;
+    }
+
+    function loadModal(url, title) {
+        document.getElementById('settingsModalTitle').textContent = title;
+        document.getElementById('settingsModalBody').innerHTML =
+            '<div class="text-center py-4"><div class="spinner-border spinner-border-sm text-secondary"></div></div>';
+        getModal().show();
+        fetch(url + '?popup=1')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('settingsModalBody').innerHTML = html;
+                wireForm();
+            })
+            .catch(function () {
+                document.getElementById('settingsModalBody').innerHTML =
+                    '<div class="text-danger p-2">' + _settingsI18n.loadFailed + '</div>';
+            });
+    }
+
+    window.openSettingsModal = function (url, title) { loadModal(url, title); };
+
+    window.openReportModal = function (url, title) { loadModal(url, title); };
+})();
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

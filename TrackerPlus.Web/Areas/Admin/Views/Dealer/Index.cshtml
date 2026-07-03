@@ -1,0 +1,192 @@
+@model IEnumerable<TrackerPlus.Core.Models.Dealer>
+@{
+    ViewData["Title"] = L["Nav_Admin_OBM_Mgmt"].Value;
+    var keyword      = ViewBag.Keyword as string ?? "";
+    var statusFilter = ViewBag.Status  as string ?? "";
+}
+<style>
+.dealer-table th, .dealer-table td { white-space: nowrap; font-size: 12px; padding: 4px 6px; }
+.dealer-table td.num { text-align: right; }
+.dealer-table tbody tr { cursor: pointer; }
+.dealer-table tbody tr.selected-row td { background-color: #cce5ff !important; }
+.toolbar-btn { min-width: 72px; }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="mb-2">
+    <h2>@L["Nav_Admin_OBM_Mgmt"] [<span id="dealerCount">@Model.Count()</span>]</h2>
+</div>
+
+<form method="get" class="row g-2 mb-2 align-items-center">
+    <div class="col-md-3">
+        <input type="text" name="keyword" value="@keyword" class="form-control form-control-sm"
+               placeholder="@L["Admin_Dealer_SearchPh"]" />
+    </div>
+    <div class="col-md-2">
+        <select name="status" class="form-select form-select-sm">
+            <option value="">@L["Common_All"]@L["Common_Status"]</option>
+            <option value="Y" selected="@(statusFilter == "Y")">@L["Admin_Member_Status_Active"]</option>
+            <option value="N" selected="@(statusFilter == "N")">@L["Admin_Dealer_Status_Disabled"]</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button>
+    </div>
+</form>
+
+<!-- 工具列 -->
+<div class="d-flex gap-1 mb-2 p-2 bg-light border rounded">
+    <button class="btn btn-success btn-sm toolbar-btn" onclick="dealerAction('create')">
+        @Html.UiIcon("add")<span>新增</span>
+    </button>
+    <button class="btn btn-info btn-sm toolbar-btn text-white" onclick="dealerAction('view')">
+        @Html.UiIcon("eye")<span>檢視</span>
+    </button>
+    <button class="btn btn-primary btn-sm toolbar-btn" onclick="dealerAction('edit')">
+        @Html.UiIcon("edit")<span>修改</span>
+    </button>
+    <button class="btn btn-danger btn-sm toolbar-btn" onclick="dealerAction('delete')">
+        @Html.UiIcon("delete")<span>刪除</span>
+    </button>
+    <button class="btn btn-secondary btn-sm toolbar-btn" onclick="dealerAction('print')">
+        @Html.UiIcon("export")<span>列印</span>
+    </button>
+    <button class="btn btn-warning btn-sm toolbar-btn" onclick="dealerAction('renew')">
+        @Html.UiIcon("refresh")<span>線上續約</span>
+    </button>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover table-sm dealer-table" id="dealerTable">
+        <thead class="table-dark">
+            <tr>
+                <th>@L["Admin_Dealer_Col_Code"]</th>
+                <th>@L["Admin_Dealer_Col_Company"]</th>
+                <th>@L["Admin_Dealer_Col_Account"]</th>
+                <th>@L["Admin_Dealer_Col_Password"]</th>
+                <th>@L["Admin_Dealer_Col_CreateDate"]</th>
+                <th>@L["Common_Status"]</th>
+                <th>@L["Admin_Dealer_Col_OnlineContract"]</th>
+                <th class="num">@L["Admin_Dealer_Col_TotalDev"]</th>
+                <th class="num">@L["Admin_Dealer_Col_OnlineDev"]</th>
+                <th class="num">@L["Admin_Dealer_Col_YesterdayDev"]</th>
+                <th class="num">@L["Admin_Dealer_Col_YesterdayLogin"]</th>
+                <th class="num">@L["Admin_Dealer_Col_Offline90"]</th>
+                <th class="num">@L["Admin_Dealer_Col_Expired"]</th>
+                <th class="num">@L["Admin_Dealer_Col_BoundPhone"]</th>
+                <th class="num">@L["Admin_Dealer_Col_BoundEmail"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var d in Model)
+            {
+                <tr data-tbkey="@d.TbKey">
+                    <td class="d-code">@d.UserCode</td>
+                    <td class="d-name">@d.UserName</td>
+                    <td>@d.UserID</td>
+                    <td>@d.UserPW</td>
+                    <td>@(d.CreateDate?.ToString("yyyy/MM/dd") ?? "")</td>
+                    <td class="d-status">
+                        @if (d.Status == "Y")
+                        {
+                            <span class="badge bg-success">@L["Admin_Member_Status_Active"]</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@L["Admin_Dealer_Status_Disabled"]</span>
+                        }
+                    </td>
+                    <td>
+                        @if (d.PaymentService)
+                        {
+                            <span class="badge bg-success">@L["Admin_Member_Status_Active"]</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">@L["Admin_Dealer_Status_Disabled"]</span>
+                        }
+                    </td>
+                    <td class="num">@d.TotalDevices</td>
+                    <td class="num">@d.OnlineDevices</td>
+                    <td class="num">@d.YesterdayDevices</td>
+                    <td class="num">@d.YesterdayLogins</td>
+                    <td class="num">@d.Offline90Days</td>
+                    <td class="num">@d.ExpiredDevices</td>
+                    <td class="num">@d.BoundPhones</td>
+                    <td class="num">@d.BoundEmails</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+let selectedTbKey = null;
+const POPUP_OPTS = 'width=860,height=760,scrollbars=yes,resizable=yes';
+
+document.querySelectorAll('#dealerTable tbody tr').forEach(tr => {
+    tr.addEventListener('click', function () {
+        document.querySelectorAll('#dealerTable tbody tr').forEach(r => r.classList.remove('selected-row'));
+        this.classList.add('selected-row');
+        selectedTbKey = parseInt(this.dataset.tbkey, 10);
+    });
+    tr.addEventListener('dblclick', function () {
+        dealerAction('edit');
+    });
+});
+
+function requireSelection() {
+    if (!selectedTbKey) { alert('請先選擇一筆經銷商資料'); return false; }
+    return true;
+}
+
+function dealerAction(action) {
+    if (action !== 'create' && !requireSelection()) return;
+
+    switch (action) {
+        case 'create':
+            window.open('/Admin/Dealer/Popup?id=0&mode=create', '_blank', POPUP_OPTS);
+            break;
+        case 'view':
+            window.open(`/Admin/Dealer/Popup?id=${selectedTbKey}&mode=view`, '_blank', POPUP_OPTS);
+            break;
+        case 'edit':
+            window.open(`/Admin/Dealer/Popup?id=${selectedTbKey}&mode=edit`, '_blank', POPUP_OPTS);
+            break;
+        case 'delete':
+            doDelete();
+            break;
+        case 'print':
+            window.open(`/Admin/Dealer/Popup?id=${selectedTbKey}&mode=print`, '_blank', POPUP_OPTS);
+            break;
+        case 'renew':
+            alert('線上續約功能開發中');
+            break;
+    }
+}
+
+function doDelete() {
+    const row = document.querySelector(`#dealerTable tr[data-tbkey="${selectedTbKey}"]`);
+    const name = row?.querySelector('.d-name')?.textContent ?? '';
+    if (!confirm(`確定要刪除【${name}】？此操作無法還原。`)) return;
+
+    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    const fd = new FormData();
+    fd.append('tbKey', selectedTbKey);
+    fd.append('__RequestVerificationToken', token);
+
+    fetch('/Admin/Dealer/DeleteAjax', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => {
+            if (!res.success) { alert(res.message || '刪除失敗'); return; }
+            row?.remove();
+            selectedTbKey = null;
+            const cnt = document.querySelectorAll('#dealerTable tbody tr').length;
+            document.getElementById('dealerCount').textContent = cnt;
+        })
+        .catch(() => alert('網路錯誤'));
+}
+</script>
+}

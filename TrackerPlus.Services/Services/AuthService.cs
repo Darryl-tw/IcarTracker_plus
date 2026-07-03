@@ -39,6 +39,24 @@ public class AuthService : IAuthService
         }
     }
 
+    public async Task<(bool Success, Member? Member, string ErrorMessage)> LoginByEmailAsync(string email)
+    {
+        try
+        {
+            var member = await _memberRepo.GetByEmailAsync(email);
+            if (member == null)
+                return (false, null, "此電子郵件尚未註冊帳號");
+            if (member.MemberStatus != "Y")
+                return (false, null, "帳號已停用");
+            return (true, member, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Email 登入失敗 Email={Email}", email);
+            return (false, null, "系統錯誤");
+        }
+    }
+
     public Task<(bool Success, Member? Member, string ErrorMessage)> LoginByGoogleAsync(string googleToken)
         => Task.FromResult<(bool, Member?, string)>((false, null, "尚未實作"));
 

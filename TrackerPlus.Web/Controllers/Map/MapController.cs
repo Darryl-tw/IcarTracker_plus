@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
+using TrackerPlus.Web.Resources;
 
 namespace TrackerPlus.Web.Controllers;
 
@@ -24,11 +26,13 @@ public class MapController : Controller
     private readonly IDeviceSettingsService _deviceSettingsService;
     private readonly AppSettings _appSettings;
     private readonly ILogger<MapController> _logger;
+    private readonly IStringLocalizer<SharedResources> _L;
 
     public MapController(ITrackerService trackerService, IHistoryService historyService,
         IGoogleApiKeyService googleApiKeyService, ILabelService labelService,
         IMapMarkRepository mapMarkRepository, IDeviceSettingsService deviceSettingsService,
-        IOptions<AppSettings> appSettings, ILogger<MapController> logger)
+        IOptions<AppSettings> appSettings, ILogger<MapController> logger,
+        IStringLocalizer<SharedResources> localizer)
     {
         _trackerService = trackerService;
         _historyService = historyService;
@@ -38,6 +42,7 @@ public class MapController : Controller
         _deviceSettingsService = deviceSettingsService;
         _appSettings = appSettings.Value;
         _logger = logger;
+        _L = localizer;
     }
 
     private int GetMemberTbKey()
@@ -160,14 +165,14 @@ public class MapController : Controller
     {
         var memberTbKey = GetMemberTbKey();
         if (string.IsNullOrWhiteSpace(request.Memo))
-            return Json(new { success = false, message = "請輸入地標名稱" });
+            return Json(new { success = false, message = _L["Live_LandmarkMemoRequired"].Value });
 
         if (Math.Abs(request.Lat) < 0.0001 && Math.Abs(request.Lng) < 0.0001)
-            return Json(new { success = false, message = "座標無效" });
+            return Json(new { success = false, message = _L["Live_LandmarkCoordsInvalid"].Value });
 
         var count = await _mapMarkRepository.GetCountByMemberAsync(memberTbKey);
         if (count >= 500)
-            return Json(new { success = false, message = "自建地標已達上限 (500)" });
+            return Json(new { success = false, message = _L["Live_LandmarkLimit"].Value });
 
         var id = await _mapMarkRepository.CreateAsync(
             memberTbKey,
@@ -498,7 +503,7 @@ public class MapController : Controller
         return Json(result);
     }
 
-    private static object FormatDailySummaryRow(DailyHistorySummary s)
+    private object FormatDailySummaryRow(DailyHistorySummary s)
     {
         var dayMidnight = s.Date.ToString("yyyy/MM/dd 00:00:00");
         TimeSpan? dur = s.FirstGPS.HasValue && s.LastGPS.HasValue ? s.LastGPS.Value - s.FirstGPS.Value : null;
@@ -516,7 +521,9 @@ public class MapController : Controller
                 ? $"{(int)d.TotalDays}days / {d.Hours:D2}:{d.Minutes:D2}:{d.Seconds:D2}"
                 : "0days / 00:00:00",
             recordCount = s.RecordCount,
-            totalKm = s.TotalDistanceKm > 0 ? $"{s.TotalDistanceKm:F2}公里" : "0公里"
+            totalKm = s.TotalDistanceKm > 0
+                ? string.Format(_L["Live_Unit_KmValue"].Value, s.TotalDistanceKm.ToString("F2"))
+                : _L["Map_Hist_ZeroKm"].Value
         };
     }
 }

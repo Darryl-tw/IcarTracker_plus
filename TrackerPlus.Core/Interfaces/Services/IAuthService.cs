@@ -5,6 +5,7 @@ namespace TrackerPlus.Core.Interfaces.Services;
 public interface IAuthService
 {
     Task<(bool Success, Member? Member, string ErrorMessage)> LoginAsync(string loginId, string password);
+    Task<(bool Success, Member? Member, string ErrorMessage)> LoginByEmailAsync(string email);
     Task<(bool Success, Member? Member, string ErrorMessage)> LoginByGoogleAsync(string googleToken);
     Task<(bool Success, Member? Member, string ErrorMessage)> LoginByAppleAsync(string appleToken);
     Task<bool> LogoutAsync(int memberTbKey);

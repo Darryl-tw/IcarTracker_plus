@@ -1,0 +1,258 @@
+@model TrackerPlus.Core.Models.Dealer
+@{
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    var mode    = ViewBag.Mode as string ?? "view";
+    var isView  = mode == "view" || mode == "print";
+    var isPrint = mode == "print";
+    var isCreate = mode == "create";
+    var modeTitle = isCreate ? "新增" : (isPrint ? "列印" : (isView ? "檢視" : "修改"));
+    var subTitle  = isCreate ? "" : $" - {Model.UserName}";
+    ViewData["Title"] = $"{modeTitle}經銷商{subTitle}";
+}
+
+@section HeadStyles {
+<style>
+body { font-size: 13px; }
+.section-bar { background:#e9ecef; padding:3px 8px; font-weight:600; border-left:3px solid #0d6efd; margin-bottom:8px; }
+.lbl { font-weight:600; }
+textarea { resize: none; }
+@@media print { .no-print { display:none!important; } }
+</style>
+}
+
+<div class="p-3">
+    <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2 no-print">
+        <h6 class="mb-0">@ViewData["Title"]</h6>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.close()">✕ 關閉</button>
+    </div>
+
+    <form id="popupForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" id="p_TbKey" name="tbKey" value="@Model.TbKey" />
+        <input type="hidden" id="p_Mode"  value="@mode" />
+
+        <div class="row g-2">
+            <!-- 左欄：基本資料 -->
+            <div class="col-md-6">
+                <div class="section-bar">基本資料</div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Col_Code"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_UserCode" name="userCode"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.UserCode" maxlength="30"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Col_Company"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_UserName" name="userName"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.UserName" maxlength="50"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Col_Account"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_UserID" name="userID"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.UserID" maxlength="30"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Col_Password"]：</label>
+                    <div class="col-8">
+                        @if (isView)
+                        {
+                            <input type="text" class="form-control-plaintext form-control-sm"
+                                   value="@Model.UserPW" readonly />
+                        }
+                        else
+                        {
+                            <input type="password" id="p_UserPW" name="userPW"
+                                   class="form-control form-control-sm"
+                                   value="@Model.UserPW" maxlength="30" autocomplete="new-password" />
+                        }
+                    </div>
+                </div>
+                @if (!isView)
+                {
+                    <div class="row mb-1 align-items-center">
+                        <label class="col-4 lbl">@L["Admin_Dealer_Edit_PwConfirm"]：</label>
+                        <div class="col-8">
+                            <input type="password" id="p_UserPWChk" class="form-control form-control-sm"
+                                   value="@Model.UserPW" maxlength="30" />
+                            <div id="p_PwError" class="text-danger small" style="display:none"></div>
+                        </div>
+                    </div>
+                }
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Common_Status"]：</label>
+                    <div class="col-8">
+                        @if (isView)
+                        {
+                            if (Model.Status == "Y")
+                            {
+                                <span class="badge bg-success">@L["Admin_Member_Status_Active"]</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@L["Admin_Dealer_Status_Disabled"]</span>
+                            }
+                        }
+                        else
+                        {
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="p_StatusY" value="Y" @(Model.Status == "Y" ? Html.Raw("checked") : Html.Raw("")) />
+                                <label class="form-check-label" for="p_StatusY">@L["Admin_Member_Status_Active"]</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="status" id="p_StatusN" value="N" @(Model.Status != "Y" ? Html.Raw("checked") : Html.Raw("")) />
+                                <label class="form-check-label" for="p_StatusN">@L["Admin_Dealer_Status_Disabled"]</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="row mb-1">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_Memo"]：</label>
+                    <div class="col-8">
+                        <textarea id="p_UserMemo" name="userMemo" rows="3" maxlength="500"
+                                  class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                                  @(isView ? Html.Raw("readonly") : Html.Raw(""))>@Model.UserMemo</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右欄：聯絡資訊 -->
+            <div class="col-md-6">
+                <div class="section-bar">聯絡資訊</div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_Contact"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_Contact" name="contact"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.Contact" maxlength="50"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_Tel"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_Tel" name="tel"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.Tel" maxlength="30"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_Email"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_Email" name="email"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.Email" maxlength="100"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_Webtitle"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_Webtitle" name="webtitle"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.Webtitle" maxlength="50"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_ServiceSender"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_ServiceSenderTitle" name="serviceSenderTitle"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.ServiceSenderTitle" maxlength="50"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+                <div class="row mb-1 align-items-center">
+                    <label class="col-4 lbl">@L["Admin_Dealer_Edit_ServiceEmail"]：</label>
+                    <div class="col-8">
+                        <input type="text" id="p_ServiceEmail" name="serviceEmail"
+                               class="@(isView ? "form-control-plaintext form-control-sm" : "form-control form-control-sm")"
+                               value="@Model.ServiceEmail" maxlength="100"
+                               @(isView ? Html.Raw("readonly") : Html.Raw("")) />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="d-flex gap-2 mt-3 pt-2 border-top no-print">
+        @if (!isView)
+        {
+            <button type="button" class="btn btn-primary btn-sm" onclick="savePopup()">
+                ✓ @L["Common_Confirm"]
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="location.reload()">
+                ↺ @L["Common_Reset"]
+            </button>
+        }
+        @if (isPrint)
+        {
+            <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()">
+                列印
+            </button>
+        }
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.close()">
+            @L["Common_Close"]
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function savePopup() {
+    @if (!isView)
+    {
+        <text>
+    const pw    = document.getElementById('p_UserPW')?.value.trim()    ?? '';
+    const pwChk = document.getElementById('p_UserPWChk')?.value.trim() ?? '';
+    const errEl = document.getElementById('p_PwError');
+
+    if (pw || pwChk) {
+        if (pw.length < 6) {
+            errEl.textContent = @Json.Serialize(L["Admin_Dealer_Edit_PwTooShort"].Value);
+            errEl.style.display = '';
+            document.getElementById('p_UserPW').focus();
+            return;
+        }
+        if (pw !== pwChk) {
+            errEl.textContent = @Json.Serialize(L["Admin_Dealer_Edit_PwMismatch"].Value);
+            errEl.style.display = '';
+            document.getElementById('p_UserPWChk').focus();
+            return;
+        }
+    }
+    if (errEl) errEl.style.display = 'none';
+
+    const mode = document.getElementById('p_Mode').value;
+    const url  = mode === 'create' ? '/Admin/Dealer/CreateAjax' : '/Admin/Dealer/UpdateAjax';
+    const fd   = new FormData(document.getElementById('popupForm'));
+
+    fetch(url, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => {
+            if (!res.success) { alert(res.message || '儲存失敗'); return; }
+            if (window.opener && !window.opener.closed) window.opener.location.reload();
+            window.close();
+        })
+        .catch(() => alert('網路錯誤'));
+        </text>
+    }
+}
+@if (isPrint)
+{
+    <text>window.addEventListener('load', () => window.print());</text>
+}
+</script>
+}

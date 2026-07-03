@@ -1,58 +1,79 @@
 @using TrackerPlus.Core.Common
 @model PagedResult<TrackerPlus.Core.Models.Member>
 @{
-    ViewData["Title"] = L["Admin_Member_Title"].Value;
+    ViewData["Title"] = L["Nav_Admin_Account_Mgmt"].Value;
     var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
 }
-<div class="d-flex justify-content-between mb-3">
-    <h2>@L["Admin_Member_Title"]</h2>
-    <a asp-area="Admin" asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_Member_Add"]</span></a>
+<div class="mb-3">
+    <h2>@L["Nav_Admin_Account_Mgmt"] [@Model.Items.Count()]</h2>
 </div>
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-4">
+<form method="get" class="row g-2 mb-3 align-items-center">
+    <div class="col-auto">
+        <span class="fw-bold">@L["Admin_Member_FilterTitle"]</span>
+        <span class="ms-3">@L["Admin_Member_FilterAccount"]</span>
+    </div>
+    <div class="col-md-3">
         <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_Member_SearchPh"]" />
     </div>
     <div class="col-md-2">
         <select name="status" class="form-select">
             <option value="">@L["Common_All"]@L["Common_Status"]</option>
-            <option value="Y" selected="@(filter.Status == "Y")">@L["Common_Active"]</option>
-            <option value="N" selected="@(filter.Status == "N")">@L["Common_Inactive"]</option>
-            <option value="D" selected="@(filter.Status == "D")">@L["Common_Disabled"]</option>
+            <option value="Y" selected="@(filter.Status == "Y")">@L["Admin_Member_Status_Active"]</option>
+            <option value="N" selected="@(filter.Status == "N")">@L["Admin_Member_Status_Unverified"]</option>
+            <option value="S" selected="@(filter.Status == "S")">@L["Admin_Member_Status_Suspended"]</option>
+            <option value="D" selected="@(filter.Status == "D")">@L["Admin_Member_Status_Demo"]</option>
         </select>
     </div>
-    <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button>
+    </div>
 </form>
 <div class="table-responsive">
-    <table class="table table-striped table-sm">
+    <table class="table table-striped table-sm align-middle">
         <thead class="table-dark">
             <tr>
                 <th>TbKey</th>
                 <th>@L["Admin_Member_Account"]</th>
-                <th>@L["Admin_Member_Name"]</th>
-                <th>Email</th>
-                <th>@L["Common_Status"]</th>
-                <th>@L["Field_Language"]</th>
                 <th>@L["Field_CreatedDate"]</th>
+                <th>@L["Admin_Member_Col_LastOnline"]</th>
+                <th>@L["Admin_Member_Col_TrackerCount"]</th>
+                <th>@L["Admin_Member_Col_Tel"]</th>
+                <th>@L["Admin_Member_Col_Email"]</th>
+                <th>@L["Admin_Member_Col_Addr"]</th>
+                <th>@L["Common_Status"]</th>
                 <th>@L["Common_Operation"]</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var m in Model.Items)
             {
-                <tr>
+                var statusLabel = m.MemberStatus switch
+                {
+                    "Y" => L["Admin_Member_Status_Active"].Value,
+                    "S" => L["Admin_Member_Status_Suspended"].Value,
+                    "D" => L["Admin_Member_Status_Demo"].Value,
+                    _ => L["Admin_Member_Status_Unverified"].Value
+                };
+                var statusBadge = m.MemberStatus switch
+                {
+                    "Y" => "bg-success",
+                    "S" => "bg-warning text-dark",
+                    "D" => "bg-info text-dark",
+                    _ => "bg-secondary"
+                };
+                <tr data-tbkey="@m.TbKey">
                     <td>@m.TbKey</td>
                     <td>@m.ID</td>
-                    <td>@m.CName</td>
-                    <td>@m.Email</td>
+                    <td>@m.CDate.ToString("yyyy/MM/dd")</td>
+                    <td>@(m.ConnectionTime.Year > 1900 ? m.ConnectionTime.ToString("yyyy/MM/dd") : "-")</td>
+                    <td class="text-center">@m.TrackerCount</td>
+                    <td class="member-tel">@m.Tel</td>
+                    <td class="member-email">@m.Email</td>
+                    <td class="member-addr">@m.Addr</td>
+                    <td><span class="badge status-badge @statusBadge">@statusLabel</span></td>
                     <td>
-                        <span class="badge @(m.MemberStatus == "Y" ? "bg-success" : m.MemberStatus == "D" ? "bg-danger" : "bg-secondary")">
-                            @m.MemberStatus
-                        </span>
-                    </td>
-                    <td>@m.UserLanguage</td>
-                    <td>@m.CDate.ToString("yyyy-MM-dd")</td>
-                    <td>
-                        <a asp-action="Detail" asp-route-id="@m.TbKey" class="btn btn-sm btn-info btn-with-icon">@Html.UiIcon("details")<span>@L["Common_Details"]</span></a>
+                        <button type="button" class="btn btn-sm btn-info btn-with-icon" onclick="openEditModal(@m.TbKey)">@Html.UiIcon("edit")<span>@L["Admin_Member_EditBtn"]</span></button>
+                        <button type="button" class="btn btn-sm btn-outline-primary btn-with-icon" onclick="memberPreview(@m.TbKey)">@Html.UiIcon("details")<span>@L["Admin_Member_PreviewBtn"]</span></button>
                         <form asp-action="Delete" method="post" class="d-inline"
                               onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, m.ID)')">
                             @Html.AntiForgeryToken()
@@ -65,18 +86,285 @@
         </tbody>
     </table>
 </div>
-<div class="d-flex justify-content-between align-items-center">
-    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)，@string.Format(L["Common_PageInfo"].Value, Model.PageIndex, Model.TotalPages)</span>
-    <div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span>
+        @L["Admin_Member_MatchCount"] [@Model.TotalCount]　@L["Admin_Member_CurrentPage"] [@Model.PageIndex/@Model.TotalPages]
+    </span>
+    <div class="btn-group">
         @if (Model.HasPreviousPage)
         {
+            <a asp-action="Index" asp-route-page="1" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("first")<span>@L["Common_FirstPage"]</span></a>
             <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword"
                asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+        }
+        else
+        {
+            <span class="btn btn-sm btn-outline-secondary btn-with-icon disabled">@Html.UiIcon("first")<span>@L["Common_FirstPage"]</span></span>
+            <span class="btn btn-sm btn-outline-secondary btn-with-icon disabled">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></span>
         }
         @if (Model.HasNextPage)
         {
             <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword"
                asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+            <a asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-keyword="@filter.Keyword"
+               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("last")<span>@L["Common_LastPage"]</span></a>
+        }
+        else
+        {
+            <span class="btn btn-sm btn-outline-secondary btn-with-icon disabled">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></span>
+            <span class="btn btn-sm btn-outline-secondary btn-with-icon disabled">@Html.UiIcon("last")<span>@L["Common_LastPage"]</span></span>
         }
     </div>
 </div>
+
+<style>
+    @@keyframes memberModalShake {
+        0%, 100% { transform: translateX(0); }
+        15%, 45%, 75% { transform: translateX(-10px); }
+        30%, 60%, 90% { transform: translateX(10px); }
+    }
+    .modal-shake .modal-dialog {
+        animation: memberModalShake 0.5s ease-in-out;
+    }
+    #editMemberModal .field-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    #editMemberModal .field-label {
+        width: 90px;
+        flex-shrink: 0;
+        padding-top: 0.375rem;
+        font-weight: 500;
+        text-align: right;
+        padding-right: 12px;
+    }
+    #editMemberModal .field-value {
+        flex: 1;
+    }
+</style>
+
+<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-modal="true" role="dialog">
+    <div class="modal-dialog" style="min-width:560px">
+        <div class="modal-content">
+            <div class="modal-header py-2">
+                <h6 class="modal-title" id="editMemberModalLabel">修改會員資料</h6>
+                <button type="button" class="btn-close" onclick="editModal.hide()" title="關閉"></button>
+            </div>
+            <div class="modal-body">
+                <div id="em_error" class="alert alert-danger d-none mb-3 py-2"></div>
+                <form id="editMemberForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="em_TbKey" name="tbKey" />
+
+                    <div class="field-row">
+                        <div class="field-label">@L["Admin_Member_Account"]:</div>
+                        <div class="field-value">
+                            <input type="text" id="em_display_id" class="form-control form-control-sm" readonly />
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-label">備用Mail:</div>
+                        <div class="field-value">
+                            <input type="email" id="em_Email" name="Email" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-label">@L["Admin_Member_Phone"]:</div>
+                        <div class="field-value">
+                            <input type="text" id="em_Tel" name="Tel" class="form-control form-control-sm"
+                                   oninput="clearTelError()" />
+                            <div id="em_tel_error" class="text-danger small mt-1 d-none"></div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-label">@L["Admin_Member_Address"]:</div>
+                        <div class="field-value">
+                            <input type="text" id="em_Addr" name="Addr" class="form-control form-control-sm" />
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-label">@L["Common_Status"]:</div>
+                        <div class="field-value d-flex gap-3 flex-wrap pt-1">
+                            <div class="form-check form-check-inline me-0">
+                                <input class="form-check-input" type="radio" name="MemberStatus" id="em_status_Y" value="Y" />
+                                <label class="form-check-label" for="em_status_Y">@L["Admin_Member_Status_Active"]</label>
+                            </div>
+                            <div class="form-check form-check-inline me-0">
+                                <input class="form-check-input" type="radio" name="MemberStatus" id="em_status_D" value="D" />
+                                <label class="form-check-label" for="em_status_D">@L["Admin_Member_Status_Demo"]</label>
+                            </div>
+                            <div class="form-check form-check-inline me-0">
+                                <input class="form-check-input" type="radio" name="MemberStatus" id="em_status_S" value="S" />
+                                <label class="form-check-label" for="em_status_S">@L["Admin_Member_Status_Suspended"]</label>
+                            </div>
+                            <div class="form-check form-check-inline me-0">
+                                <input class="form-check-input" type="radio" name="MemberStatus" id="em_status_N" value="N" />
+                                <label class="form-check-label" for="em_status_N">@L["Admin_Member_Status_Unverified"]</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field-label">備註資訊:</div>
+                        <div class="field-value">
+                            <textarea id="em_DynaCheckCode" class="form-control form-control-sm" rows="3" readonly></textarea>
+                        </div>
+                    </div>
+                    <div class="field-row mb-0">
+                        <div class="field-label">@L["Field_CreatedDate"]:</div>
+                        <div class="field-value">
+                            <span id="em_display_cdate" class="form-control-plaintext form-control-sm py-0"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer py-2 justify-content-end gap-2">
+                <button type="button" id="em_saveBtn" class="btn btn-primary btn-sm px-4" onclick="saveEditMember()">確定</button>
+                <button type="button" class="btn btn-secondary btn-sm px-4" onclick="resetEditForm()">@L["Common_Reset"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // 狀態對應表（Json.Serialize 避免中文被 HTML encode）
+        const statusLabels = {
+            'Y': @Json.Serialize(L["Admin_Member_Status_Active"].Value),
+            'S': @Json.Serialize(L["Admin_Member_Status_Suspended"].Value),
+            'D': @Json.Serialize(L["Admin_Member_Status_Demo"].Value),
+            'N': @Json.Serialize(L["Admin_Member_Status_Unverified"].Value)
+        };
+        const statusBadges = {
+            'Y': 'bg-success',
+            'S': 'bg-warning text-dark',
+            'D': 'bg-info text-dark',
+            'N': 'bg-secondary'
+        };
+
+        const editModalEl = document.getElementById('editMemberModal');
+        const editModal = new bootstrap.Modal(editModalEl, { backdrop: 'static', keyboard: false });
+        let originalData = null;
+
+        // Bootstrap static backdrop 點外側觸發 hidePrevented → 自訂震動
+        editModalEl.addEventListener('hidePrevented.bs.modal', function () {
+            editModalEl.classList.remove('modal-shake');
+            void editModalEl.offsetWidth; // reflow
+            editModalEl.classList.add('modal-shake');
+            setTimeout(() => editModalEl.classList.remove('modal-shake'), 500);
+        });
+
+        function openEditModal(tbKey) {
+            fetch('/Admin/Member/GetMemberJson?id=' + tbKey)
+                .then(r => { if (!r.ok) throw new Error('找不到會員'); return r.json(); })
+                .then(d => {
+                    originalData = d;
+                    populateForm(d);
+                    document.getElementById('em_error').classList.add('d-none');
+                    editModal.show();
+                })
+                .catch(e => alert(e.message));
+        }
+
+        function populateForm(d) {
+            document.getElementById('em_TbKey').value = d.tbKey;
+            document.getElementById('em_display_id').value = d.id;
+            document.getElementById('em_display_cdate').textContent = d.cDate;
+            document.getElementById('em_Email').value = d.email || '';
+            document.getElementById('em_Tel').value = d.tel || '';
+            document.getElementById('em_Addr').value = d.addr || '';
+            document.getElementById('em_DynaCheckCode').value = d.dynaCheckCode || '';
+
+            const radio = document.querySelector(`input[name="MemberStatus"][value="${d.memberStatus}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        function isValidPhone(tel) {
+            const digits = tel.replace(/[\s\-\(\)\+]/g, '');
+            return /^\d{7,15}$/.test(digits);
+        }
+
+        function clearTelError() {
+            const telInput = document.getElementById('em_Tel');
+            const errEl = document.getElementById('em_tel_error');
+            telInput.classList.remove('is-invalid');
+            errEl.classList.add('d-none');
+        }
+
+        function resetEditForm() {
+            if (originalData) populateForm(originalData);
+            document.getElementById('em_error').classList.add('d-none');
+            clearTelError();
+        }
+
+        function saveEditMember() {
+            const telInput = document.getElementById('em_Tel');
+            const tel = telInput.value.trim();
+            if (tel && !isValidPhone(tel)) {
+                telInput.classList.add('is-invalid');
+                const errEl = document.getElementById('em_tel_error');
+                errEl.textContent = '電話格式不正確（例：0912345678 或 02-12345678）';
+                errEl.classList.remove('d-none');
+                telInput.focus();
+                return;
+            }
+
+            const form = document.getElementById('editMemberForm');
+            const formData = new FormData(form);
+
+            const saveBtn = document.getElementById('em_saveBtn');
+            saveBtn.disabled = true;
+
+            fetch('/Admin/Member/UpdateAjax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    // 更新列表列資料
+                    const newStatus = document.querySelector('input[name="MemberStatus"]:checked')?.value || originalData.memberStatus;
+                    updateTableRow({
+                        tbKey: parseInt(document.getElementById('em_TbKey').value),
+                        tel: document.getElementById('em_Tel').value,
+                        email: document.getElementById('em_Email').value,
+                        addr: document.getElementById('em_Addr').value,
+                        memberStatus: newStatus
+                    });
+                    editModal.hide();
+                } else {
+                    const errEl = document.getElementById('em_error');
+                    errEl.textContent = d.message;
+                    errEl.classList.remove('d-none');
+                }
+            })
+            .catch(() => {
+                const errEl = document.getElementById('em_error');
+                errEl.textContent = '儲存失敗，請稍後再試';
+                errEl.classList.remove('d-none');
+            })
+            .finally(() => { saveBtn.disabled = false; });
+        }
+
+        function updateTableRow(d) {
+            const row = document.querySelector(`tr[data-tbkey="${d.tbKey}"]`);
+            if (!row) return;
+            row.querySelector('.member-tel').textContent = d.tel;
+            row.querySelector('.member-email').textContent = d.email;
+            row.querySelector('.member-addr').textContent = d.addr;
+            const badge = row.querySelector('.status-badge');
+            badge.className = `badge status-badge ${statusBadges[d.memberStatus] || 'bg-secondary'}`;
+            badge.textContent = statusLabels[d.memberStatus] || d.memberStatus;
+        }
+
+        function memberPreview(memberTbKey) {
+            fetch('/Admin/Member/GetPreviewToken?memberTbKey=' + memberTbKey)
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) window.open('/Account/AdminPreview?t=' + encodeURIComponent(d.token), '_blank');
+                    else alert(d.message);
+                });
+        }
+    </script>
+}

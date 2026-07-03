@@ -39,22 +39,22 @@
         @{
             var settingsCtrl = ViewContext.RouteData.Values["controller"]?.ToString() == "Settings";
         }
-        <div class="nav-label mt-2">系統設定</div>
+        <div class="nav-label mt-2">@L["Live_Menu_System"]</div>
         <a class="nav-link @(settingsCtrl && ViewContext.RouteData.Values["action"]?.ToString() == "SystemParams" ? "active" : "")"
            asp-controller="Settings" asp-action="SystemParams">
-            系統參數
+            @L["Settings_SystemParams"]
         </a>
         <a class="nav-link @(settingsCtrl && ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")"
            asp-controller="Settings" asp-action="Profile">
-            基本資料維護
+            @L["Settings_Profile"]
         </a>
         <a class="nav-link @(settingsCtrl && ViewContext.RouteData.Values["action"]?.ToString() == "LabelGroup" ? "active" : "")"
            asp-controller="Settings" asp-action="LabelGroup">
-            自定義群組與欄位名稱
+            @L["Settings_LabelGroup"]
         </a>
         <a class="nav-link @(settingsCtrl && ViewContext.RouteData.Values["action"]?.ToString() == "ReportFields" ? "active" : "")"
            asp-controller="Settings" asp-action="ReportFields">
-            報表欄位
+            @L["Settings_ReportFields"]
         </a>
     </nav>
     <div class="p-3 border-top border-secondary">

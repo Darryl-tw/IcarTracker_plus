@@ -2,7 +2,7 @@
 @using System.Globalization
 @using System.Text.Json
 @{
-    Layout = null;
+    Layout = "_LiveLayout";
     var googleApiJs = ViewBag.GoogleApiJs as string ?? "";
     var memberName = ViewBag.MemberName as string ?? User.Identity?.Name ?? "";
     var memberTimezone = (int)(ViewBag.MemberTimezone ?? 480);
@@ -65,12 +65,16 @@
         gps120m = L["DeviceSettings_Gps120m"].Value,
         detailOffline = L["Live_Detail_Offline"].Value,
         detailOnline = L["Live_Detail_Online"].Value,
-        statusSleeping = "休眠",
-        statusTerminated = "已到期",
-        statusSelectDevice = "請選擇裝置",
+        statusSleeping = L["Live_Status_Sleeping"].Value,
+        statusTerminated = L["Live_Status_Terminated"].Value,
+        statusSelectDevice = L["Live_SelectDevice"].Value,
         labelGsm = "GSM",
-        labelSatellites = "衛星",
-        labelVoltage = "電壓",
+        labelSatellites = L["Live_Detail_Satellites"].Value,
+        labelVoltage = L["Live_Label_Voltage"].Value,
+        unitMeterValue = L["Live_Unit_MeterValue"].Value,
+        unitKmValue = L["Live_Unit_KmValue"].Value,
+        unitKmhValue = L["Live_Unit_KmhValue"].Value,
+        histDetailWithLbs = L["Live_Hist_DetailWithLbs"].Value,
         detailLastLogin = L["Live_Detail_LastLogin"].Value,
         detailLastGps = L["Live_Detail_LastGps"].Value,
         detailLastConnect = L["Live_Detail_LastConnect"].Value,
@@ -151,14 +155,7 @@
         serviceDays = t.EffectiveDays,
     }));
 }
-<!DOCTYPE html>
-<html lang="@CultureInfo.CurrentUICulture.Name">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>@L["Live_Title"]</title>
-<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/btn-icons.css" asp-append-version="true" />
+@section HeadStyles {
 <style>
 /* ======= RESET & BASE ======= */
 html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family: Tahoma, Arial, sans-serif; font-size: 13px; }
@@ -565,52 +562,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
     text-align: center; color: #94a3b8; display: none;
 }
 </style>
-</head>
-<body>
-
-<!-- ===== TOP NAVBAR ===== -->
-<div id="top-nav">
-    <span class="brand">@L["Live_Brand"]</span>
-
-    <!-- ????? -->
-    <div class="dropdown">
-        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("menu")<span>@L["Live_Menu_System"]</span></button>
-        <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="/Tracker/Index">@L["Nav_DeviceList"]</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><h6 class="dropdown-header">@L["Live_Menu_AfterSelectDevice"]</h6></li>
-            <li><a class="dropdown-item" id="menu-tracker-detail" href="#">@L["Detail_Title"]</a></li>
-            <li><a class="dropdown-item" id="menu-geofence" href="#">@L["Live_Menu_Geofence"]</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/Account/ForgotPassword">@L["Live_Menu_ChangePassword"]</a></li>
-        </ul>
-    </div>
-
-    <!-- ?????? -->
-    <div class="dropdown">
-        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("reports")<span>@L["Live_Menu_Reports"]</span></button>
-        <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" id="menu-hist-gps" href="/History/Index">@L["Live_Menu_HistGps"]</a></li>
-            <li><a class="dropdown-item" id="menu-hist-lbs" href="/History/Index?type=LBS">@L["Live_Menu_HistLbs"]</a></li>
-        </ul>
-    </div>
-
-    <!-- ??? -->
-    <div class="dropdown">
-        <button class="nav-btn dropdown-toggle" data-bs-toggle="dropdown" type="button">@Html.UiIcon("help")<span>@L["Live_Menu_Help"]</span></button>
-        <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="https://www.traceez.com/tw/icar_webplatform.html" target="_blank">@L["Live_Menu_Manual"]</a></li>
-            <li><a class="dropdown-item" href="https://intro.traceez.com/icar/privacy_policy/app_privacy_policy_tw.html" target="_blank">@L["Live_Menu_Privacy"]</a></li>
-        </ul>
-    </div>
-
-    <div class="spacer"></div>
-    <span class="user-info">@memberName</span>
-    <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0">
-        @Html.AntiForgeryToken()
-        <button type="submit" class="logout-btn">@Html.UiIcon("logout")<span>@L["Live_LogoutSystem"]</span></button>
-    </form>
-</div>
+}
 
 <!-- ===== MAIN LAYOUT ===== -->
 <div id="main-layout">
@@ -668,7 +620,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
     </div>
 
     <!-- ===== SIDEBAR RESIZE HANDLE ===== -->
-    <div id="sidebar-resize-handle" title="拖曳調整裝置列表寬度" aria-label="拖曳調整裝置列表寬度"></div>
+    <div id="sidebar-resize-handle" title="@L["Live_Resize_SidebarWidth"]" aria-label="@L["Live_Resize_SidebarWidth"]"></div>
 
     <!-- ===== RIGHT PANEL ===== -->
     <div id="right-panel">
@@ -897,7 +849,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
         </div>
 
         <!-- HISTORY PANEL RESIZE HANDLE -->
-        <div id="hist-resize-handle" title="拖曳調整地圖與歷史紀錄高度" aria-label="拖曳調整地圖與歷史紀錄高度"></div>
+        <div id="hist-resize-handle" title="@L["Live_Resize_HistHeight"]" aria-label="@L["Live_Resize_HistHeight"]"></div>
 
         <!-- HISTORY PANEL -->
         <div id="history-panel">
@@ -981,9 +933,7 @@ html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; font-family:
     </div><!-- end right-panel -->
 </div><!-- end main-layout -->
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/ui-icons.js" asp-append-version="true"></script>
+@section Scripts {
 <script>
 // ========== GLOBALS ==========
 const TIMEZOOM = @memberTimezone;
@@ -1049,7 +999,7 @@ function initMap() {
     if (autoFocusTbKey > 0) {
         selectDeviceOnMap(autoFocusTbKey);
         if (!markers[autoFocusTbKey]) {
-            showRefreshStatus(i18n.noGpsPosition || '此裝置目前無 GPS 位置資料');
+            showRefreshStatus(i18n.noGpsPosition);
         }
     }
     } catch (e) {
@@ -1306,11 +1256,10 @@ function selectDeviceOnMap(tbKey) {
     if (el) el.classList.add('active');
 
     const imei = el?.dataset.imei;
+    window._selectedImei = imei || '';
     if (imei) {
         document.getElementById('menu-tracker-detail').href = `/Tracker/Detail/${tbKey}`;
         document.getElementById('menu-geofence').href = `/Tracker/Detail/${tbKey}#geofence`;
-        document.getElementById('menu-hist-gps').href = `/History/Index?imei=${imei}`;
-        document.getElementById('menu-hist-lbs').href = `/History/Index?imei=${imei}&type=LBS`;
         document.getElementById('hist-device-sel').value = imei;
         const nameEl = el?.querySelector('.device-name');
         const histLabel = document.getElementById('hist-device-label');
@@ -1855,8 +1804,8 @@ function showDeviceDetail(tbKey) {
         }
 
         const speedVal = (m && m.markerData && typeof m.markerData.speed === 'number') ? m.markerData.speed : (d.speedKmh || 0);
-        const speedStr = speedVal.toFixed(1) + '\u516C\u91CC';
-        const distStr = Math.round(d.distanceMeters || 0) + '\u516C\u5C3A';
+        const speedStr = i18n.unitKmValue.replace('{0}', speedVal.toFixed(1));
+        const distStr = i18n.unitMeterValue.replace('{0}', String(Math.round(d.distanceMeters || 0)));
         const coordDms = decToDeg(lat, 'lat') + ', ' + decToDeg(lng, 'lng');
         const coordDec = `(${lat.toFixed(6)}, ${lng.toFixed(6)})`;
 
@@ -2466,7 +2415,7 @@ function loadLbsSummary() {
 }
 
 function loadLbsDetail(imei, date) {
-    showHistDetailView(imei + '  ' + date + ' (含LBS)');
+    showHistDetailView(i18n.histDetailWithLbs.replace('{0}', imei).replace('{1}', date));
     clearHistoryMap();
     startHistoryStream(imei, date, 'Combined');
 }
@@ -2521,8 +2470,8 @@ function appendHistBatch(logs, imei, type, polylineColor) {
             <td>${String(Math.round(l.hdop)).padStart(2,'0')}</td>
             <td>${csqBars(l.csq)} CSQ:${l.csq}</td>
             <td>${voltageCell(l.voltageV, l.voltage)}</td>
-            <td>${l.distanceM}公尺</td>
-            <td>${l.speed.toFixed(1)}公里/時</td>
+            <td>${i18n.unitMeterValue.replace('{0}', l.distanceM)}</td>
+            <td>${i18n.unitKmhValue.replace('{0}', l.speed.toFixed(1))}</td>
             <td>${dirBadge(l.direction, effectiveLogType)}</td>
         `;
         tr.onclick = () => { if (map) { map.panTo({ lat: l.lat, lng: l.lng }); map.setZoom(17); } };
@@ -2711,5 +2660,4 @@ else
         if (mts) mts.style.display = 'none';
     </script>
 }
-</body>
-</html>
+}

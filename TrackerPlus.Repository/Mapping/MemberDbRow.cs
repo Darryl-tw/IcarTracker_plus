@@ -20,4 +20,5 @@ internal sealed class MemberDbRow
     public bool ispush { get; set; }
     public DateTime CDate { get; set; }
     public string? GMTCode { get; set; }
+    public int TrackerCount { get; set; }
 }

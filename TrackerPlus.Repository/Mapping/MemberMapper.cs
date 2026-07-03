@@ -10,7 +10,8 @@ internal static class MemberMapper
                RTRIM(m.CName) AS CName, m.MemberStatus, RTRIM(m.DynaCheckCode) AS DynaCheckCode,
                RTRIM(m.UserLanguage) AS UserLanguage, RTRIM(m.Unit) AS Unit, m.TimeZone_tbkey,
                RTRIM(m.Tel) AS Tel, RTRIM(m.Addr) AS Addr, m.ConnectionTime,
-               m.issendemail, m.ispush, m.CDate, tz.GMTCode
+               m.issendemail, m.ispush, m.CDate, tz.GMTCode,
+               (SELECT COUNT(*) FROM dbo.Tracker tr WHERE tr.Member_tbKey = m.tbKey) AS TrackerCount
         FROM dbo.Member m
         LEFT JOIN dbo.TimeZone tz ON m.TimeZone_tbkey = tz.tbKey";
 
@@ -32,6 +33,7 @@ internal static class MemberMapper
         ConnectionTime = row.ConnectionTime,
         IsSendEmail = row.issendemail,
         IsPush = row.ispush,
-        CDate = row.CDate
+        CDate = row.CDate,
+        TrackerCount = row.TrackerCount
     };
 }

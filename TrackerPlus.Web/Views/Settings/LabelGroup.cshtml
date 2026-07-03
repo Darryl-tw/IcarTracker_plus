@@ -1,49 +1,49 @@
 @using TrackerPlus.Core.Models
 @{
-    Layout = "_MemberLayout";
-    ViewData["Title"] = "自定義群組與欄位名稱";
+    var isPopup = Context.Request.Query["popup"] == "1";
+    Layout = isPopup ? null : "_LiveLayout";
+    ViewData["Title"] = L["Settings_LabelGroup"].Value;
     var fields = (List<UdField>)ViewBag.Fields;
     var labels = (List<UdLabel>)ViewBag.Labels;
 }
+@if (!isPopup)
+{
+    @Html.Raw($"<div class='container py-4'><div class='row justify-content-center'><div class='col-md-7 col-lg-6'><div class='card shadow-sm'><div class='card-header bg-white fw-semibold'>{L["Settings_LabelGroup"].Value}</div><div class='card-body'>")
+}
+<form method="post" asp-action="LabelGroup">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="popup" value="@(isPopup ? "1" : "0")" />
 
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-semibold">自定義群組與欄位名稱</div>
-            <div class="card-body">
-                <form method="post" asp-action="LabelGroup">
-                    @Html.AntiForgeryToken()
-
-                    @for (int i = 0; i < fields.Count; i++)
-                    {
-                        <div class="mb-3 row">
-                            <label class="col-sm-5 col-form-label">自訂欄位名稱(@(i + 1))</label>
-                            <div class="col-sm-7">
-                                <input type="text" class="form-control" name="field_@fields[i].TbKey"
-                                       value="@fields[i].FName" maxlength="10" />
-                            </div>
-                        </div>
-                    }
-
-                    <hr class="my-3" />
-
-                    @for (int i = 0; i < labels.Count; i++)
-                    {
-                        <div class="mb-3 row">
-                            <label class="col-sm-5 col-form-label">自訂群組名稱(@(i + 1))</label>
-                            <div class="col-sm-7">
-                                <input type="text" class="form-control" name="label_@labels[i].TbKey"
-                                       value="@labels[i].LabelName" maxlength="10" />
-                            </div>
-                        </div>
-                    }
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="reset" class="btn btn-outline-secondary">重置</button>
-                        <button type="submit" class="btn btn-primary">確定</button>
-                    </div>
-                </form>
+    @for (int i = 0; i < fields.Count; i++)
+    {
+        <div class="mb-3 row">
+            <label class="col-sm-5 col-form-label">@string.Format(L["Settings_CustomFieldName"].Value, i + 1)</label>
+            <div class="col-sm-7">
+                <input type="text" class="form-control" name="field_@fields[i].TbKey"
+                       value="@fields[i].FName" maxlength="10" />
             </div>
         </div>
+    }
+
+    <hr class="my-3" />
+
+    @for (int i = 0; i < labels.Count; i++)
+    {
+        <div class="mb-3 row">
+            <label class="col-sm-5 col-form-label">@string.Format(L["Settings_CustomGroupName"].Value, i + 1)</label>
+            <div class="col-sm-7">
+                <input type="text" class="form-control" name="label_@labels[i].TbKey"
+                       value="@labels[i].LabelName" maxlength="10" />
+            </div>
+        </div>
+    }
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="reset" class="btn btn-outline-secondary btn-sm">@L["Common_Reset"]</button>
+        <button type="submit" class="btn btn-primary btn-sm">@L["Common_Ok"]</button>
     </div>
-</div>
+</form>
+@if (!isPopup)
+{
+    @Html.Raw("</div></div></div></div></div></div>")
+}

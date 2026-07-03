@@ -1,82 +1,82 @@
 @model TrackerPlus.Core.Models.Member
 @{
-    Layout = "_MemberLayout";
-    ViewData["Title"] = "基本資料維護";
-    var loginType = Model.UserType == 3 ? "Google 帳號登入"
-                  : Model.UserType == 2 ? "IMEI 帳號登入"
-                  : "Traceez 帳號登入";
+    var isPopup = Context.Request.Query["popup"] == "1";
+    Layout = isPopup ? null : "_LiveLayout";
+    ViewData["Title"] = L["Settings_Profile"].Value;
+    var loginType = Model.UserType == 3 ? L["Settings_LoginTypeGoogle"].Value
+                  : Model.UserType == 2 ? L["Settings_LoginTypeImei"].Value
+                  : L["Settings_LoginTypeTraceez"].Value;
 }
+@if (!isPopup)
+{
+    @Html.Raw($"<div class='container py-4'><div class='row justify-content-center'><div class='col-md-7 col-lg-6'><div class='card shadow-sm'><div class='card-header bg-white fw-semibold'>{L["Settings_Profile"].Value}</div><div class='card-body'>")
+}
+<form method="post" asp-action="Profile">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="popup" value="@(isPopup ? "1" : "0")" />
 
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white fw-semibold">基本資料維護</div>
-            <div class="card-body">
-                <form method="post" asp-action="Profile">
-                    @Html.AntiForgeryToken()
-
-                    <div class="mb-2 row">
-                        <label class="col-sm-4 col-form-label text-muted">登入</label>
-                        <div class="col-sm-8 d-flex align-items-center">@loginType</div>
-                    </div>
-                    <div class="mb-2 row">
-                        <label class="col-sm-4 col-form-label text-muted">帳號</label>
-                        <div class="col-sm-8 d-flex align-items-center">@Model.ID</div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label" for="newPassword">密碼</label>
-                        <div class="col-sm-8">
-                            <input type="password" class="form-control" id="newPassword" name="newPassword"
-                                   placeholder="留空不更改" autocomplete="new-password" />
-                            <div class="form-text">如需更改密碼請輸入新密碼，否則留空。</div>
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label" for="cName">姓名</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="cName" name="cName"
-                                   value="@Model.CName" maxlength="50" />
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label" for="tel">連絡電話</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="tel" name="tel"
-                                   value="@Model.Tel" maxlength="50" />
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label class="col-sm-4 col-form-label" for="addr">通訊地址</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="addr" name="addr"
-                                   value="@Model.Addr" maxlength="200" />
-                        </div>
-                    </div>
-
-                    <hr class="my-3" />
-                    <div class="mb-2 fw-semibold text-muted small">警報通知設定</div>
-                    <div class="mb-2">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isPush" name="isPush"
-                                   value="true" @(Model.IsPush ? "checked" : "") />
-                            <input type="hidden" name="isPush" value="false" />
-                            <label class="form-check-label" for="isPush">行動裝置直通知</label>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="isSendEmail" name="isSendEmail"
-                                   value="true" @(Model.IsSendEmail ? "checked" : "") />
-                            <input type="hidden" name="isSendEmail" value="false" />
-                            <label class="form-check-label" for="isSendEmail">電子郵件通知</label>
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="submit" class="btn btn-primary">確定</button>
-                    </div>
-                </form>
-            </div>
+    <div class="mb-2 row">
+        <label class="col-sm-4 col-form-label text-muted">@L["Login_Title"]</label>
+        <div class="col-sm-8 d-flex align-items-center">@loginType</div>
+    </div>
+    <div class="mb-2 row">
+        <label class="col-sm-4 col-form-label text-muted">@L["Login_Account"]</label>
+        <div class="col-sm-8 d-flex align-items-center">@Model.ID</div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label" for="newPassword">@L["Login_Password"]</label>
+        <div class="col-sm-8">
+            <input type="password" class="form-control" id="newPassword" name="newPassword"
+                   placeholder="@L["Settings_PasswordPlaceholder"]" autocomplete="new-password" />
+            <div class="form-text">@L["Settings_PasswordHint"]</div>
         </div>
     </div>
-</div>
+    <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label" for="cName">@L["Register_Name"]</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" id="cName" name="cName"
+                   value="@Model.CName" maxlength="50" />
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label" for="tel">@L["Settings_Tel"]</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" id="tel" name="tel"
+                   value="@Model.Tel" maxlength="50" />
+        </div>
+    </div>
+    <div class="mb-3 row">
+        <label class="col-sm-4 col-form-label" for="addr">@L["Settings_Addr"]</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" id="addr" name="addr"
+                   value="@Model.Addr" maxlength="200" />
+        </div>
+    </div>
+
+    <hr class="my-3" />
+    <div class="mb-2 fw-semibold text-muted small">@L["Settings_AlertNotify"]</div>
+    <div class="mb-2">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="isPush" name="isPush"
+                   value="true" @(Model.IsPush ? "checked" : "") />
+            <input type="hidden" name="isPush" value="false" />
+            <label class="form-check-label" for="isPush">@L["Settings_PushNotify"]</label>
+        </div>
+    </div>
+    <div class="mb-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="isSendEmail" name="isSendEmail"
+                   value="true" @(Model.IsSendEmail ? "checked" : "") />
+            <input type="hidden" name="isSendEmail" value="false" />
+            <label class="form-check-label" for="isSendEmail">@L["Settings_EmailNotify"]</label>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2">
+        <button type="submit" class="btn btn-primary btn-sm">@L["Common_Ok"]</button>
+    </div>
+</form>
+@if (!isPopup)
+{
+    @Html.Raw("</div></div></div></div></div></div>")
+}
