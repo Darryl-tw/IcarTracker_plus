@@ -178,12 +178,12 @@ public class TrackerService : ITrackerService
     public async Task<int> GetTrackerCountAsync(int? memberTbKey = null)
         => await _trackerRepo.GetCountAsync(memberTbKey);
 
-    public async Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey)
+    public async Task<OperationResult> BatchMoveDevicesAsync(BatchMoveDevicesRequest request)
     {
-        try { return await _trackerRepo.BatchTransferToOBMAsync(imeis, obmTbKey); }
+        try { return await _trackerRepo.BatchMoveDevicesAsync(request); }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "批次轉移 OBM 失敗 OBM={OBM}", obmTbKey);
+            _logger.LogError(ex, "批次轉移經銷商失敗 OBM={OBM}", request.OBMTbKey);
             return OperationResult.Fail(ex.Message);
         }
     }

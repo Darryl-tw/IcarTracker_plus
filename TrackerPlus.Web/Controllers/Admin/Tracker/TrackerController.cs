@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using TrackerPlus.Core.Common;
+using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
 
@@ -16,12 +17,14 @@ public class TrackerController : AdminBaseController
     private readonly IHistoryService _historyService;
     private readonly IFirmwareService _firmwareService;
     private readonly IOBMService _obmService;
+    private readonly IDealerRepository _dealerRepo;
+    private readonly ISubAdminRepository _subAdminRepo;
     private readonly IDataProtectionProvider _dataProtection;
 
     public TrackerController(ITrackerService trackerService, IMemberService memberService,
         IPayLogService payLogService, IDeviceSettingsService deviceSettingsService,
         IHistoryService historyService, IFirmwareService firmwareService, IOBMService obmService,
-        IDataProtectionProvider dataProtection)
+        IDealerRepository dealerRepo, ISubAdminRepository subAdminRepo, IDataProtectionProvider dataProtection)
     {
         _trackerService = trackerService;
         _memberService = memberService;
@@ -30,6 +33,8 @@ public class TrackerController : AdminBaseController
         _historyService = historyService;
         _firmwareService = firmwareService;
         _obmService = obmService;
+        _dealerRepo = dealerRepo;
+        _subAdminRepo = subAdminRepo;
         _dataProtection = dataProtection;
     }
 
@@ -261,9 +266,47 @@ public class TrackerController : AdminBaseController
     {
         if (req == null || req.Imeis == null || !req.Imeis.Any() || req.OBMTbKey <= 0)
             return Json(new { success = false, message = L["Admin_Error_InvalidParams"].Value });
-        var result = await _trackerService.BatchTransferToOBMAsync(req.Imeis, req.OBMTbKey);
+
+        if (string.IsNullOrWhiteSpace(req.SubAdminId) || string.IsNullOrWhiteSpace(req.SubAdminPassword))
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminRequired"].Value });
+
+        var saleModel = req.DefaultPay ? req.SaleModel : 0;
+        var subAdminKey = await _subAdminRepo.ValidateMoveDeviceAsync(
+            req.SubAdminId, req.SubAdminPassword, req.DefaultPay, saleModel);
+        if (subAdminKey is null or <= 0)
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminInvalid"].Value });
+
+        if (req.DefaultPay && string.Equals(req.EndDateStatus, "A", StringComparison.OrdinalIgnoreCase)
+            && (req.EDate == null))
+            return Json(new { success = false, message = L["Admin_PayLog_EdateBeforeSdate"].Value });
+
+        var dealer = await _dealerRepo.GetByIdAsync(req.OBMTbKey);
+        var moveReq = new BatchMoveDevicesRequest
+        {
+            Imeis = req.Imeis.Select(x => x.Trim()).Where(x => x.Length > 0).ToList(),
+            OBMTbKey = req.OBMTbKey,
+            ResetOnlineTime = req.ResetOnlineTime,
+            DefaultPay = req.DefaultPay,
+            OrderNo = req.OrderNo?.Trim() ?? string.Empty,
+            SaleModel = req.SaleModel,
+            SDate = req.SDate,
+            EDate = req.EDate,
+            EndDateStatus = req.EndDateStatus?.Trim() ?? "1",
+            FMonth = req.FMonth,
+            Amount = req.Amount,
+            ValueAddedWeb = req.ValueAddedWeb,
+            SaleMemo = req.SaleMemo?.Trim() ?? string.Empty,
+            IsSimBundled = req.IsSimBundled,
+            IconFile = req.IconFile?.Trim() ?? string.Empty,
+            SubAdminUserTbKey = subAdminKey.Value,
+            TargetDealerLabel = dealer != null
+                ? $"{dealer.UserName.Trim()}({dealer.UserID.Trim()})"
+                : req.OBMTbKey.ToString()
+        };
+
+        var result = await _trackerService.BatchMoveDevicesAsync(moveReq);
         var msg = result.Success
-            ? string.Format(L["Admin_Tracker_Msg_BatchTransferOk"].Value, result.Data ?? 0)
+            ? (result.Message ?? string.Format(L["Admin_Tracker_Msg_BatchTransferOk"].Value, result.Data ?? 0))
             : (result.Message == "無 IMEI" ? L["Admin_Tracker_Msg_NoImei"].Value : result.Message);
         return Json(new { success = result.Success, message = msg });
     }
@@ -360,7 +403,20 @@ public class TrackerController : AdminBaseController
         return Json(new { success = result.Success, message = msg });
     }
 
-    // ── 取得 OBM 列表 ─────────────────────────────────────────────────────────
+    [HttpGet]
+    public async Task<IActionResult> GetDealerList()
+    {
+        var list = await _dealerRepo.GetAllAsync(null, null);
+        return Json(list
+            .OrderBy(o => o.UserName)
+            .Select(o => new
+            {
+                tbKey = o.TbKey,
+                name = $"{o.UserName.Trim()}({o.UserID.Trim()})"
+            }));
+    }
+
+    // ── 取得 OBM 列表（韌體等仍可能使用） ─────────────────────────────────────
     [HttpGet]
     public async Task<IActionResult> GetOBMList()
     {
@@ -453,7 +509,26 @@ public class TrackerController : AdminBaseController
 
 public class CreateTrackerRequest { public string? Imei { get; set; } public string? CName { get; set; } }
 public class ClearHistoryRequest { public string? Imei { get; set; } public bool DeleteAll { get; set; } public string? StartDate { get; set; } public string? EndDate { get; set; } }
-public class BatchTransferRequest { public List<string>? Imeis { get; set; } public int OBMTbKey { get; set; } }
+public class BatchTransferRequest
+{
+    public List<string>? Imeis { get; set; }
+    public int OBMTbKey { get; set; }
+    public bool ResetOnlineTime { get; set; }
+    public bool DefaultPay { get; set; }
+    public string? OrderNo { get; set; }
+    public int SaleModel { get; set; }
+    public DateTime? SDate { get; set; }
+    public DateTime? EDate { get; set; }
+    public string? EndDateStatus { get; set; }
+    public int FMonth { get; set; } = 1;
+    public decimal Amount { get; set; }
+    public int ValueAddedWeb { get; set; }
+    public string? SaleMemo { get; set; }
+    public bool IsSimBundled { get; set; } = true;
+    public string? IconFile { get; set; }
+    public string? SubAdminId { get; set; }
+    public string? SubAdminPassword { get; set; }
+}
 public class BatchFirmwareRequest { public List<string>? Imeis { get; set; } public string? TargetVersion { get; set; } }
 public class BatchDeleteRequest { public List<int>? TbKeys { get; set; } }
 public class DeleteAllByMemberRequest { public int MemberTbKey { get; set; } }

@@ -429,18 +429,136 @@
   </div>
 </div>
 
-<!-- ===== 批次轉移 Modal ===== -->
-<div class="modal fade" id="batchTransferModal" tabindex="-1">
-  <div class="modal-dialog">
+<!-- ===== 批次轉移 Modal（對齊 IMEI_Move.aspx） ===== -->
+<div class="modal fade" id="batchTransferModal" tabindex="-1" data-modal-static>
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnBatchTransfer"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small fw-semibold mb-1">@L["Admin_Tracker_ImeisToTransfer"]</label><textarea id="bt-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;123456789012346&#10;..."></textarea></div>
-        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_TargetObm"]</label><select id="bt-obm" class="form-select form-select-sm"><option value="">@L["Admin_Tracker_Loading"]</option></select></div>
+        <div class="mb-2">
+          <label class="form-label small fw-semibold mb-1">@L["Admin_Tracker_ImeisToTransfer"]</label>
+          <textarea id="bt-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;123456789012346"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small mb-1">@L["Admin_Tracker_Bt_MoveDealer"]</label>
+          <select id="bt-obm" class="form-select form-select-sm"><option value="">@L["Admin_Tracker_Loading"]</option></select>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_Bt_ResetOnline"]</label>
+            <div class="d-flex gap-3 small">
+              <label class="form-check-label"><input type="radio" name="bt-reset" value="N" class="form-check-input" checked /> @L["Common_No"]</label>
+              <label class="form-check-label"><input type="radio" name="bt-reset" value="Y" class="form-check-input" /> @L["Common_Yes"]</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_Bt_DefaultPay"]</label>
+            <div class="d-flex gap-3 small">
+              <label class="form-check-label"><input type="radio" name="bt-default-pay" value="N" class="form-check-input" checked onchange="btDefaultPayChange()" /> @L["Common_No"]</label>
+              <label class="form-check-label"><input type="radio" name="bt-default-pay" value="Y" class="form-check-input" onchange="btDefaultPayChange()" /> @L["Common_Yes"]</label>
+            </div>
+          </div>
+        </div>
+        <div id="bt-pay-panel" class="border rounded p-2 bg-light-subtle" style="opacity:.55;pointer-events:none">
+          <div class="row g-2">
+            <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_OrderNo"]</label>
+              <input type="text" id="bt-add-orderno" class="form-control form-control-sm" readonly /></div>
+            <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_SaleModel"]</label>
+              <select id="bt-add-model" class="form-select form-select-sm" onchange="btSaleModeChange()">
+                <option value="">　</option>
+                <option value="1">@L["Admin_PayLog_SM_1"]</option>
+                <option value="2">@L["Admin_PayLog_SM_2"]</option>
+                <option value="3">@L["Admin_PayLog_SM_3"]</option>
+                <option value="16">@L["Admin_PayLog_SM_16"]</option>
+                <option value="17">@L["Admin_PayLog_SM_17"]</option>
+                <option value="18">@L["Admin_PayLog_SM_18"]</option>
+                <option value="6">@L["Admin_PayLog_SM_6"]</option>
+                <option value="7">@L["Admin_PayLog_SM_7"]</option>
+                <option value="4">@L["Admin_PayLog_SM_4"]</option>
+                <option value="5">@L["Admin_PayLog_SM_5"]</option>
+                <option value="13">@L["Admin_PayLog_SM_13"]</option>
+                <option value="14">@L["Admin_PayLog_SM_14"]</option>
+                <option value="15">@L["Admin_PayLog_SM_15"]</option>
+                <option value="20">@L["Admin_PayLog_SM_20"]</option>
+                <option value="21">@L["Admin_PayLog_SM_21"]</option>
+                <option value="22">@L["Admin_PayLog_SM_22"]</option>
+                <option value="9">@L["Admin_PayLog_SM_9"]</option>
+              </select>
+            </div>
+            <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceStart"]</label>
+              <div class="d-flex gap-1">
+                <input type="date" id="bt-add-sdate" class="form-control form-control-sm" oninput="btEdsCalcEdate()" />
+                <button type="button" class="btn btn-outline-secondary btn-sm text-nowrap" onclick="btCalcEndFromStart()">@L["Admin_Tracker_Bt_CalcEndDate"]</button>
+              </div>
+            </div>
+            <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_EndDateStatus"]</label>
+              <div class="d-flex gap-1">
+                <select id="bt-add-eds" class="form-select form-select-sm" onchange="btEdsCalcEdate()">
+                  <option value="0">@L["Admin_PayLog_EDS_Week"]</option>
+                  <option value="1" selected>@L["Admin_PayLog_EDS_Month1"]</option>
+                  <option value="8">@L["Admin_PayLog_EDS_8days"]</option>
+                  <option value="6">@L["Admin_PayLog_EDS_HalfYear"]</option>
+                  <option value="12">@L["Admin_PayLog_EDS_Year1"]</option>
+                  <option value="S">@L["Admin_PayLog_EDS_Unlimited"]</option>
+                  <option value="A">@L["Admin_PayLog_EDS_Custom"]</option>
+                  <option value="13">@L["Admin_PayLog_EDS_Month13"]</option>
+                  <option value="24">@L["Admin_PayLog_EDS_Year2"]</option>
+                  <option value="36">@L["Admin_PayLog_EDS_Year3"]</option>
+                  <option value="B">@L["Admin_PayLog_EDS_Months"]</option>
+                </select>
+                <select id="bt-add-fmonth" class="form-select form-select-sm" style="display:none;width:70px" onchange="btEdsCalcEdate()">
+                  @for (int m = 1; m <= 12; m++) { <option value="@m">@m</option> }
+                </select>
+              </div>
+            </div>
+            <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_Amount"]</label>
+              <input type="number" id="bt-add-amount" class="form-control form-control-sm" step="0.01" value="0" /></div>
+            <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceEnd"]</label>
+              <input type="date" id="bt-add-edate" class="form-control form-control-sm" /></div>
+            <div class="col-12"><div class="form-check"><input type="checkbox" id="bt-add-vaw" class="form-check-input"><label for="bt-add-vaw" class="form-check-label small">@L["Admin_Tracker_Col_ValueAdded"]</label></div></div>
+            <div class="col-12"><label class="form-label small mb-0">@L["Admin_Tracker_Col_SaleMemo"]</label>
+              <textarea id="bt-add-memo" class="form-control form-control-sm" rows="2"></textarea></div>
+          </div>
+        </div>
+        <hr class="my-2" />
+        <div class="mb-2">
+          <label class="form-label small fw-semibold mb-2">@L["Admin_Tracker_MapIcon"]</label>
+          <div class="d-flex flex-wrap gap-2">
+            @foreach (var ic in new[] {("A","汽車"),("B","貨車"),("C","工作車"),("D","巴士"),("E","機車"),("F","自行車"),("G","人"),("H","寵物")}) {
+              <div class="form-check form-check-inline mb-0">
+                <input class="form-check-input" type="radio" name="bt-icon" id="bt-icon-@ic.Item1" value="@ic.Item1" @(ic.Item1 == "A" ? "checked" : "")>
+                <label class="form-check-label small" for="bt-icon-@ic.Item1">@ic.Item2</label>
+              </div>
+            }
+          </div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_SubAdminId"]</label>
+            <input type="text" id="bt-sub-id" class="form-control form-control-sm" autocomplete="username" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_SubAdminPassword"]</label>
+            <input type="password" id="bt-sub-pw" class="form-control form-control-sm" autocomplete="current-password" />
+          </div>
+        </div>
+        <div class="row g-2 mb-2 align-items-end">
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_Bt_ExpiryDisplay"]</label>
+            <input type="text" id="bt-expiry-display" class="form-control form-control-sm" value="2025-07-19" readonly />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1">@L["Admin_Tracker_IsSimBundled"]</label>
+            <div class="d-flex gap-3 small">
+              <label class="form-check-label"><input type="radio" name="bt-sim" value="N" class="form-check-input" /> @L["Common_No"]</label>
+              <label class="form-check-label"><input type="radio" name="bt-sim" value="Y" class="form-check-input" checked /> @L["Common_Yes"]</label>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-secondary btn-sm" onclick="doBatchTransfer()">@L["Common_Confirm"]</button>
-        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="doBatchTransfer()">@L["Common_Confirm"]</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -1445,30 +1563,208 @@ var _T = {
             .then(r => { alert(r.message || (r.success ? _T.success : _T.failed)); if (r.success) bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal'))?.hide(); });
     };
 
-    // ── 批次轉移 ────────────────────────────────────────────────────────
-    window.openBatchTransfer = async function () {
-        const sel = document.getElementById('bt-obm');
-        if (sel.options.length <= 1) {
-            const list = await fetch('/Admin/Tracker/GetOBMList').then(r => r.json());
-            sel.innerHTML = '<option value="">' + (_T.selectObm || '選擇 OBM') + '</option>' +
-                list.map(o => `<option value="${o.tbKey}">${escHtml(o.name)}</option>`).join('');
+    // ── 批次轉移（IMEI_Move） ───────────────────────────────────────────
+
+    function btFmtDate(d) {
+        const MM = ('0' + (d.getMonth() + 1)).slice(-2);
+        const dd = ('0' + d.getDate()).slice(-2);
+        return d.getFullYear() + '-' + MM + '-' + dd;
+    }
+
+    function btInitForm() {
+        const today = new Date();
+        document.querySelector('input[name="bt-reset"][value="N"]').checked = true;
+        document.querySelector('input[name="bt-default-pay"][value="N"]').checked = true;
+        document.querySelector('input[name="bt-sim"][value="Y"]').checked = true;
+        document.getElementById('bt-add-sdate').value = btFmtDate(today);
+        document.getElementById('bt-add-eds').value = '1';
+        document.getElementById('bt-add-amount').value = '0';
+        document.getElementById('bt-add-vaw').checked = false;
+        document.getElementById('bt-add-memo').value = '';
+        document.getElementById('bt-sub-id').value = '';
+        document.getElementById('bt-sub-pw').value = '';
+        btDefaultPayChange();
+        btEdsCalcEdate();
+    }
+
+    window.btDefaultPayChange = function () {
+        const on = document.querySelector('input[name="bt-default-pay"]:checked')?.value === 'Y';
+        const panel = document.getElementById('bt-pay-panel');
+        panel.style.opacity = on ? '1' : '.55';
+        panel.style.pointerEvents = on ? 'auto' : 'none';
+        if (on) {
+            btSaleModeChange();
+            btCalcOrderNo();
         }
-        const imeis = getCheckedImeis();
-        document.getElementById('bt-imeis').value = imeis.join('\n');
-        new bootstrap.Modal(document.getElementById('batchTransferModal')).show();
     };
+
+    window.btSaleModeChange = function () {
+        const mode = document.getElementById('bt-add-model').value;
+        const cfg = PL_EDS_ALLOWED[mode] || { allowed: ['12','24','36','13','6','1','0','S','A'], def: '12' };
+        const edsEl = document.getElementById('bt-add-eds');
+        const edateEl = document.getElementById('bt-add-edate');
+        const amtEl = document.getElementById('bt-add-amount');
+        const fmonthEl = document.getElementById('bt-add-fmonth');
+        Array.from(edsEl.options).forEach(o => { o.disabled = cfg.allowed ? !cfg.allowed.includes(o.value) : true; });
+        edsEl.disabled = !cfg.allowed;
+        fmonthEl.style.display = 'none';
+        if (cfg.refund) {
+            edateEl.value = document.getElementById('bt-add-sdate').value;
+            edateEl.readOnly = false;
+            amtEl.value = '0'; amtEl.disabled = true;
+        } else if (cfg.auto1900) {
+            document.getElementById('bt-add-sdate').value = '1900-01-01';
+            edateEl.value = '1900-01-01';
+            edateEl.readOnly = true;
+            if (cfg.amt0) { amtEl.value = '0'; amtEl.disabled = true; }
+            else if (cfg.amt) { amtEl.value = cfg.amt; amtEl.disabled = !!cfg.amtDis; }
+            else { amtEl.disabled = false; }
+        } else {
+            edateEl.readOnly = true;
+            amtEl.disabled = false;
+            if (cfg.setToday) document.getElementById('bt-add-sdate').value = btFmtDate(new Date());
+            if (cfg.amt0) amtEl.value = '0';
+            if (cfg.def) { edsEl.value = cfg.def; btEdsCalcEdate(); }
+        }
+        if (mode === '1') {
+            const t = new Date();
+            const yy = t.getFullYear().toString().slice(-2);
+            const MM = ('0' + (t.getMonth() + 1)).slice(-2);
+            const dd = ('0' + t.getDate()).slice(-2);
+            document.getElementById('bt-add-orderno').value = 'C7B' + yy + MM + dd;
+        } else btCalcOrderNo();
+    };
+
+    window.btEdsCalcEdate = function () {
+        const eds = document.getElementById('bt-add-eds').value;
+        const sdate = document.getElementById('bt-add-sdate').value;
+        const fmonthEl = document.getElementById('bt-add-fmonth');
+        const edateEl = document.getElementById('bt-add-edate');
+        fmonthEl.style.display = eds === 'B' ? 'block' : 'none';
+        if (!sdate || document.getElementById('bt-add-eds').disabled) return;
+        const base = new Date(sdate);
+        let edate = new Date(base);
+        if (eds === 'S') edate = new Date('2070-01-01');
+        else if (eds === 'A') {
+            edateEl.readOnly = false;
+            if (!edateEl.value || edateEl.readOnly === false) {
+                const t = new Date(); t.setDate(t.getDate() + 1);
+                edateEl.value = btFmtDate(t);
+            }
+            btCalcOrderNo();
+            return;
+        } else {
+            edateEl.readOnly = true;
+            if (eds === '0') edate.setDate(edate.getDate() + 7);
+            else if (eds === 'B') edate.setMonth(edate.getMonth() + (parseInt(fmonthEl.value) || 1));
+            else if (!isNaN(parseInt(eds))) edate.setMonth(edate.getMonth() + parseInt(eds));
+        }
+        edateEl.value = btFmtDate(edate);
+        btCalcOrderNo();
+    };
+
+    window.btCalcEndFromStart = function () {
+        const mode = document.getElementById('bt-add-model').value;
+        if (mode !== '9') return;
+        const s = document.getElementById('bt-add-sdate').value;
+        if (!s) return;
+        const d = new Date(s);
+        d.setFullYear(d.getFullYear() + 1);
+        document.getElementById('bt-add-edate').value = btFmtDate(d);
+    };
+
+    window.btCalcOrderNo = function () {
+        const mode = document.getElementById('bt-add-model').value;
+        const eds = document.getElementById('bt-add-eds').value;
+        const today = new Date();
+        const yy = today.getFullYear().toString().slice(-2);
+        const MM = ('0' + (today.getMonth() + 1)).slice(-2);
+        const dd = ('0' + today.getDate()).slice(-2);
+        if (mode === '6') {
+            document.getElementById('bt-add-orderno').value = 'BAK_' + today.getFullYear() + MM + dd;
+            return;
+        }
+        const noSuffix = ['4','5','13','21','22'];
+        const prefixMap = {
+            '1':'C7','2':'A2','3':'A1','4':'B3F','5':'B2F','7':'Z8','13':'B4C','14':'B5','15':'B6','16':'A3',
+            '17':'A4','18':'A6','20':'D6','21':'IS','22':'TRIAL','9':'A6'
+        };
+        const prefix = prefixMap[mode] || 'C7';
+        const suffix = noSuffix.includes(mode) ? ''
+            : ({'1':'B','8':'H','12':'C','24':'D','36':'E','B':'A','A':'G','0':'B','13':'C'}[eds] || 'C');
+        document.getElementById('bt-add-orderno').value = prefix + suffix + yy + MM + dd;
+    };
+
+    async function loadBtDealerList() {
+        const sel = document.getElementById('bt-obm');
+        try {
+            const list = await fetch('/Admin/Tracker/GetDealerList').then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+            if (!Array.isArray(list)) throw new Error('invalid');
+            sel.innerHTML = '<option value="">' + _T.selectObm + '</option>' +
+                list.map(o => `<option value="${o.tbKey}">${escHtml(o.name)}</option>`).join('');
+        } catch {
+            sel.innerHTML = '<option value="">' + _T.selectObm + '</option>';
+        }
+    }
+
+    window.openBatchTransfer = function () {
+        btInitForm();
+        const imeis = getCheckedImeis();
+        document.getElementById('bt-imeis').value = imeis.length ? imeis.join('\n') : (window._selImei || '');
+        const el = document.getElementById('batchTransferModal');
+        if (typeof StaticModal !== 'undefined') StaticModal.show('batchTransferModal');
+        else new bootstrap.Modal(el).show();
+        loadBtDealerList();
+    };
+
     window.doBatchTransfer = async function () {
         const raw = document.getElementById('bt-imeis').value;
         const imeis = raw.split(/[\n,\r]+/).map(s => s.trim()).filter(s => s.length === 15);
         const obmTbKey = parseInt(document.getElementById('bt-obm').value) || 0;
+        const defaultPay = document.querySelector('input[name="bt-default-pay"]:checked')?.value === 'Y';
+        const resetOnline = document.querySelector('input[name="bt-reset"]:checked')?.value === 'Y';
         if (!imeis.length) { alert(_T.enterImei); return; }
         if (!obmTbKey) { alert(_T.selectTargetObm); return; }
+        const subAdminId = document.getElementById('bt-sub-id').value.trim();
+        const subAdminPassword = document.getElementById('bt-sub-pw').value;
+        if (!subAdminId || !subAdminPassword) { alert(_T.subAdminRequired); return; }
+        const iconChecked = document.querySelector('input[name="bt-icon"]:checked');
+        const isSimBundled = document.querySelector('input[name="bt-sim"]:checked')?.value === 'Y';
+        const saleModel = parseInt(document.getElementById('bt-add-model').value) || 0;
+        const sdate = document.getElementById('bt-add-sdate').value;
+        const edate = document.getElementById('bt-add-edate').value;
+        const amount = parseFloat(document.getElementById('bt-add-amount').value) || 0;
+        const endDateStatus = document.getElementById('bt-add-eds').value;
+        if (defaultPay) {
+            if (!saleModel) { alert(_T.plSelectSaleModel || '請選擇銷售類型'); return; }
+            if (edate && sdate && edate < sdate) { alert(_T.plEdateBeforeSdate); return; }
+            const skipAmt = ['1','6','22'].includes(String(saleModel));
+            if (!skipAmt && amount <= 0) { alert(_T.plAmountRequired || '金額不得小於 1'); return; }
+            const orderNo = document.getElementById('bt-add-orderno').value.trim();
+            if (!orderNo && saleModel !== 6) { alert(_T.plOrderNoRequired || '訂單號碼不得為空'); return; }
+            if (endDateStatus === 'A' && !edate) { alert(_T.plEdateBeforeSdate); return; }
+        }
         if (!(await TpDialog.confirm(_T.confirmBatchTransfer.replace('{0}', imeis.length)))) return;
-        postJson('/Admin/Tracker/BatchTransfer', { imeis, obmTbKey })
+        const req = {
+            imeis, obmTbKey, resetOnlineTime: resetOnline, defaultPay,
+            orderNo: document.getElementById('bt-add-orderno').value.trim(),
+            saleModel, sDate: sdate || null, eDate: edate || null,
+            endDateStatus,
+            fMonth: parseInt(document.getElementById('bt-add-fmonth').value) || 1,
+            amount,
+            valueAddedWeb: document.getElementById('bt-add-vaw').checked ? 1 : 0,
+            saleMemo: document.getElementById('bt-add-memo').value.trim(),
+            isSimBundled,
+            iconFile: iconChecked ? iconChecked.value : '',
+            subAdminId,
+            subAdminPassword
+        };
+        postJson('/Admin/Tracker/BatchTransfer', req)
             .then(r => {
                 alert(r.message);
                 if (r.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('batchTransferModal'))?.hide();
+                    if (typeof StaticModal !== 'undefined') StaticModal.hide('batchTransferModal');
+                    else bootstrap.Modal.getInstance(document.getElementById('batchTransferModal'))?.hide();
                     window.doSearch();
                 }
             });

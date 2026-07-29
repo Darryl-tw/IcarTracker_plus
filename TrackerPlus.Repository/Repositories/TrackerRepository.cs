@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using TrackerPlus.Core.Common;
@@ -229,22 +230,233 @@ INNER JOIN _PageKeys pk ON t.tbKey = pk.tbKey
         return await conn.ExecuteScalarAsync<int>(sql, new { MemberTbKey = memberTbKey });
     }
 
-    public async Task<OperationResult> BatchTransferToOBMAsync(IEnumerable<string> imeis, int obmTbKey)
+    public async Task<OperationResult> BatchMoveDevicesAsync(BatchMoveDevicesRequest req)
     {
-        var list = imeis.Select(x => x.Trim()).Where(x => x.Length > 0).ToList();
+        var list = req.Imeis
+            .Select(x => x.Trim())
+            .Where(x => x.Length == 15 && x.All(char.IsDigit))
+            .Distinct()
+            .ToList();
         if (list.Count == 0) return OperationResult.Fail("無 IMEI");
+
+        var dealerLabel = string.IsNullOrWhiteSpace(req.TargetDealerLabel)
+            ? req.OBMTbKey.ToString()
+            : req.TargetDealerLabel.Trim();
+        var iconFile = NormalizeIconFile(req.IconFile);
+        var subAdminKey = req.SubAdminUserTbKey;
+        var errors = new List<string>();
+        var success = 0;
+        var now = DateTime.Now;
+
         using var conn = _db.CreateMainConnection();
-        int count = 0;
+
         foreach (var imei in list)
         {
-            count += await conn.ExecuteAsync(
-                "UPDATE dbo.Tracker SET OBM_tbKey=@OBM WHERE RTRIM(IMEICode)=@IMEI",
-                new { OBM = obmTbKey, IMEI = imei });
-            await conn.ExecuteAsync(
-                "UPDATE dbo.IMEITable SET OBM_tbKey=@OBM WHERE RTRIM(IMEICODE)=@IMEI",
-                new { OBM = obmTbKey, IMEI = imei });
+            try
+            {
+                await conn.ExecuteAsync(
+                    "DELETE FROM dbo.SendGCM WHERE RTRIM(IMEICODE)=@IMEI",
+                    new { IMEI = imei });
+
+                var info = await conn.QueryFirstOrDefaultAsync<ImeiMoveLookupRow>(
+                    @"SELECT A.Tracker_tbKey AS TrackerTbKey, A.OBM_tbKey AS ObmTbKey, B.Member_tbKey AS MemberTbKey
+                      FROM dbo.IMEITable A
+                      LEFT JOIN dbo.Tracker B ON A.Tracker_tbKey = B.tbKey
+                      WHERE RTRIM(A.IMEICODE)=@IMEI",
+                    new { IMEI = imei });
+
+                if (info == null || info.TrackerTbKey <= 0)
+                {
+                    errors.Add($"查無此:{imei}，搬移失敗");
+                    continue;
+                }
+
+                var moveMemo = $"此定位器於{now:yyyy/MM/dd HH:mm:ss}搬移至{dealerLabel}";
+                var movOrder = $"MOV_{now:yyyyMMdd}";
+
+                await conn.ExecuteAsync(
+                    @"INSERT INTO dbo.PayLog
+                      (Member_tbKey, Tracker_tbKey, IMEICode, OrderNumber, Amount, SDate, EDate, CMemo, ValueAddedFunc, Sub_adminUser_tbkey)
+                      VALUES (@MemberTbKey, @TrackerTbKey, @IMEI, @OrderNumber, 0, @Now, @Now, @CMemo, 'N', @SubAdminKey)",
+                    new
+                    {
+                        MemberTbKey = info.MemberTbKey,
+                        TrackerTbKey = info.TrackerTbKey,
+                        IMEI = imei,
+                        OrderNumber = movOrder,
+                        Now = now,
+                        CMemo = moveMemo,
+                        SubAdminKey = subAdminKey
+                    });
+
+                if (req.DefaultPay)
+                {
+                    var (sDate, eDate, orderNo, amount) = ComputeDefaultPayLog(req);
+                    var skipInsert = false;
+                    if (req.SaleModel is 4 or 5 or 7)
+                    {
+                        var existing = await conn.ExecuteScalarAsync<int>(
+                            @"SELECT COUNT(*) FROM dbo.PayLog
+                              WHERE Member_tbKey=@MemberTbKey AND RTRIM(IMEICode)=@IMEI
+                                AND Model IN (4,5,7)
+                                AND CONVERT(char(8), SDate, 112)='19000101'
+                                AND CONVERT(char(8), EDate, 112)='19000101'",
+                            new { MemberTbKey = info.MemberTbKey, IMEI = imei });
+                        skipInsert = existing > 0;
+                    }
+
+                    if (!skipInsert)
+                    {
+                        await conn.ExecuteAsync(
+                            @"INSERT INTO dbo.PayLog
+                              (Member_tbKey, Tracker_tbKey, IMEICode, OrderNumber, Amount, SDate, EDate, CMemo, ValueAddedFunc,
+                               Sub_adminUser_tbkey, Model, ValueAddedWeb, sale_memo)
+                              VALUES (@MemberTbKey, @TrackerTbKey, @IMEI, @OrderNo, @Amount, @SDate, @EDate, N'轉移經銷商的預設訂單', 'N',
+                                      @SubAdminKey, @Model, @ValueAddedWeb, @SaleMemo)",
+                            new
+                            {
+                                MemberTbKey = info.MemberTbKey,
+                                TrackerTbKey = info.TrackerTbKey,
+                                IMEI = imei,
+                                OrderNo = orderNo,
+                                Amount = amount,
+                                SDate = sDate,
+                                EDate = eDate,
+                                SubAdminKey = subAdminKey,
+                                Model = req.SaleModel,
+                                ValueAddedWeb = req.ValueAddedWeb,
+                                SaleMemo = req.SaleMemo?.Trim() ?? string.Empty
+                            });
+                    }
+                }
+
+                await conn.ExecuteAsync(
+                    @"UPDATE dbo.IMEITable SET OBM_tbKey=@OBM WHERE RTRIM(IMEICODE)=@IMEI;
+                      UPDATE dbo.Tracker SET OBM_tbKey=@OBM WHERE RTRIM(IMEICode)=@IMEI",
+                    new { OBM = req.OBMTbKey, IMEI = imei });
+
+                if (req.ResetOnlineTime)
+                {
+                    await conn.ExecuteAsync(
+                        @"UPDATE dbo.Tracker SET
+                            LastConnectedDate='2001-01-01', LastReportDate=NULL,
+                            Lastlogintime='2001-01-01', FirstLoginDateTime=NULL,
+                            OBM_tbKey=@OBM, IconFile=@Icon, IsSimBundled=@Sim
+                          WHERE RTRIM(IMEICode)=@IMEI",
+                        new { OBM = req.OBMTbKey, IMEI = imei, Icon = iconFile, Sim = req.IsSimBundled });
+                }
+                else
+                {
+                    await conn.ExecuteAsync(
+                        @"UPDATE dbo.Tracker SET IconFile=@Icon, IsSimBundled=@Sim WHERE RTRIM(IMEICode)=@IMEI",
+                        new { IMEI = imei, Icon = iconFile, Sim = req.IsSimBundled });
+                }
+
+                await conn.ExecuteAsync(
+                    @"INSERT INTO dbo.Sub_adminFuntionLog (Sub_adminUser_tbkey, IMEICODE, Admin_Funtion, Memo)
+                      VALUES (@SubAdminKey, @IMEI, N'搬移經銷商', @Memo)",
+                    new { SubAdminKey = subAdminKey, IMEI = imei, Memo = moveMemo });
+
+                if (req.SaleModel != 6)
+                {
+                    try
+                    {
+                        await conn.ExecuteAsync(
+                            "delothersystem570",
+                            new { imeicode = imei },
+                            commandType: CommandType.StoredProcedure);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "delothersystem570 失敗 IMEI={IMEI}", imei);
+                    }
+                }
+
+                if (req.SaleModel != 1)
+                {
+                    var activeModel1 = await conn.ExecuteScalarAsync<int>(
+                        @"SELECT COUNT(*) FROM dbo.PayLog
+                          WHERE RTRIM(IMEICode)=@IMEI AND Model=1
+                            AND SDate<=GETDATE() AND EDate>=GETDATE()-1 AND SDate<>EDate",
+                        new { IMEI = imei });
+                    if (activeModel1 > 0)
+                    {
+                        await conn.ExecuteAsync(
+                            @"UPDATE dbo.PayLog SET EDate=GETDATE()-1
+                              WHERE RTRIM(IMEICode)=@IMEI AND Model=1
+                                AND SDate<=GETDATE() AND EDate>=GETDATE()-1 AND SDate<>EDate",
+                            new { IMEI = imei });
+                    }
+                }
+
+                success++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "批次轉移失敗 IMEI={IMEI}", imei);
+                errors.Add($"{imei} 發生錯誤，搬移失敗");
+            }
         }
-        return OperationResult.Ok($"已轉移 {count} 筆", count);
+
+        var msg = $"已新增 {success} 筆裝置移至 {dealerLabel} 經銷商下";
+        if (errors.Count > 0)
+            msg += "\n" + string.Join("\n", errors);
+        return success > 0 || errors.Count == 0
+            ? OperationResult.Ok(msg, success)
+            : OperationResult.Fail(msg);
+    }
+
+    private static (DateTime sDate, DateTime eDate, string orderNo, decimal amount) ComputeDefaultPayLog(BatchMoveDevicesRequest req)
+    {
+        var saleModel = req.SaleModel;
+        var sDate = req.SDate?.Date ?? DateTime.Today;
+        var eds = (req.EndDateStatus ?? "1").Trim();
+        var fed = req.EDate?.Date;
+
+        if (saleModel is 4 or 5 or 7 or 21)
+            sDate = new DateTime(1900, 1, 1);
+
+        DateTime eDate;
+        if (eds == "S")
+            eDate = new DateTime(2070, 1, 1);
+        else if (eds == "A" && fed.HasValue)
+            eDate = fed.Value;
+        else if (eds == "B")
+            eDate = sDate.AddMonths(req.FMonth > 0 ? req.FMonth : 1);
+        else if (eds == "0")
+            eDate = sDate.AddDays(7);
+        else if (int.TryParse(eds, out var months))
+            eDate = sDate.AddMonths(months);
+        else
+            eDate = sDate.AddMonths(1);
+
+        if (saleModel is 4 or 5 or 7 or 21)
+            eDate = new DateTime(1900, 1, 1);
+        if (saleModel == 13 && fed.HasValue)
+            eDate = fed.Value;
+
+        var orderNo = saleModel == 6
+            ? $"BAK_{DateTime.Now:yyyyMMdd}"
+            : req.OrderNo.Trim();
+        if (saleModel == 6)
+            eDate = sDate;
+
+        var amount = saleModel == 4 ? 999999m : req.Amount;
+        return (sDate, eDate, orderNo, amount);
+    }
+
+    private static string NormalizeIconFile(string? icon)
+    {
+        if (string.IsNullOrWhiteSpace(icon)) return string.Empty;
+        var c = char.ToUpperInvariant(icon.Trim()[0]);
+        return c is >= 'A' and <= 'H' ? c.ToString() : string.Empty;
+    }
+
+    private sealed class ImeiMoveLookupRow
+    {
+        public int TrackerTbKey { get; set; }
+        public int ObmTbKey { get; set; }
+        public int MemberTbKey { get; set; }
     }
 
     public async Task<OperationResult> FactoryResetAsync(int tbKey)

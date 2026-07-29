@@ -41,6 +41,7 @@ builder.Services.AddScoped<IMapMarkRepository, MapMarkRepository>();
 builder.Services.AddScoped<IDeviceSettingsRepository, DeviceSettingsRepository>();
 builder.Services.AddScoped<IAdminUserRepository, AdminUserRepository>();
 builder.Services.AddScoped<IDealerRepository, DealerRepository>();
+builder.Services.AddScoped<ISubAdminRepository, SubAdminRepository>();
 builder.Services.AddScoped<IUdFieldRepository, UdFieldRepository>();
 builder.Services.AddScoped<IReportFieldsRepository, ReportFieldsRepository>();
 

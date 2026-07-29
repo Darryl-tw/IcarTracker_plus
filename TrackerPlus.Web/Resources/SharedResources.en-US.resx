@@ -1958,6 +1958,7 @@
   <data name="Admin_PayLog_SM_20" xml:space="preserve"><value>Internal Test</value></data>
   <data name="Admin_PayLog_SM_21" xml:space="preserve"><value>Intl SIM Card</value></data>
   <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>App Tracker Trial</value></data>
+  <data name="Admin_PayLog_SM_9" xml:space="preserve"><value>Online renewal</value></data>
   <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>Add</value></data>
   <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>Edit</value></data>
   <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>Delete</value></data>
@@ -2174,6 +2175,8 @@
   <data name="Admin_Tracker_Bt_MoveDealer" xml:space="preserve"><value>Move to dealer</value></data>
   <data name="Admin_Tracker_Bt_ResetOnline" xml:space="preserve"><value>Reset online time</value></data>
   <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>Default order</value></data>
+  <data name="Admin_Tracker_Bt_CalcEndDate" xml:space="preserve"><value>Calculate end date</value></data>
+  <data name="Admin_Tracker_Bt_ExpiryDisplay" xml:space="preserve"><value>Expiry date</value></data>
   <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>Sub-admin ID</value></data>
   <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>Sub-admin password</value></data>
   <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>Sub-admin ID and password are required</value></data>

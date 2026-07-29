@@ -1958,6 +1958,7 @@
   <data name="Admin_PayLog_SM_20" xml:space="preserve"><value>内测订单</value></data>
   <data name="Admin_PayLog_SM_21" xml:space="preserve"><value>国际SIM卡</value></data>
   <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>app tracker 试用单</value></data>
+  <data name="Admin_PayLog_SM_9" xml:space="preserve"><value>线上续约</value></data>
   <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>新增</value></data>
   <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>修改</value></data>
   <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>删除</value></data>
@@ -2174,6 +2175,8 @@
   <data name="Admin_Tracker_Bt_MoveDealer" xml:space="preserve"><value>经销商移至</value></data>
   <data name="Admin_Tracker_Bt_ResetOnline" xml:space="preserve"><value>重置上线时间</value></data>
   <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>预设订单</value></data>
+  <data name="Admin_Tracker_Bt_CalcEndDate" xml:space="preserve"><value>计算结束日期</value></data>
+  <data name="Admin_Tracker_Bt_ExpiryDisplay" xml:space="preserve"><value>到期日期</value></data>
   <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>子账号 ID</value></data>
   <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>子账号密码</value></data>
   <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>请输入子账号 ID 与密码</value></data>

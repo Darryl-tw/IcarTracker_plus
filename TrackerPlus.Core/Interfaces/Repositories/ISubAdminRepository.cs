@@ -1,0 +1,7 @@
+namespace TrackerPlus.Core.Interfaces.Repositories;
+
+public interface ISubAdminRepository
+{
+    /// <summary>驗證子帳號可否執行裝置搬移（對齊舊 CheckSubadmin + MoveDevice 權限）。</summary>
+    Task<int?> ValidateMoveDeviceAsync(string subAdminId, string subAdminPassword, bool defaultPay, int saleModel);
+}
