@@ -57,6 +57,32 @@ public class MapController : Controller
         return int.TryParse(val, out var key) ? key : 0;
     }
 
+    /// <summary>
+    /// 前台裝置列表：管理員「前台(單機)」帶 AdminPreviewTbKey 時只回傳該台；
+    /// 一般會員登入／會員預覽（preview=0）則回傳該會員全部裝置。
+    /// </summary>
+    private async Task<IEnumerable<Tracker>> GetLiveTrackersForCurrentUserAsync()
+    {
+        var memberTbKey = GetMemberTbKey();
+        var previewTbKey = GetAdminPreviewTbKey();
+
+        if (previewTbKey > 0)
+        {
+            var single = await _trackerService.GetTrackerAsync(previewTbKey);
+            if (single == null)
+                return Enumerable.Empty<Tracker>();
+            // 以會員身份預覽時，確認裝置屬於該會員（或未綁定預覽 member=0）
+            if (memberTbKey > 0 && single.Member_TbKey != memberTbKey)
+                return Enumerable.Empty<Tracker>();
+            return new[] { single };
+        }
+
+        if (memberTbKey <= 0)
+            return Enumerable.Empty<Tracker>();
+
+        return await _trackerService.GetLiveLocationsAsync(memberTbKey);
+    }
+
     private int GetMemberTimezone()
     {
         var val = User.FindFirstValue("Timezoom");
@@ -66,21 +92,10 @@ public class MapController : Controller
     [HttpGet]
     public async Task<IActionResult> Live(int focus = 0)
     {
-        var memberTbKey = GetMemberTbKey();
         var previewTbKey = GetAdminPreviewTbKey();
         var focusTbKey = focus > 0 ? focus : previewTbKey;
 
-        IEnumerable<Tracker> trackers;
-        if (memberTbKey == 0 && previewTbKey > 0)
-        {
-            // 管理員預覽未綁定裝置：只載入該裝置
-            var single = await _trackerService.GetTrackerAsync(previewTbKey);
-            trackers = single != null ? new[] { single } : Enumerable.Empty<Tracker>();
-        }
-        else
-        {
-            trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
-        }
+        var trackers = await GetLiveTrackersForCurrentUserAsync();
 
         ViewBag.GoogleApiJs = _googleApiKeyService.GetMapsJavaScriptUrl(Request.Host.Host);
         ViewBag.MemberName = User.FindFirstValue("CName") ?? User.Identity?.Name ?? "";
@@ -215,9 +230,8 @@ public class MapController : Controller
     [HttpGet]
     public async Task<IActionResult> LiveData()
     {
-        var memberTbKey = GetMemberTbKey();
         var memberTimezone = GetMemberTimezone();
-        var trackers = await _trackerService.GetLiveLocationsAsync(memberTbKey);
+        var trackers = await GetLiveTrackersForCurrentUserAsync();
         var now = DateTime.UtcNow;
         var data = trackers.Select(t => new
         {
