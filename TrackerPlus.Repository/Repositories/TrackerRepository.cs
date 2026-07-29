@@ -483,6 +483,109 @@ INNER JOIN _PageKeys pk ON t.tbKey = pk.tbKey
         return deleted;
     }
 
+    public async Task<(bool Success, string? ErrorCode)> DeleteDeviceByImeiAsync(string imei, int subAdminUserTbKey, string? adminFunction = null)
+    {
+        imei = imei.Trim();
+        if (imei.Length != 15 || !imei.All(char.IsDigit))
+            return (false, "INVALID_IMEI");
+
+        var fun = string.IsNullOrWhiteSpace(adminFunction) ? "Delete Drive" : adminFunction.Trim();
+
+        using var conn = _db.CreateMainConnection();
+        await conn.OpenAsync();
+        using var tx = conn.BeginTransaction();
+
+        try
+        {
+            var trackerTbKey = await conn.ExecuteScalarAsync<int?>(
+                "SELECT tbKey FROM dbo.Tracker WHERE RTRIM(IMEICode)=@IMEI",
+                new { IMEI = imei }, tx);
+            if (trackerTbKey is null or <= 0)
+            {
+                tx.Rollback();
+                return (false, "NOT_FOUND");
+            }
+
+            var histCount = await conn.ExecuteScalarAsync<int>(
+                "SELECT COUNT(*) FROM dbo.DelHistoryTLGAll WHERE RTRIM(IMEICODE)=@IMEI",
+                new { IMEI = imei }, tx);
+            if (histCount == 0)
+            {
+                await conn.ExecuteAsync(
+                    @"INSERT INTO dbo.DelHistoryTLGAll (IMEICODE, TrackerEnableDate)
+                      SELECT RTRIM(IMEICode), TrackerEnabledDate FROM dbo.Tracker WHERE RTRIM(IMEICode)=@IMEI",
+                    new { IMEI = imei }, tx);
+            }
+            else
+            {
+                await conn.ExecuteAsync(
+                    "UPDATE dbo.DelHistoryTLGAll SET DelDateTime=GETUTCDATE() WHERE RTRIM(IMEICODE)=@IMEI",
+                    new { IMEI = imei }, tx);
+            }
+
+            await conn.ExecuteAsync(
+                @"DELETE FROM dbo.IMEITable WHERE RTRIM(IMEICODE)=@IMEI;
+                  DELETE FROM dbo.AlertModule WHERE Tracker_tbKey=@TbKey;
+                  DELETE FROM dbo.UDFieldsValue WHERE Tracker_tbKey=@TbKey;
+                  DELETE FROM dbo.UDLabelValue WHERE Tracker_tbKey=@TbKey;
+                  DELETE FROM dbo.Tracker WHERE RTRIM(IMEICode)=@IMEI;
+                  DELETE FROM dbo.Tracker_Info WHERE RTRIM(IMEICode)=@IMEI;
+                  DELETE FROM dbo.PayLog WHERE RTRIM(IMEICode)=@IMEI;
+                  DELETE FROM dbo.ICARMEMBER WHERE RTRIM(IMEICODE)=@IMEI;
+                  DELETE FROM dbo.SendGCM WHERE RTRIM(IMEICODE)=@IMEI;
+                  DELETE FROM dbo.SendGCMLog WHERE RTRIM(IMEICODE)=@IMEI;",
+                new { IMEI = imei, TbKey = trackerTbKey }, tx);
+
+            await conn.ExecuteAsync(
+                @"INSERT INTO dbo.Sub_adminFuntionLog (Sub_adminUser_tbkey, IMEICODE, Admin_Funtion, Memo)
+                  VALUES (@SubKey, @IMEI, @Fun, '')",
+                new { SubKey = subAdminUserTbKey, IMEI = imei, Fun = fun }, tx);
+
+            tx.Commit();
+        }
+        catch (Exception ex)
+        {
+            tx.Rollback();
+            _logger.LogError(ex, "刪除裝置失敗 IMEI={IMEI}", imei);
+            return (false, ex.Message);
+        }
+
+        await DropPerImeiLogTablesSafeAsync(imei);
+        return (true, null);
+    }
+
+    private async Task DropPerImeiLogTablesSafeAsync(string imei)
+    {
+        var suffixes = new[] { "AlertLog_", "SYSLog_", "TL_", "TLS_" };
+        using var logConn = _db.CreateLogConnection();
+        try
+        {
+            await logConn.OpenAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "無法連線 Log DB，略過 DROP per-IMEI 表 IMEI={IMEI}", imei);
+            return;
+        }
+
+        foreach (var suffix in suffixes)
+        {
+            var tableName = suffix + imei;
+            try
+            {
+                var exists = await logConn.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM sys.tables WHERE name = @Name AND schema_id = SCHEMA_ID('dbo')",
+                    new { Name = tableName });
+                if (exists > 0)
+                    await logConn.ExecuteAsync($"DROP TABLE dbo.[{tableName}]");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "DROP Log 表失敗 {Table} IMEI={IMEI}", tableName, imei);
+            }
+        }
+    }
+
     public async Task<OperationResult> UnbindAsync(int tbKey)
     {
         _logger.LogWarning("解除裝置綁定 TbKey={TbKey}", tbKey);

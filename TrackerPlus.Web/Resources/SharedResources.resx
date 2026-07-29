@@ -2202,6 +2202,7 @@
   <data name="Admin_Tracker_MoveHistoryHint" xml:space="preserve"><value>歷史軌跡轉移由系統背景排程執行，完成後資料將歸屬至目標 IMEI。</value></data>
   <data name="Admin_Tracker_SelectDeviceFirst" xml:space="preserve"><value>請先點選一台裝置</value></data>
   <data name="Admin_Tracker_ConfirmDeleteDevice" xml:space="preserve"><value>確定刪除此裝置（IMEI: {0}）？</value></data>
+  <data name="Admin_Tracker_ConfirmDeleteDeviceDetail" xml:space="preserve"><value>是否刪除裝置[{0}]？&#xA;請注意：刪除後裝置歷史記錄與繳費記錄會被清除。</value></data>
   <data name="Admin_Tracker_DeleteOk" xml:space="preserve"><value>刪除成功</value></data>
   <data name="Admin_Tracker_EnterDateRange" xml:space="preserve"><value>請輸入日期區間</value></data>
   <data name="Admin_Tracker_ConfirmClearAll" xml:space="preserve"><value>確定清除全部歷史資料？此動作無法復原。</value></data>
@@ -2215,6 +2216,7 @@
   <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>確定刪除選取的 {0} 台裝置？此動作無法復原。</value></data>
   <data name="Admin_Tracker_ConfirmBatchDeleteDevices" xml:space="preserve"><value>是否刪除裝置？&#xA;請注意：刪除後裝置歷史記錄與繳費記錄會被清除。</value></data>
   <data name="Admin_Tracker_ImeisToDelete" xml:space="preserve"><value>IMEI</value></data>
+  <data name="Admin_Tracker_BatchBusy" xml:space="preserve"><value>...執行中</value></data>
   <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>再次確認：確定要恢復出廠嗎？</value></data>
   <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>來源 IMEI 需為 15 碼</value></data>
   <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>目標 IMEI 需為 15 碼</value></data>

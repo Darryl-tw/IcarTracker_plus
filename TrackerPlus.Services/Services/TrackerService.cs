@@ -227,4 +227,42 @@ public class TrackerService : ITrackerService
             return 0;
         }
     }
+
+    public async Task<OperationResult> BatchDeleteDevicesByImeiAsync(IEnumerable<string> imeis, int subAdminUserTbKey)
+    {
+        var list = imeis.Select(i => i.Trim()).Where(i => i.Length == 15 && i.All(char.IsDigit)).Distinct().ToList();
+        if (list.Count == 0)
+            return OperationResult.Fail("NO_IMEI");
+
+        var errorLines = new List<string>();
+        var deleted = 0;
+        foreach (var imei in list)
+        {
+            var (success, code) = await _trackerRepo.DeleteDeviceByImeiAsync(imei, subAdminUserTbKey, "Delete Drive");
+            if (success)
+                deleted++;
+            else
+                errorLines.Add($"{imei}:{code ?? "ERROR"}");
+        }
+
+        if (deleted == 0 && errorLines.Count > 0)
+            return OperationResult.Fail(string.Join("\n", errorLines));
+
+        var msg = deleted.ToString();
+        if (errorLines.Count > 0)
+            msg += "|" + string.Join("\n", errorLines);
+        return OperationResult.Ok(msg);
+    }
+
+    public async Task<OperationResult> DeleteDeviceByImeiAsync(string imei, int subAdminUserTbKey)
+    {
+        imei = (imei ?? string.Empty).Trim();
+        if (imei.Length != 15 || !imei.All(char.IsDigit))
+            return OperationResult.Fail("INVALID_IMEI");
+
+        var (success, code) = await _trackerRepo.DeleteDeviceByImeiAsync(imei, subAdminUserTbKey, "刪除裝置");
+        if (success)
+            return OperationResult.Ok("OK");
+        return OperationResult.Fail(code ?? "ERROR");
+    }
 }

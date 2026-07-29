@@ -21,6 +21,8 @@ public interface ITrackerRepository
     Task<OperationResult> BatchMoveDevicesAsync(BatchMoveDevicesRequest request);
     Task<OperationResult> FactoryResetAsync(int tbKey);
     Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys);
+
+    Task<(bool Success, string? ErrorCode)> DeleteDeviceByImeiAsync(string imei, int subAdminUserTbKey, string? adminFunction = null);
     Task<OperationResult> UnbindAsync(int tbKey);
     Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey);
 }

@@ -335,14 +335,82 @@ public class TrackerController : AdminBaseController
         return Json(new { success = result.Success, message = msg });
     }
 
-    // ── 整批刪除裝置（刪除選取的 tbKey 列表） ─────────────────────────────────
+    // ── 整批刪除裝置（依 IMEI，需操作者 DelDevice 權限） ───────────────────────
     [HttpPost]
     public async Task<IActionResult> BatchDeleteDevices([FromBody] BatchDeleteRequest req)
     {
-        if (req == null || req.TbKeys == null || !req.TbKeys.Any())
-            return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
-        var deleted = await _trackerService.BatchDeleteByKeysAsync(req.TbKeys);
-        return Json(new { success = true, message = string.Format(L["Admin_Error_BatchDeleted"].Value, deleted) });
+        if (req?.Imeis == null || !req.Imeis.Any())
+            return Json(new { success = false, message = L["Admin_Tracker_EnterImei"].Value });
+
+        if (string.IsNullOrWhiteSpace(req.SubAdminId) || string.IsNullOrWhiteSpace(req.SubAdminPassword))
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminRequired"].Value });
+
+        var subAdminKey = await _subAdminRepo.ValidateDeleteDeviceAsync(req.SubAdminId, req.SubAdminPassword);
+        if (subAdminKey is null or <= 0)
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminInvalid"].Value });
+
+        var result = await _trackerService.BatchDeleteDevicesByImeiAsync(req.Imeis, subAdminKey.Value);
+        if (!result.Success)
+        {
+            var failMsg = FormatBatchDeleteErrors(result.Message ?? string.Empty);
+            return Json(new { success = false, message = failMsg });
+        }
+
+        var parts = (result.Message ?? "0").Split('|', 2);
+        var deleted = int.TryParse(parts[0], out var n) ? n : 0;
+        var message = string.Format(L["Admin_Error_BatchDeleted"].Value, deleted);
+        if (parts.Length > 1 && !string.IsNullOrWhiteSpace(parts[1]))
+            message += "\n" + FormatBatchDeleteErrors(parts[1]);
+        return Json(new { success = true, message });
+    }
+
+    // ── 單筆刪除裝置（對齊舊 IMEI_Del） ───────────────────────────────────────
+    [HttpPost]
+    public async Task<IActionResult> DeleteDevice([FromBody] DeleteDeviceRequest req)
+    {
+        if (req == null || string.IsNullOrWhiteSpace(req.Imei))
+            return Json(new { success = false, message = L["Admin_Tracker_EnterImei"].Value });
+
+        if (string.IsNullOrWhiteSpace(req.SubAdminId) || string.IsNullOrWhiteSpace(req.SubAdminPassword))
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminRequired"].Value });
+
+        var subAdminKey = await _subAdminRepo.ValidateDeleteDeviceAsync(req.SubAdminId, req.SubAdminPassword);
+        if (subAdminKey is null or <= 0)
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminInvalid"].Value });
+
+        var result = await _trackerService.DeleteDeviceByImeiAsync(req.Imei.Trim(), subAdminKey.Value);
+        if (!result.Success)
+        {
+            var msg = result.Message switch
+            {
+                "NOT_FOUND" => L["Admin_Tracker_Msg_DeviceNotFound"].Value,
+                "INVALID_IMEI" => L["Admin_Tracker_EnterImei"].Value,
+                _ => result.Message
+            };
+            return Json(new { success = false, message = msg });
+        }
+        return Json(new { success = true, message = L["Admin_Tracker_DeleteOk"].Value });
+    }
+
+    private string FormatBatchDeleteErrors(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return raw;
+        if (raw == "NO_IMEI") return L["Admin_Tracker_EnterImei"].Value;
+        var lines = raw.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        return string.Join("\n", lines.Select(line =>
+        {
+            var idx = line.IndexOf(':');
+            if (idx <= 0) return line;
+            var imei = line[..idx];
+            var code = line[(idx + 1)..];
+            var reason = code switch
+            {
+                "NOT_FOUND" => L["Admin_Tracker_Msg_DeviceNotFound"].Value,
+                "INVALID_IMEI" => L["Admin_Tracker_EnterImei"].Value,
+                _ => code
+            };
+            return $"{imei}:{reason}";
+        }));
     }
 
     // ── 整批刪除（刪除某會員所有裝置） ──────────────────────────────────────
@@ -530,7 +598,18 @@ public class BatchTransferRequest
     public string? SubAdminPassword { get; set; }
 }
 public class BatchFirmwareRequest { public List<string>? Imeis { get; set; } public string? TargetVersion { get; set; } }
-public class BatchDeleteRequest { public List<int>? TbKeys { get; set; } }
+public class BatchDeleteRequest
+{
+    public List<string>? Imeis { get; set; }
+    public string? SubAdminId { get; set; }
+    public string? SubAdminPassword { get; set; }
+}
+public class DeleteDeviceRequest
+{
+    public string? Imei { get; set; }
+    public string? SubAdminId { get; set; }
+    public string? SubAdminPassword { get; set; }
+}
 public class DeleteAllByMemberRequest { public int MemberTbKey { get; set; } }
 public class SingleTbKeyRequest { public int TbKey { get; set; } }
 public class MoveHistoryRequest { public string? SourceImei { get; set; } public string? DestImei { get; set; } }

@@ -22,6 +22,11 @@ public interface ITrackerService
     Task<OperationResult> BatchMoveDevicesAsync(BatchMoveDevicesRequest request);
     Task<OperationResult> FactoryResetAsync(int tbKey);
     Task<int> BatchDeleteByKeysAsync(IEnumerable<int> tbKeys);
+
+    Task<OperationResult> BatchDeleteDevicesByImeiAsync(IEnumerable<string> imeis, int subAdminUserTbKey);
+
+    /// <summary>單筆刪除（對齊舊 IMEI_Del，Admin_Funtion=刪除裝置）。</summary>
+    Task<OperationResult> DeleteDeviceByImeiAsync(string imei, int subAdminUserTbKey);
     Task<OperationResult> UnbindDeviceAsync(int tbKey);
     Task<OperationResult> UnbindAllByMemberAsync(int memberTbKey);
 }

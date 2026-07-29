@@ -2201,6 +2201,7 @@
   <data name="Admin_Tracker_MoveHistoryHint" xml:space="preserve"><value>History transfer runs in the background. When complete, data will belong to the target IMEI.</value></data>
   <data name="Admin_Tracker_SelectDeviceFirst" xml:space="preserve"><value>Please select a device first</value></data>
   <data name="Admin_Tracker_ConfirmDeleteDevice" xml:space="preserve"><value>Delete this device (IMEI: {0})?</value></data>
+  <data name="Admin_Tracker_ConfirmDeleteDeviceDetail" xml:space="preserve"><value>Delete device [{0}]?&#xA;Note: device history and payment records will be permanently removed.</value></data>
   <data name="Admin_Tracker_DeleteOk" xml:space="preserve"><value>Deleted successfully</value></data>
   <data name="Admin_Tracker_EnterDateRange" xml:space="preserve"><value>Please enter a date range</value></data>
   <data name="Admin_Tracker_ConfirmClearAll" xml:space="preserve"><value>Clear all history? This cannot be undone.</value></data>
@@ -2214,6 +2215,7 @@
   <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>Delete the selected {0} device(s)? This cannot be undone.</value></data>
   <data name="Admin_Tracker_ConfirmBatchDeleteDevices" xml:space="preserve"><value>Delete these devices?&#xA;Device history and payment records will be permanently removed.</value></data>
   <data name="Admin_Tracker_ImeisToDelete" xml:space="preserve"><value>IMEI</value></data>
+  <data name="Admin_Tracker_BatchBusy" xml:space="preserve"><value>...Processing</value></data>
   <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>Confirm again: factory reset this device?</value></data>
   <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>Source IMEI must be 15 digits</value></data>
   <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>Target IMEI must be 15 digits</value></data>
