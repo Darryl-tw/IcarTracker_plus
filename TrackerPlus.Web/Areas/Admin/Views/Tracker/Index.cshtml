@@ -228,15 +228,34 @@
             <div id="em-labels-row" class="mb-2"></div>
             <hr class="my-2" />
             <div class="mb-2">
-              <label class="form-label small fw-semibold mb-2">裝置圖示</label>
-              <div class="d-flex flex-wrap gap-3">
-                @foreach (var ic in new[] {("A","汽車"),("B","貨車"),("C","工作車"),("D","巴士"),("E","機車"),("F","自行車"),("G","人"),("H","寵物")}) {
-                  <div class="form-check">
-                    <input class="form-check-input" type="radio" name="em-icon" id="em-icon-@ic.Item1" value="@ic.Item1">
-                    <label class="form-check-label small" for="em-icon-@ic.Item1">@ic.Item2</label>
-                  </div>
-                }
-              </div>
+              <label class="form-label small fw-semibold mb-2">@L["Admin_Tracker_MapIcon"]</label>
+              <table class="table table-sm table-borderless mb-0 bt-map-icon-grid">
+                <tbody>
+                  <tr>
+                    @foreach (var ic in new[] {
+                      ("A", L["DeviceIcon_A"].Value),
+                      ("B", L["DeviceIcon_B"].Value),
+                      ("C", L["DeviceIcon_C"].Value),
+                      ("D", L["DeviceIcon_D"].Value),
+                      ("E", L["DeviceIcon_E"].Value),
+                      ("F", L["DeviceIcon_F"].Value),
+                      ("G", L["DeviceIcon_G"].Value),
+                      ("H", L["DeviceIcon_H"].Value)
+                    }) {
+                      <td class="text-center">
+                        <img src="@Url.Content($"~/images/map-icons/Icon{ic.Item1}/dir_0.png")" alt="@ic.Item2" class="bt-map-icon-img" />
+                      </td>
+                    }
+                  </tr>
+                  <tr>
+                    @foreach (var ic in new[] { "A", "B", "C", "D", "E", "F", "G", "H" }) {
+                      <td class="text-center">
+                        <input class="form-check-input" type="radio" name="em-icon" id="em-icon-@ic" value="@ic">
+                      </td>
+                    }
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -363,7 +382,7 @@
                 <thead class="table-secondary" style="position:sticky;top:0;z-index:1">
                   <tr>
                     <th>建立日期</th><th>訂單號碼</th><th>業務備註</th><th>操作者</th>
-                    <th>銷售類型</th><th>加值服務</th><th class="text-end">訂單金額</th>
+                    <th>銷售類型</th><th>@L["Admin_Tracker_Col_ValueAdded"]</th><th class="text-end">訂單金額</th>
                     <th>起始日期</th><th>結束日期</th>
                   </tr>
                 </thead>
@@ -523,14 +542,42 @@
         <hr class="my-2" />
         <div class="mb-2">
           <label class="form-label small fw-semibold mb-2">@L["Admin_Tracker_MapIcon"]</label>
-          <div class="d-flex flex-wrap gap-2">
-            @foreach (var ic in new[] {("A","汽車"),("B","貨車"),("C","工作車"),("D","巴士"),("E","機車"),("F","自行車"),("G","人"),("H","寵物")}) {
-              <div class="form-check form-check-inline mb-0">
-                <input class="form-check-input" type="radio" name="bt-icon" id="bt-icon-@ic.Item1" value="@ic.Item1" @(ic.Item1 == "A" ? "checked" : "")>
-                <label class="form-check-label small" for="bt-icon-@ic.Item1">@ic.Item2</label>
-              </div>
-            }
-          </div>
+          <table class="table table-sm table-borderless mb-0 bt-map-icon-grid">
+            <tbody>
+              <tr class="bt-map-icon-img-row">
+                @foreach (var ic in new[] {
+                  ("A", L["DeviceIcon_A"].Value),
+                  ("B", L["DeviceIcon_B"].Value),
+                  ("C", L["DeviceIcon_C"].Value),
+                  ("D", L["DeviceIcon_D"].Value),
+                  ("E", L["DeviceIcon_E"].Value),
+                  ("F", L["DeviceIcon_F"].Value),
+                  ("G", L["DeviceIcon_G"].Value),
+                  ("H", L["DeviceIcon_H"].Value)
+                }) {
+                  <td class="text-center">
+                    <img src="@Url.Content($"~/images/map-icons/Icon{ic.Item1}/dir_0.png")" alt="@ic.Item2" class="bt-map-icon-img" />
+                  </td>
+                }
+              </tr>
+              <tr>
+                @foreach (var ic in new[] {
+                  ("A", L["DeviceIcon_A"].Value),
+                  ("B", L["DeviceIcon_B"].Value),
+                  ("C", L["DeviceIcon_C"].Value),
+                  ("D", L["DeviceIcon_D"].Value),
+                  ("E", L["DeviceIcon_E"].Value),
+                  ("F", L["DeviceIcon_F"].Value),
+                  ("G", L["DeviceIcon_G"].Value),
+                  ("H", L["DeviceIcon_H"].Value)
+                }) {
+                  <td class="text-center">
+                    <input class="form-check-input" type="radio" name="bt-icon" id="bt-icon-@ic.Item1" value="@ic.Item1" @(ic.Item1 == "A" ? "checked" : "") aria-label="@ic.Item2" />
+                  </td>
+                }
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="row g-2 mb-2">
           <div class="col-md-6">
@@ -853,7 +900,17 @@
         line-height: 1.5;
         border-radius: 3px;
     }
-    /* Resizable splitters */
+    .bt-map-icon-grid td {
+        padding: 2px 6px;
+        vertical-align: middle;
+    }
+    .bt-map-icon-img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+    }
     .adm-v-splitter {
         height: 5px;
         background: #dee2e6;
@@ -925,6 +982,7 @@ var _T = {
     enabled:       @Json.Serialize(L["Common_Enabled"].Value),
     disabled:      @Json.Serialize(L["Common_Disabled"].Value),
     paylogActive:  @Json.Serialize(L["Admin_Tracker_PayLog_Active"].Value),
+    valueAdded:    @Json.Serialize(L["Admin_Tracker_Col_ValueAdded"].Value),
     noSelection:   @Json.Serialize(L["Admin_Tracker_NoSelection"].Value),
     noData:        @Json.Serialize(L["Admin_Tracker_NoData"].Value),
     noOrders:      @Json.Serialize(L["Admin_Tracker_NoOrders"].Value),
@@ -1228,7 +1286,7 @@ var _T = {
                     '<td title="' + escHtml(l.memo ?? '') + '">' + escHtml(l.memo ?? '') + '</td>' +
                     '<td>' + escHtml(l.op ?? '') + '</td>' +
                     '<td>' + escHtml(l.saleType || (saleModelLabel[l.saleModel] ?? String(l.saleModel))) + '</td>' +
-                    '<td>' + (l.valueAdded === 1 ? '網頁平台' : '無') + '</td>' +
+                    '<td>' + (l.valueAdded === 1 ? _T.valueAdded : '無') + '</td>' +
                     '<td>' + l.amount + '</td>' +
                     '<td>' + (l.sDate ?? '-') + '</td>' +
                     '<td>' + (l.eDate ?? '-') + '</td>' +
@@ -1420,7 +1478,7 @@ var _T = {
             return `<tr${bg}><td>${l.cDate??'-'}</td><td>${escHtml(l.orderNo??'')}</td>` +
                 `<td>${escHtml(l.memo??'')}</td><td>${escHtml(l.op??'')}</td>` +
                 `<td>${escHtml(l.saleType||(smlMap[l.saleModel]??String(l.saleModel??'')))}</td>` +
-                `<td>${l.valueAdded===1?'網頁平台':'無'}</td>` +
+                `<td>${l.valueAdded===1?_T.valueAdded:'無'}</td>` +
                 `<td class="text-end">${l.amount??0}</td>` +
                 `<td>${l.sDate??'-'}</td><td>${l.eDate??'-'}</td></tr>`;
         }).join('');

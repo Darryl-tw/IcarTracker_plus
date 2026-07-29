@@ -1914,7 +1914,7 @@
   <data name="Admin_Tracker_Col_Firmware" xml:space="preserve"><value>Firmware</value></data>
   <data name="Admin_Tracker_Col_OrderNo" xml:space="preserve"><value>Order no.</value></data>
   <data name="Admin_Tracker_Col_SaleMemo" xml:space="preserve"><value>Sales note</value></data>
-  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>Value-added</value></data>
+  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>Web platform</value></data>
   <data name="Admin_Tracker_Col_StartDate" xml:space="preserve"><value>Start date</value></data>
   <data name="Admin_Tracker_Col_EndDate" xml:space="preserve"><value>End date</value></data>
   <data name="Admin_Tracker_Col_LastReportTime" xml:space="preserve"><value>Last report time</value></data>
@@ -2177,8 +2177,8 @@
   <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>Default order</value></data>
   <data name="Admin_Tracker_Bt_CalcEndDate" xml:space="preserve"><value>Calculate end date</value></data>
   <data name="Admin_Tracker_Bt_ExpiryDisplay" xml:space="preserve"><value>Expiry date</value></data>
-  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>Sub-admin ID</value></data>
-  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>Sub-admin password</value></data>
+  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>Operator:</value></data>
+  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>Operator password:</value></data>
   <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>Sub-admin ID and password are required</value></data>
   <data name="Admin_Tracker_SubAdminInvalid" xml:space="preserve"><value>Invalid sub-admin credentials or insufficient permission</value></data>
   <data name="Admin_Tracker_MapIcon" xml:space="preserve"><value>Map icon</value></data>
@@ -2212,6 +2212,8 @@
   <data name="Admin_Tracker_ConfirmFwUpgrade" xml:space="preserve"><value>Schedule {0} device(s) to upgrade to {1}?</value></data>
   <data name="Admin_Tracker_BatchDeleteNeedSelect" xml:space="preserve"><value>Please select devices to delete first.&#xA;&#xA;To delete all devices for a member, select a device bound to that member first.</value></data>
   <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>Delete the selected {0} device(s)? This cannot be undone.</value></data>
+  <data name="Admin_Tracker_ConfirmBatchDeleteDevices" xml:space="preserve"><value>Delete these devices?&#xA;Device history and payment records will be permanently removed.</value></data>
+  <data name="Admin_Tracker_ImeisToDelete" xml:space="preserve"><value>IMEI</value></data>
   <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>Confirm again: factory reset this device?</value></data>
   <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>Source IMEI must be 15 digits</value></data>
   <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>Target IMEI must be 15 digits</value></data>

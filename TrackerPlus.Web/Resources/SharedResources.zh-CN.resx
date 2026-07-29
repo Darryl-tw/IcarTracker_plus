@@ -1914,7 +1914,7 @@
   <data name="Admin_Tracker_Col_Firmware" xml:space="preserve"><value>固件版本</value></data>
   <data name="Admin_Tracker_Col_OrderNo" xml:space="preserve"><value>订单号码</value></data>
   <data name="Admin_Tracker_Col_SaleMemo" xml:space="preserve"><value>业务备注</value></data>
-  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>增值服务</value></data>
+  <data name="Admin_Tracker_Col_ValueAdded" xml:space="preserve"><value>网页平台</value></data>
   <data name="Admin_Tracker_Col_StartDate" xml:space="preserve"><value>起始日期</value></data>
   <data name="Admin_Tracker_Col_EndDate" xml:space="preserve"><value>结束日期</value></data>
   <data name="Admin_Tracker_Col_LastReportTime" xml:space="preserve"><value>最后回报时间</value></data>
@@ -2177,8 +2177,8 @@
   <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>预设订单</value></data>
   <data name="Admin_Tracker_Bt_CalcEndDate" xml:space="preserve"><value>计算结束日期</value></data>
   <data name="Admin_Tracker_Bt_ExpiryDisplay" xml:space="preserve"><value>到期日期</value></data>
-  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>子账号 ID</value></data>
-  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>子账号密码</value></data>
+  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>操作者:</value></data>
+  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>操作者密码:</value></data>
   <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>请输入子账号 ID 与密码</value></data>
   <data name="Admin_Tracker_SubAdminInvalid" xml:space="preserve"><value>子账号或密码错误，或无此操作权限</value></data>
   <data name="Admin_Tracker_MapIcon" xml:space="preserve"><value>地图图示</value></data>
@@ -2212,6 +2212,8 @@
   <data name="Admin_Tracker_ConfirmFwUpgrade" xml:space="preserve"><value>确定排程 {0} 台设备升级至 {1}？</value></data>
   <data name="Admin_Tracker_BatchDeleteNeedSelect" xml:space="preserve"><value>请先勾选要删除的设备（或选取后使用下方整批功能）&#xA;&#xA;若要删除会员所有设备，请先点选有绑定会员的设备。</value></data>
   <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>确定删除选取的 {0} 台设备？此动作无法复原。</value></data>
+  <data name="Admin_Tracker_ConfirmBatchDeleteDevices" xml:space="preserve"><value>是否删除设备？&#xA;请注意：删除后设备历史记录与缴费记录会被清除。</value></data>
+  <data name="Admin_Tracker_ImeisToDelete" xml:space="preserve"><value>IMEI</value></data>
   <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>再次确认：确定要恢复出厂吗？</value></data>
   <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>来源 IMEI 需为 15 码</value></data>
   <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>目标 IMEI 需为 15 码</value></data>
