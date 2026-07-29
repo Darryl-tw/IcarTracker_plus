@@ -10,6 +10,10 @@ public interface ITrackerService
     Task<IEnumerable<Tracker>> GetMemberTrackersAsync(int memberTbKey);
     Task<PagedResult<Tracker>> GetTrackersPagedAsync(QueryFilter filter, int? memberTbKey = null);
     Task<OperationResult> CreateTrackerAsync(Tracker tracker);
+
+    /// <summary>後台批次新增裝置（對齊舊 IMEI_New）。</summary>
+    Task<OperationResult> InsertDevicesAsync(IEnumerable<string> imeis, int subAdminUserTbKey);
+
     Task<OperationResult> UpdateTrackerAsync(Tracker tracker);
     Task<OperationResult> DeleteTrackerAsync(int tbKey);
     Task<OperationResult> DeleteAllTrackersByMemberAsync(int memberTbKey);

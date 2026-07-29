@@ -2147,7 +2147,7 @@
   <data name="Admin_Dealer_RenewSoon" xml:space="preserve"><value>线上续约功能开发中</value></data>
   <!-- ── Admin Tracker toolbar / modals ── -->
   <data name="Admin_Tracker_BtnAdd" xml:space="preserve"><value>新增</value></data>
-  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>新增设备</value></data>
+  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>新增定位器资料</value></data>
   <data name="Admin_Tracker_BtnDeleteTitle" xml:space="preserve"><value>删除选取设备</value></data>
   <data name="Admin_Tracker_BtnClearHistory" xml:space="preserve"><value>清除历史资料</value></data>
   <data name="Admin_Tracker_BtnBatchTransfer" xml:space="preserve"><value>批次转移</value></data>
@@ -2164,6 +2164,9 @@
   <data name="Admin_Tracker_FilterPh" xml:space="preserve"><value>筛选…</value></data>
   <data name="Admin_Tracker_Imei15Label" xml:space="preserve"><value>IMEI（15码）</value></data>
   <data name="Admin_Tracker_ConfirmAdd" xml:space="preserve"><value>确定新增</value></data>
+  <data name="Admin_Tracker_AddImeiHint" xml:space="preserve"><value>每行一笔 15 码 IMEI，可一次新增多笔。</value></data>
+  <data name="Admin_Tracker_InitOrderLabel" xml:space="preserve"><value>初始化订单:</value></data>
+  <data name="Admin_Tracker_InitOrderHint" xml:space="preserve"><value>新增装置将于 Administrator 帐户下，自动建立第一笔一个月的 0 金额短期订单，并自动启用所有加值服务。</value></data>
   <data name="Admin_Tracker_SelectedImei" xml:space="preserve"><value>选取设备 IMEI：</value></data>
   <data name="Admin_Tracker_NoneSelected" xml:space="preserve"><value>（未选取）</value></data>
   <data name="Admin_Tracker_ClearAllHistory" xml:space="preserve"><value>删除全部历史资料</value></data>
@@ -2223,6 +2226,10 @@
   <data name="Common_Success" xml:space="preserve"><value>成功</value></data>
   <data name="Common_Failed" xml:space="preserve"><value>失败</value></data>
   <data name="Admin_Tracker_Msg_CreateOk" xml:space="preserve"><value>新增成功</value></data>
+  <data name="Admin_Tracker_Msg_CreateSummary" xml:space="preserve"><value>已新增 {0} 笔装置至 Administrator 帐号下</value></data>
+  <data name="Admin_Tracker_Msg_CreateExists" xml:space="preserve"><value>{0} 已存在，略过</value></data>
+  <data name="Admin_Tracker_Msg_CreateFail" xml:space="preserve"><value>{0} 发生错误，请重新新增</value></data>
+  <data name="Admin_Tracker_Msg_CreateException" xml:space="preserve"><value>{0} 发生错误，请通知系统管理人</value></data>
   <data name="Admin_Tracker_Msg_FactoryResetOk" xml:space="preserve"><value>恢复出厂成功</value></data>
   <data name="Admin_Tracker_Msg_BatchTransferOk" xml:space="preserve"><value>已转移 {0} 台</value></data>
   <data name="Admin_Tracker_Msg_ClearAllHistoryOk" xml:space="preserve"><value>历史资料已全部清除</value></data>

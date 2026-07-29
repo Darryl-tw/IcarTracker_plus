@@ -459,6 +459,241 @@ INNER JOIN _PageKeys pk ON t.tbKey = pk.tbKey
         public int MemberTbKey { get; set; }
     }
 
+    /// <summary>對齊舊 IMEI_New.aspx.vb btnCheck_Click 流程。</summary>
+    public async Task<OperationResult> InsertDevicesAsync(IEnumerable<string> imeis, int subAdminUserTbKey)
+    {
+        var lines = imeis
+            .Select(x => (x ?? string.Empty).Trim())
+            .Where(x => x.Length > 0)
+            .ToList();
+        if (lines.Count == 0)
+            return OperationResult.Fail("NO_IMEI");
+
+        const int memberTbKey = 0; // Administrator
+        const int obmTbKey = 1;
+        var sDate = DateTime.Today;
+        var eDate = sDate.AddMonths(1);
+        var orderNo = "init" + sDate.ToString("yyMMdd");
+        var createMemo = "CREATE:" + sDate.ToString("yyyy-MM-dd HH:mm:ss");
+
+        var errors = new List<string>();
+        var success = 0;
+
+        using var conn = _db.CreateMainConnection();
+        await conn.OpenAsync();
+
+        var defaults = await conn.QuerySingleOrDefaultAsync<SystemOptionsRow>(
+            "SELECT TOP 1 TimeZone_tbKey, GPSReportTime, SMSPassword, SOSCT FROM dbo.Options");
+        var timeZone = defaults?.TimeZone_tbKey ?? 29;
+        var gpsReportTime = defaults?.GPSReportTime ?? 60;
+        var smsPassword = defaults?.SMSPassword?.Trim() ?? "0000";
+        var sosCt = defaults?.SOSCT?.Trim() ?? "+886";
+
+        foreach (var raw in lines)
+        {
+            var imei = raw;
+            try
+            {
+                if (imei.Length != 15 || !imei.All(char.IsDigit))
+                {
+                    errors.Add($"IMEI_FORMAT:{imei}");
+                    continue;
+                }
+
+                var existingTracker = await conn.ExecuteScalarAsync<int?>(
+                    "SELECT TOP 1 tbKey FROM dbo.Tracker WHERE RTRIM(IMEICode)=@IMEI",
+                    new { IMEI = imei });
+                if (existingTracker is > 0)
+                {
+                    errors.Add($"IMEI_EXISTS:{imei}");
+                    continue;
+                }
+
+                var imeiCount = await conn.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM dbo.IMEITable WHERE RTRIM(IMEICODE)=@IMEI",
+                    new { IMEI = imei });
+                if (imeiCount == 0)
+                {
+                    await conn.ExecuteAsync(
+                        @"INSERT INTO dbo.IMEITable (OBM_tbKey, IMEICODE, SERIALCODE, CDate, STATUS, CMemo)
+                          VALUES (@OBM, @IMEI, @IMEI, GETUTCDATE(), 'Y', 'AUTO CREATE')",
+                        new { OBM = obmTbKey, IMEI = imei });
+                }
+
+                const string insertTracker = @"
+                    INSERT INTO dbo.Tracker (
+                        TrackerEnabledDate, OBM_tbKey, UserLevel, Member_tbKey, IMEICode, CName,
+                        TrackerEnabled, CurrentStatus, CDate, TimeZone_tbKey, GPSReportTime, IconFile,
+                        SOSCT1, SOSTEL1, SOSCT2, SOSTEL2, SOSCT3, SOSTEL3, SOSMSG, SMSPassword, initParameter, FWVERSION)
+                    VALUES (
+                        GETUTCDATE(), @OBM, 'N', @Member, @IMEI, @IMEI, 'Y', 'N',
+                        GETUTCDATE(),
+                        @TZ, @GPS, 'A', @SOS, '', @SOS, '', @SOS, '', '', @SMS, 'N', '');
+                    SELECT CAST(SCOPE_IDENTITY() AS int);";
+
+                var trackerTbKey = await conn.ExecuteScalarAsync<int>(insertTracker, new
+                {
+                    OBM = obmTbKey,
+                    Member = memberTbKey,
+                    IMEI = imei,
+                    TZ = timeZone,
+                    GPS = gpsReportTime,
+                    SOS = sosCt,
+                    SMS = smsPassword
+                });
+
+                if (trackerTbKey <= 0)
+                {
+                    await conn.ExecuteAsync(
+                        "DELETE FROM dbo.Tracker WHERE RTRIM(IMEICode)=@IMEI",
+                        new { IMEI = imei });
+                    errors.Add($"IMEI_CREATE_FAIL:{imei}");
+                    continue;
+                }
+
+                await conn.ExecuteAsync(
+                    @"UPDATE dbo.IMEITable SET STATUS='Y', Tracker_tbKey=@TrackerKey
+                      WHERE OBM_tbKey=@OBM AND RTRIM(SERIALCODE)=@IMEI;
+                      IF NOT EXISTS (SELECT 1 FROM dbo.Tracker_Info WHERE RTRIM(IMEICode)=@IMEI)
+                          INSERT INTO dbo.Tracker_Info (IMEICode) VALUES (@IMEI);",
+                    new { TrackerKey = trackerTbKey, OBM = obmTbKey, IMEI = imei });
+
+                await EnsureAlertModuleDefaultAsync(conn, trackerTbKey, imei, memberTbKey);
+                await EnsurePerImeiLogTablesAsync(imei);
+
+                await conn.ExecuteAsync(
+                    @"IF NOT EXISTS (
+                          SELECT 1 FROM dbo.PayLog
+                          WHERE RTRIM(IMEICode)=@IMEI AND SDate=@SDate AND EDate=@EDate)
+                      INSERT INTO dbo.PayLog (
+                          Member_tbKey, Tracker_tbKey, IMEICode, OrderNumber, Amount,
+                          ValueAddedFunc, ValueAddedWeb, Model, Sub_adminUser_tbkey, SDate, EDate, CMemo)
+                      VALUES (
+                          @Member, @TrackerKey, @IMEI, @OrderNo, 0,
+                          'Y', 1, 1, @SubKey, @SDate, @EDate, @CMemo)",
+                    new
+                    {
+                        IMEI = imei,
+                        SDate = sDate,
+                        EDate = eDate,
+                        Member = memberTbKey,
+                        TrackerKey = trackerTbKey,
+                        OrderNo = orderNo,
+                        SubKey = subAdminUserTbKey,
+                        CMemo = createMemo
+                    });
+
+                await conn.ExecuteAsync(
+                    @"INSERT INTO dbo.Sub_adminFuntionLog (Sub_adminUser_tbkey, IMEICODE, Admin_Funtion, Memo)
+                      VALUES (@SubKey, @IMEI, N'增加裝置', '')",
+                    new { SubKey = subAdminUserTbKey, IMEI = imei });
+
+                success++;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "新增裝置失敗 IMEI={IMEI}", imei);
+                errors.Add($"IMEI_EXCEPTION:{imei}|{ex.Message}");
+            }
+        }
+
+        // Message 格式：成功筆數|錯誤碼列表（Controller 組裝在地化訊息）
+        var payload = $"{success}|{string.Join("\n", errors)}";
+        return OperationResult.Ok(payload, success);
+    }
+
+    private static async Task EnsureAlertModuleDefaultAsync(
+        Microsoft.Data.SqlClient.SqlConnection conn, int trackerTbKey, string imei, int memberTbKey)
+    {
+        const string sql = @"
+            IF NOT EXISTS (SELECT 1 FROM dbo.AlertModule WHERE Tracker_tbKey=@TrackerKey AND Member_tbKey=@Member)
+            INSERT INTO dbo.AlertModule (
+                Member_tbKey, Tracker_tbKey, ATEnabled, ATWeekDay, ATWeekTime,
+                ACEnabled, ACMinute, APEnabled, APMinute, ASEnabled, ASMinute, ABEnabled,
+                ATMsg, ACMsg, APMsg, ASMsg, ABMsg, AR_EMail1, AR_EMail2, AR_EMail3, AR_SMS1, AR_SMS2, AR_SMS3)
+            VALUES (@Member, @TrackerKey, 'N', '', '00:00', 'N', 0, 'N', 0, 'N', 0, 'N',
+                @Msg, @Msg, @Msg, @Msg, @Msg, '', '', '', '', '', '')";
+        await conn.ExecuteAsync(sql, new { TrackerKey = trackerTbKey, Member = memberTbKey, Msg = imei });
+    }
+
+    private async Task EnsurePerImeiLogTablesAsync(string imei)
+    {
+        // IMEI 已驗證為 15 碼數字，可安全組成表名
+        using var logConn = _db.CreateLogConnection();
+        try
+        {
+            await logConn.OpenAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "無法連線 Log DB，略過建立 per-IMEI 表 IMEI={IMEI}", imei);
+            return;
+        }
+
+        async Task EnsureTable(string tableName, string createSql)
+        {
+            try
+            {
+                var exists = await logConn.ExecuteScalarAsync<int>(
+                    "SELECT COUNT(*) FROM sys.tables WHERE name=@Name AND schema_id=SCHEMA_ID('dbo')",
+                    new { Name = tableName });
+                if (exists == 0)
+                    await logConn.ExecuteAsync(createSql);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "建立 Log 表失敗 {Table} IMEI={IMEI}", tableName, imei);
+            }
+        }
+
+        var tl = "TL_" + imei;
+        var tls = "TLS_" + imei;
+        var alert = "AlertLog_" + imei;
+        var sys = "SYSLog_" + imei;
+
+        await EnsureTable(tl,
+            $@"CREATE TABLE dbo.[{tl}] (
+                [tbKey] [int] PRIMARY KEY IDENTITY (1, 1) NOT NULL,
+                [CDate] [datetime] NOT NULL,
+                [CmdStr] [nvarchar] (700) NOT NULL,
+                [CMode] [char] (1) NOT NULL) ON [PRIMARY]");
+
+        await EnsureTable(tls,
+            $@"CREATE TABLE dbo.[{tls}] (
+                [tbKey] [int] PRIMARY KEY IDENTITY (1, 1) NOT NULL,
+                [SDate] [datetime] NOT NULL,
+                [EDate] [datetime] NULL,
+                [TimeZone_tbKey] [int] NOT NULL,
+                [SDesc] [nchar] (20) NULL) ON [PRIMARY];
+              CREATE INDEX [IDX_SD_{imei}] ON dbo.[{tls}] (SDate DESC)");
+
+        await EnsureTable(alert,
+            $@"CREATE TABLE dbo.[{alert}] (
+                tbKey int PRIMARY KEY IDENTITY,
+                CDate datetime NOT NULL,
+                LogType char(2) NOT NULL,
+                CMemo nvarchar(100),
+                Lat char(10),
+                Lng char(10))");
+
+        await EnsureTable(sys,
+            $@"CREATE TABLE dbo.[{sys}] (
+                tbKey int PRIMARY KEY IDENTITY,
+                CDate datetime NOT NULL,
+                LogType char(2) NOT NULL,
+                CMemo nvarchar(100),
+                Lat char(10),
+                Lng char(10))");
+    }
+
+    private sealed class SystemOptionsRow
+    {
+        public int TimeZone_tbKey { get; set; }
+        public int GPSReportTime { get; set; }
+        public string SMSPassword { get; set; } = "0000";
+        public string SOSCT { get; set; } = "+886";
+    }
+
     public async Task<OperationResult> FactoryResetAsync(int tbKey)
     {
         _logger.LogWarning("恢復出廠 TbKey={TbKey}", tbKey);

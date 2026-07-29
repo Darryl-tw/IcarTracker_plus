@@ -32,12 +32,12 @@
                 </label>
                 <label class="adm-filter-item">
                     <span class="text-muted">IMEI</span>
-                    <input type="text" id="kw-imei" class="form-control form-control-sm" style="width:110px"
+                    <input type="text" id="kw-imei" class="form-control form-control-sm" style="width:160px"
                            onkeydown="if(event.key==='Enter')doSearch()" />
                 </label>
                 <label class="adm-filter-item">
                     <span class="text-muted">@L["Admin_Tracker_Col_Account"]</span>
-                    <input type="text" id="kw-account" class="form-control form-control-sm" style="width:120px"
+                    <input type="text" id="kw-account" class="form-control form-control-sm" style="width:180px"
                            placeholder="ID / Email" autocomplete="off" onkeydown="if(event.key==='Enter')doSearch()" />
                 </label>
                 <button type="button" onclick="doSearch()" class="btn btn-primary btn-sm">@L["Common_Search"]</button>
@@ -406,18 +406,39 @@
   </div>
 </div>
 
-<!-- ===== 新增裝置 Modal ===== -->
+<!-- ===== 新增定位器 Modal（對齊舊 IMEI_New） ===== -->
 <div class="modal fade" id="addTrackerModal" tabindex="-1">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnAddTitle"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2">
+        <h6 class="modal-title mb-0">@L["Admin_Tracker_BtnAddTitle"]</h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_Imei15Label"]</label><input type="text" id="add-imei" class="form-control form-control-sm" maxlength="15" placeholder="000000000000000" /></div>
-        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_Col_Name"]</label><input type="text" id="add-cname" class="form-control form-control-sm" /></div>
+        <div class="mb-2">
+          <label class="form-label small mb-1" for="add-imeis">IMEI</label>
+          <textarea id="add-imeis" class="form-control form-control-sm" rows="8"
+                    placeholder="123456789012345&#10;123456789012346"></textarea>
+          <div class="form-text small">@L["Admin_Tracker_AddImeiHint"]</div>
+        </div>
+        <div class="mb-2">
+          <div class="small fw-semibold mb-1">@L["Admin_Tracker_InitOrderLabel"]</div>
+          <div class="small text-muted">@L["Admin_Tracker_InitOrderHint"]</div>
+        </div>
+        <div class="row g-2 mb-2">
+          <div class="col-md-6">
+            <label class="form-label small mb-1" for="add-sub-id">@L["Admin_Tracker_SubAdminId"]</label>
+            <input type="text" id="add-sub-id" class="form-control form-control-sm" autocomplete="username" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-1" for="add-sub-pw">@L["Admin_Tracker_SubAdminPassword"]</label>
+            <input type="password" id="add-sub-pw" class="form-control form-control-sm" autocomplete="current-password" />
+          </div>
+        </div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-success btn-sm" onclick="doAddTracker()">@L["Admin_Tracker_ConfirmAdd"]</button>
-        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
+        <button type="button" class="btn btn-success btn-sm" id="btn-add-tracker" onclick="doAddTracker()">@L["Common_Confirm"]</button>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -2387,16 +2408,31 @@ var _T = {
             .then(r => { alert(r.message); if (r.success) bootstrap.Modal.getInstance(document.getElementById('moveHistoryModal'))?.hide(); });
     };
 
-    // ── 新增裝置 ────────────────────────────────────────────────────────
-    window.doAddTracker = function () {
-        const imei = document.getElementById('add-imei').value.trim();
-        const cName = document.getElementById('add-cname').value.trim();
-        if (!imei || imei.length !== 15) { alert(_T.imei15Digits); return; }
-        postJson('/Admin/Tracker/CreateTracker', { imei, cName })
-            .then(r => {
-                alert(r.message);
-                if (r.success) { bootstrap.Modal.getInstance(document.getElementById('addTrackerModal'))?.hide(); window.doSearch(); }
+    // ── 新增裝置（對齊舊 IMEI_New）─────────────────────────────────────
+    window.doAddTracker = async function () {
+        const imeisText = (document.getElementById('add-imeis')?.value || '').trim();
+        const subAdminId = (document.getElementById('add-sub-id')?.value || '').trim();
+        const subAdminPassword = document.getElementById('add-sub-pw')?.value || '';
+        if (!imeisText) { await TpDialog.alert(_T.enterImei); return; }
+        if (!subAdminId || !subAdminPassword) { await TpDialog.alert(_T.subAdminRequired); return; }
+        if (_admBusy) return;
+        showAdmBusy(_T.batchBusy);
+        try {
+            const r = await postJson('/Admin/Tracker/CreateTracker', {
+                imeis: imeisText.split(/\r?\n/),
+                subAdminId,
+                subAdminPassword
             });
+            await finishAdmBusyThenAlert(r.message || (r.success ? _T.success : _T.failed), r.success ? _T.success : _T.failed);
+            if (r.success) {
+                bootstrap.Modal.getInstance(document.getElementById('addTrackerModal'))?.hide();
+                document.getElementById('add-imeis').value = '';
+                document.getElementById('add-sub-pw').value = '';
+                window.doSearch();
+            }
+        } catch (err) {
+            await finishAdmBusyThenAlert(_T.failed + (err && err.message ? '：' + err.message : ''), _T.failed);
+        }
     };
 
     // ── 工具函式 ────────────────────────────────────────────────────────

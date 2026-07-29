@@ -2148,7 +2148,7 @@
   <data name="Admin_Dealer_RenewSoon" xml:space="preserve"><value>線上續約功能開發中</value></data>
   <!-- ── Admin Tracker toolbar / modals ── -->
   <data name="Admin_Tracker_BtnAdd" xml:space="preserve"><value>新增</value></data>
-  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>新增裝置</value></data>
+  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>新增定位器資料</value></data>
   <data name="Admin_Tracker_BtnDeleteTitle" xml:space="preserve"><value>刪除選取裝置</value></data>
   <data name="Admin_Tracker_BtnClearHistory" xml:space="preserve"><value>清除歷史資料</value></data>
   <data name="Admin_Tracker_BtnBatchTransfer" xml:space="preserve"><value>批次轉移</value></data>
@@ -2165,6 +2165,9 @@
   <data name="Admin_Tracker_FilterPh" xml:space="preserve"><value>篩選…</value></data>
   <data name="Admin_Tracker_Imei15Label" xml:space="preserve"><value>IMEI（15碼）</value></data>
   <data name="Admin_Tracker_ConfirmAdd" xml:space="preserve"><value>確定新增</value></data>
+  <data name="Admin_Tracker_AddImeiHint" xml:space="preserve"><value>每行一筆 15 碼 IMEI，可一次新增多筆。</value></data>
+  <data name="Admin_Tracker_InitOrderLabel" xml:space="preserve"><value>初始化訂單:</value></data>
+  <data name="Admin_Tracker_InitOrderHint" xml:space="preserve"><value>新增裝置將於 Administrator 帳戶下，自動建立第一筆一個月的 0 金額短期訂單，並自動啟用所有加值服務。</value></data>
   <data name="Admin_Tracker_SelectedImei" xml:space="preserve"><value>選取裝置 IMEI：</value></data>
   <data name="Admin_Tracker_NoneSelected" xml:space="preserve"><value>（未選取）</value></data>
   <data name="Admin_Tracker_ClearAllHistory" xml:space="preserve"><value>刪除全部歷史資料</value></data>
@@ -2224,6 +2227,10 @@
   <data name="Common_Success" xml:space="preserve"><value>成功</value></data>
   <data name="Common_Failed" xml:space="preserve"><value>失敗</value></data>
   <data name="Admin_Tracker_Msg_CreateOk" xml:space="preserve"><value>新增成功</value></data>
+  <data name="Admin_Tracker_Msg_CreateSummary" xml:space="preserve"><value>已新增 {0} 筆裝置至 Administrator 帳號下</value></data>
+  <data name="Admin_Tracker_Msg_CreateExists" xml:space="preserve"><value>{0} 已存在，略過</value></data>
+  <data name="Admin_Tracker_Msg_CreateFail" xml:space="preserve"><value>{0} 發生錯誤，請重新新增</value></data>
+  <data name="Admin_Tracker_Msg_CreateException" xml:space="preserve"><value>{0} 發生錯誤，請通知系統管理人</value></data>
   <data name="Admin_Tracker_Msg_FactoryResetOk" xml:space="preserve"><value>恢復出廠成功</value></data>
   <data name="Admin_Tracker_Msg_BatchTransferOk" xml:space="preserve"><value>已轉移 {0} 台</value></data>
   <data name="Admin_Tracker_Msg_ClearAllHistoryOk" xml:space="preserve"><value>歷史資料已全部清除</value></data>

@@ -2147,7 +2147,7 @@
   <data name="Admin_Dealer_RenewSoon" xml:space="preserve"><value>Online renewal is under development</value></data>
   <!-- ── Admin Tracker toolbar / modals ── -->
   <data name="Admin_Tracker_BtnAdd" xml:space="preserve"><value>Add</value></data>
-  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>Add device</value></data>
+  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>Add locator data</value></data>
   <data name="Admin_Tracker_BtnDeleteTitle" xml:space="preserve"><value>Delete selected device</value></data>
   <data name="Admin_Tracker_BtnClearHistory" xml:space="preserve"><value>Clear History</value></data>
   <data name="Admin_Tracker_BtnBatchTransfer" xml:space="preserve"><value>Batch Transfer</value></data>
@@ -2164,6 +2164,9 @@
   <data name="Admin_Tracker_FilterPh" xml:space="preserve"><value>Filter…</value></data>
   <data name="Admin_Tracker_Imei15Label" xml:space="preserve"><value>IMEI (15 digits)</value></data>
   <data name="Admin_Tracker_ConfirmAdd" xml:space="preserve"><value>Confirm Add</value></data>
+  <data name="Admin_Tracker_AddImeiHint" xml:space="preserve"><value>One 15-digit IMEI per line. Multiple devices can be added at once.</value></data>
+  <data name="Admin_Tracker_InitOrderLabel" xml:space="preserve"><value>Initialization order:</value></data>
+  <data name="Admin_Tracker_InitOrderHint" xml:space="preserve"><value>New devices will be created under the Administrator account with a one-month $0 short-term order, and all value-added services enabled.</value></data>
   <data name="Admin_Tracker_SelectedImei" xml:space="preserve"><value>Selected IMEI: </value></data>
   <data name="Admin_Tracker_NoneSelected" xml:space="preserve"><value>(None selected)</value></data>
   <data name="Admin_Tracker_ClearAllHistory" xml:space="preserve"><value>Delete all history</value></data>
@@ -2223,6 +2226,10 @@
   <data name="Common_Success" xml:space="preserve"><value>Success</value></data>
   <data name="Common_Failed" xml:space="preserve"><value>Failed</value></data>
   <data name="Admin_Tracker_Msg_CreateOk" xml:space="preserve"><value>Created successfully</value></data>
+  <data name="Admin_Tracker_Msg_CreateSummary" xml:space="preserve"><value>Added {0} device(s) under the Administrator account</value></data>
+  <data name="Admin_Tracker_Msg_CreateExists" xml:space="preserve"><value>{0} already exists, skipped</value></data>
+  <data name="Admin_Tracker_Msg_CreateFail" xml:space="preserve"><value>{0} failed, please try again</value></data>
+  <data name="Admin_Tracker_Msg_CreateException" xml:space="preserve"><value>{0} failed, please contact the administrator</value></data>
   <data name="Admin_Tracker_Msg_FactoryResetOk" xml:space="preserve"><value>Factory reset successful</value></data>
   <data name="Admin_Tracker_Msg_BatchTransferOk" xml:space="preserve"><value>Transferred {0} device(s)</value></data>
   <data name="Admin_Tracker_Msg_ClearAllHistoryOk" xml:space="preserve"><value>All history cleared</value></data>

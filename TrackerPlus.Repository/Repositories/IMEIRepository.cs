@@ -219,7 +219,7 @@ public class IMEIRepository : IIMEIRepository
                 SOSCT1, SOSTEL1, SOSCT2, SOSTEL2, SOSCT3, SOSTEL3, SOSMSG, SMSPassword, initParameter, FWVERSION)
             VALUES (
                 GETUTCDATE(), @OBM, 'N', 0, @IMEI, @IMEI, 'Y', 'N',
-                CONVERT(varchar(20), GETUTCDATE(), 112) + REPLACE(CONVERT(varchar(20), GETUTCDATE(), 108), ':', ''),
+                GETUTCDATE(),
                 @TZ, @GPS, 'A', @SOS, '', @SOS, '', @SOS, '', '', @SMS, 'N', '');
             SELECT CAST(SCOPE_IDENTITY() AS int);";
 

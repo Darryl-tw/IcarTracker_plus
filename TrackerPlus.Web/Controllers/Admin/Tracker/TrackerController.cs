@@ -210,27 +210,82 @@ public class TrackerController : AdminBaseController
         return RedirectToAction(nameof(Index));
     }
 
-    // ── 新增裝置 ─────────────────────────────────────────────────────────────
+    // ── 新增裝置（對齊舊 IMEI_New）───────────────────────────────────────────
     [HttpPost]
     public async Task<IActionResult> CreateTracker([FromBody] CreateTrackerRequest req)
     {
-        if (req == null || string.IsNullOrWhiteSpace(req.Imei))
+        if (req == null)
             return Json(new { success = false, message = L["Admin_Error_ImeiRequired"].Value });
-        if (req.Imei.Trim().Length != 15)
-            return Json(new { success = false, message = L["Admin_Error_Imei15Digits"].Value });
 
-        var tracker = new Core.Models.Tracker
+        var imeiLines = (req.Imeis ?? Enumerable.Empty<string>())
+            .Concat(string.IsNullOrWhiteSpace(req.Imei)
+                ? Enumerable.Empty<string>()
+                : new[] { req.Imei })
+            .SelectMany(s => (s ?? string.Empty).Replace("\r\n", "\n").Replace('\r', '\n').Split('\n'))
+            .Select(s => s.Trim())
+            .Where(s => s.Length > 0)
+            .ToList();
+
+        if (imeiLines.Count == 0)
+            return Json(new { success = false, message = L["Admin_Error_ImeiRequired"].Value });
+
+        if (string.IsNullOrWhiteSpace(req.SubAdminId) || string.IsNullOrWhiteSpace(req.SubAdminPassword))
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminRequired"].Value });
+
+        var subAdminKey = await _subAdminRepo.ValidateInsertDeviceAsync(req.SubAdminId, req.SubAdminPassword);
+        if (subAdminKey is null or <= 0)
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminInvalid"].Value });
+
+        var result = await _trackerService.InsertDevicesAsync(imeiLines, subAdminKey.Value);
+        if (!result.Success)
+            return Json(new { success = false, message = result.Message });
+
+        // payload: "{successCount}|{errorLines}"
+        var payload = result.Message ?? string.Empty;
+        var pipe = payload.IndexOf('|');
+        var okCount = 0;
+        var errRaw = string.Empty;
+        if (pipe >= 0)
         {
-            IMEICODE = req.Imei.Trim(),
-            CName = req.CName?.Trim() ?? string.Empty,
-            Member_TbKey = 0,
-            TrackerStatus = "Y"
+            int.TryParse(payload[..pipe], out okCount);
+            errRaw = payload[(pipe + 1)..];
+        }
+        else
+        {
+            okCount = result.Data is int n ? n : 0;
+        }
+
+        var lines = new List<string>
+        {
+            string.Format(L["Admin_Tracker_Msg_CreateSummary"].Value, okCount)
         };
-        var result = await _trackerService.CreateTrackerAsync(tracker);
+        foreach (var err in errRaw.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (err.StartsWith("IMEI_FORMAT:", StringComparison.Ordinal))
+                lines.Add($"{L["Admin_Error_Imei15Digits"].Value}:{err["IMEI_FORMAT:".Length..]}");
+            else if (err.StartsWith("IMEI_EXISTS:", StringComparison.Ordinal))
+                lines.Add(string.Format(L["Admin_Tracker_Msg_CreateExists"].Value, err["IMEI_EXISTS:".Length..]));
+            else if (err.StartsWith("IMEI_CREATE_FAIL:", StringComparison.Ordinal))
+                lines.Add(string.Format(L["Admin_Tracker_Msg_CreateFail"].Value, err["IMEI_CREATE_FAIL:".Length..]));
+            else if (err.StartsWith("IMEI_EXCEPTION:", StringComparison.Ordinal))
+            {
+                var rest = err["IMEI_EXCEPTION:".Length..];
+                var bar = rest.IndexOf('|');
+                var imeiPart = bar >= 0 ? rest[..bar] : rest;
+                var detail = bar >= 0 ? rest[(bar + 1)..] : string.Empty;
+                var msg = string.Format(L["Admin_Tracker_Msg_CreateException"].Value, imeiPart);
+                if (!string.IsNullOrWhiteSpace(detail))
+                    msg += "\n" + detail;
+                lines.Add(msg);
+            }
+            else
+                lines.Add(err);
+        }
+
         return Json(new
         {
-            success = result.Success,
-            message = result.Success ? L["Admin_Tracker_Msg_CreateOk"].Value : result.Message
+            success = okCount > 0,
+            message = string.Join("\n", lines)
         });
     }
 
@@ -575,7 +630,16 @@ public class TrackerController : AdminBaseController
     }
 }
 
-public class CreateTrackerRequest { public string? Imei { get; set; } public string? CName { get; set; } }
+public class CreateTrackerRequest
+{
+    /// <summary>單筆 IMEI（相容舊呼叫）。</summary>
+    public string? Imei { get; set; }
+    /// <summary>多筆 IMEI（每行一筆，或陣列）。</summary>
+    public List<string>? Imeis { get; set; }
+    public string? CName { get; set; }
+    public string? SubAdminId { get; set; }
+    public string? SubAdminPassword { get; set; }
+}
 public class ClearHistoryRequest { public string? Imei { get; set; } public bool DeleteAll { get; set; } public string? StartDate { get; set; } public string? EndDate { get; set; } }
 public class BatchTransferRequest
 {

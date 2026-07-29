@@ -48,4 +48,17 @@ public class SubAdminRepository : ISubAdminRepository
         var key = await conn.ExecuteScalarAsync<int?>(sql, new { Id = subAdminId.Trim(), Pw = subAdminPassword });
         return key is > 0 ? key : null;
     }
+
+    public async Task<int?> ValidateInsertDeviceAsync(string subAdminId, string subAdminPassword)
+    {
+        if (string.IsNullOrWhiteSpace(subAdminId) || string.IsNullOrWhiteSpace(subAdminPassword))
+            return null;
+
+        const string sql = @"SELECT tbKey FROM dbo.Sub_adminUser
+            WHERE Sub_adminID=@Id AND Sub_adminPW=@Pw AND Enable=1 AND InsertDevice=1";
+
+        using var conn = _db.CreateMainConnection();
+        var key = await conn.ExecuteScalarAsync<int?>(sql, new { Id = subAdminId.Trim(), Pw = subAdminPassword });
+        return key is > 0 ? key : null;
+    }
 }

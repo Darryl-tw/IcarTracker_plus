@@ -50,6 +50,19 @@ public class TrackerService : ITrackerService
         }
     }
 
+    public async Task<OperationResult> InsertDevicesAsync(IEnumerable<string> imeis, int subAdminUserTbKey)
+    {
+        try
+        {
+            return await _trackerRepo.InsertDevicesAsync(imeis, subAdminUserTbKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "後台新增裝置失敗 SubAdmin={Sub}", subAdminUserTbKey);
+            return OperationResult.Fail(ex.Message);
+        }
+    }
+
     public async Task<OperationResult> UpdateTrackerAsync(Tracker tracker)
     {
         try
