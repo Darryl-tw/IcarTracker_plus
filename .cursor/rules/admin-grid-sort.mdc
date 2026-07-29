@@ -1,0 +1,40 @@
+---
+description: 後台 DBGrid 欄位標題必須可排序
+globs: TrackerPlus.Web/Areas/Admin/**/*.{cshtml,cs}
+alwaysApply: false
+---
+
+# Admin DBGrid 標題排序
+
+凡後台有資料表格（DBGrid）的列表頁，欄位標題（操作欄除外）都要可點擊排序。
+
+## 分頁列表（Server）
+
+1. Controller 接收 `sortBy` / `sortDesc`，用 `GridSortHelper.ApplySort(filter, …)`
+2. Repository `ORDER BY` 必須走白名單（參考 `TrackerRepository.BuildOrderByClause`）
+3. View：
+
+```html
+<table data-grid-sort="server">
+  <th class="@GridSortHelper.ThClass(filter, "imei")" data-sort="imei">IMEI<span class="sort-ind"></span></th>
+</table>
+```
+
+4. 搜尋表單／分頁連結要保留 `sortBy`、`sortDesc`
+
+## 全量在 DOM（Client）
+
+```html
+<table data-grid-sort="client">
+  <th class="sortable" data-type="text|num|date">…<span class="sort-ind"></span></th>
+</table>
+```
+
+## 資源
+
+- `wwwroot/js/grid-sort.js`、`wwwroot/css/grid-sort.css`（Admin layout 已掛）
+- `Helpers/GridSortHelper.cs`
+
+## ❌ 不要
+
+只排當前頁卻假裝全庫排序；分頁資料必須 server-side sort。

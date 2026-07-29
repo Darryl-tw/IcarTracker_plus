@@ -1,0 +1,10 @@
+@* 全站 TpDialog i18n + script（layouts 引用） *@
+<script>
+    window.TpDialogI18n = {
+        yes: @Json.Serialize(L["Common_Yes"].Value),
+        cancel: @Json.Serialize(L["Common_Cancel"].Value),
+        ok: @Json.Serialize(L["Common_Confirm"].Value),
+        confirmDelete: @Json.Serialize(L["Dialog_ConfirmDelete"].Value)
+    };
+</script>
+<script src="~/js/tp-dialog.js" asp-append-version="true"></script>

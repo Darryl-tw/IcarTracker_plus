@@ -47,7 +47,9 @@
                     <td>
                         <a asp-action="Detail" asp-route-id="@t.TbKey" class="btn btn-sm btn-info btn-with-icon">@Html.UiIcon("details")<span>@L["Common_Details"]</span></a>
                         <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, t.IMEICODE)')">
+                              data-tp-confirm
+                              data-tp-confirm-title="@L["Dialog_ConfirmDelete"]"
+                              data-tp-confirm-message="@t.IMEICODE">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@t.TbKey" />
                             <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>

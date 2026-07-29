@@ -39,10 +39,11 @@ public class IMEIRepository : IIMEIRepository
     {
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter);
+        var orderBy = BuildOrderByClause(filter);
 
         var countSql = $"SELECT COUNT(*) {IMEIMapper.FromSql} {where}";
         var dataSql = $@"{IMEIMapper.SelectSql} {IMEIMapper.FromSql} {where}
-            ORDER BY i.tbKey DESC
+            {orderBy}
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var param = new { filter.Keyword, filter.Status, Offset = offset, filter.PageSize };
@@ -324,5 +325,22 @@ public class IMEIRepository : IIMEIRepository
         if (!string.IsNullOrWhiteSpace(filter.Status))
             conditions.Add("RTRIM(i.STATUS) = @Status");
         return conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;
+    }
+
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? "").Trim().ToLowerInvariant();
+        return key switch
+        {
+            "tbkey" => $"ORDER BY i.tbKey {dir}",
+            "imei" or "imeicode" => $"ORDER BY RTRIM(i.IMEICODE) {dir}",
+            "model" or "modelname" => $"ORDER BY RTRIM(ISNULL(i.TK_Model,'')) {dir}",
+            "firmware" or "firmwareversion" => $"ORDER BY RTRIM(ISNULL(t.FWVersion,'')) {dir}",
+            "status" => $"ORDER BY RTRIM(i.STATUS) {dir}",
+            "member" or "membername" => $"ORDER BY RTRIM(ISNULL(m.CName,'')) {dir}",
+            "cdate" or "createdate" => $"ORDER BY i.CDate {dir}",
+            _ => "ORDER BY i.tbKey DESC"
+        };
     }
 }

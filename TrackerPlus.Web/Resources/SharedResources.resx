@@ -1300,34 +1300,34 @@
     <value>建立日期</value>
   </data>
   <data name="Admin_Firmware_Desc" xml:space="preserve">
-    <value>說明</value>
+    <value>新版本</value>
   </data>
   <data name="Admin_Firmware_EditTitle" xml:space="preserve">
     <value>編輯韌體</value>
   </data>
   <data name="Admin_Firmware_FileName" xml:space="preserve">
-    <value>檔名</value>
+    <value>檔案名稱</value>
   </data>
   <data name="Admin_Firmware_FtpCol" xml:space="preserve">
     <value>FTP</value>
   </data>
   <data name="Admin_Firmware_FtpDir" xml:space="preserve">
-    <value>FTP 目錄</value>
+    <value>檔案儲存路徑</value>
   </data>
   <data name="Admin_Firmware_FtpHost" xml:space="preserve">
-    <value>FTP 主機</value>
+    <value>FTP 帳號</value>
   </data>
   <data name="Admin_Firmware_FtpPass" xml:space="preserve">
-    <value>FTP 密碼</value>
+    <value>使用者密碼</value>
   </data>
   <data name="Admin_Firmware_FtpUser" xml:space="preserve">
-    <value>FTP 帳號</value>
+    <value>使用者名稱</value>
   </data>
   <data name="Admin_Firmware_SearchPh" xml:space="preserve">
     <value>版本 / 檔名 / 說明</value>
   </data>
   <data name="Admin_Firmware_Size" xml:space="preserve">
-    <value>大小</value>
+    <value>檔案大小</value>
   </data>
   <data name="Admin_Firmware_VersionCol" xml:space="preserve">
     <value>韌體版本</value>
@@ -1564,7 +1564,10 @@
     <value>啟用</value>
   </data>
   <data name="Common_ConfirmDelete" xml:space="preserve">
-    <value>確定刪除?</value>
+    <value>確定要刪除嗎？</value>
+  </data>
+  <data name="Dialog_ConfirmDelete" xml:space="preserve">
+    <value>確定要刪除嗎？</value>
   </data>
   <data name="Common_ConfirmDeleteItem" xml:space="preserve">
     <value>確定刪除 {0}?</value>
@@ -1933,6 +1936,12 @@
   <data name="Admin_Tracker_DeleteFail" xml:space="preserve"><value>刪除失敗</value></data>
   <data name="Common_PerPage" xml:space="preserve"><value>每頁</value></data>
   <data name="Common_JumpTo" xml:space="preserve"><value>跳至</value></data>
+  <data name="Common_BtnFirst" xml:space="preserve"><value>第一頁</value></data>
+  <data name="Common_BtnLast" xml:space="preserve"><value>最後一頁</value></data>
+  <data name="Common_PageNoPrefix" xml:space="preserve"><value>第</value></data>
+  <data name="Common_PageNoMid" xml:space="preserve"><value>頁，共</value></data>
+  <data name="Common_PageNoSuffix" xml:space="preserve"><value>頁</value></data>
+  <data name="Common_RecordsUnit" xml:space="preserve"><value>筆</value></data>
   <data name="Admin_Tracker_BtnUnbindAll" xml:space="preserve"><value>解除所有裝置</value></data>
   <data name="Admin_PayLog_SM_1" xml:space="preserve"><value>生產維修</value></data>
   <data name="Admin_PayLog_SM_2" xml:space="preserve"><value>國內零售</value></data>
@@ -2126,4 +2135,97 @@
   <data name="Admin_Dealer_Edit_PwConfirm" xml:space="preserve"><value>密碼確認</value></data>
   <data name="Admin_Dealer_Edit_PwTooShort" xml:space="preserve"><value>密碼長度不可小於 6 碼</value></data>
   <data name="Admin_Dealer_Edit_PwMismatch" xml:space="preserve"><value>密碼與確認密碼不一致</value></data>
+  <data name="Admin_Dealer_BtnView" xml:space="preserve"><value>檢視</value></data>
+  <data name="Admin_Dealer_BtnPrint" xml:space="preserve"><value>列印</value></data>
+  <data name="Admin_Dealer_BtnOnlineRenew" xml:space="preserve"><value>線上續約</value></data>
+  <data name="Admin_Dealer_SelectFirst" xml:space="preserve"><value>請先選擇一筆經銷商資料</value></data>
+  <data name="Admin_Firmware_SelectFirst" xml:space="preserve"><value>請先選擇一筆韌體版本</value></data>
+  <data name="Admin_Firmware_VersionRequired" xml:space="preserve"><value>韌體版本不可為空</value></data>
+  <data name="Admin_Dealer_ConfirmDelete" xml:space="preserve"><value>確定要刪除【{0}】？此操作無法還原。</value></data>
+  <data name="Admin_Dealer_Entity" xml:space="preserve"><value>經銷商</value></data>
+  <data name="Admin_Dealer_ContactSection" xml:space="preserve"><value>聯絡資訊</value></data>
+  <data name="Admin_Dealer_RenewSoon" xml:space="preserve"><value>線上續約功能開發中</value></data>
+  <!-- ── Admin Tracker toolbar / modals ── -->
+  <data name="Admin_Tracker_BtnAdd" xml:space="preserve"><value>新增</value></data>
+  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>新增裝置</value></data>
+  <data name="Admin_Tracker_BtnDeleteTitle" xml:space="preserve"><value>刪除選取裝置</value></data>
+  <data name="Admin_Tracker_BtnClearHistory" xml:space="preserve"><value>清除歷史資料</value></data>
+  <data name="Admin_Tracker_BtnBatchTransfer" xml:space="preserve"><value>批次轉移</value></data>
+  <data name="Admin_Tracker_BtnBatchTransferTitle" xml:space="preserve"><value>批次轉移 OBM</value></data>
+  <data name="Admin_Tracker_BtnFwUpgrade" xml:space="preserve"><value>韌體昇級</value></data>
+  <data name="Admin_Tracker_BtnBatchDelete" xml:space="preserve"><value>整批刪除裝置</value></data>
+  <data name="Admin_Tracker_BtnBatchDeleteTitle" xml:space="preserve"><value>整批刪除（可多選：Ctrl+點列，或於視窗貼上多行 IMEI）</value></data>
+  <data name="Admin_Tracker_BatchDeleteHint" xml:space="preserve"><value>每行一筆 15 碼 IMEI。可先按住 Ctrl 點選上方列表多列，再按整批刪除帶入。</value></data>
+  <data name="Admin_Tracker_BatchDeleteWarn" xml:space="preserve"><value>刪除後裝置、訂單與相關資料無法復原，請確認 IMEI 正確。</value></data>
+  <data name="Admin_Tracker_BtnFrontendSingle" xml:space="preserve"><value>前台(單機)</value></data>
+  <data name="Admin_Tracker_BtnFactoryReset" xml:space="preserve"><value>恢復出廠</value></data>
+  <data name="Admin_Tracker_BtnFactoryResetTitle" xml:space="preserve"><value>恢復出廠設定</value></data>
+  <data name="Admin_Tracker_BtnMoveHistory" xml:space="preserve"><value>轉移歷史軌跡</value></data>
+  <data name="Admin_Tracker_FilterPh" xml:space="preserve"><value>篩選…</value></data>
+  <data name="Admin_Tracker_Imei15Label" xml:space="preserve"><value>IMEI（15碼）</value></data>
+  <data name="Admin_Tracker_ConfirmAdd" xml:space="preserve"><value>確定新增</value></data>
+  <data name="Admin_Tracker_SelectedImei" xml:space="preserve"><value>選取裝置 IMEI：</value></data>
+  <data name="Admin_Tracker_NoneSelected" xml:space="preserve"><value>（未選取）</value></data>
+  <data name="Admin_Tracker_ClearAllHistory" xml:space="preserve"><value>刪除全部歷史資料</value></data>
+  <data name="Admin_Tracker_ClearRangeHistory" xml:space="preserve"><value>刪除指定區間</value></data>
+  <data name="Admin_Tracker_ClearIrreversible" xml:space="preserve"><value>注意：刪除後無法復原</value></data>
+  <data name="Admin_Tracker_ConfirmClear" xml:space="preserve"><value>確定清除</value></data>
+  <data name="Admin_Tracker_ImeisToTransfer" xml:space="preserve"><value>要轉移的 IMEI（每行一筆，或留空使用選取列）</value></data>
+  <data name="Admin_Tracker_TargetObm" xml:space="preserve"><value>目標 OBM 經銷商</value></data>
+  <data name="Admin_Tracker_Bt_MoveDealer" xml:space="preserve"><value>經銷商移至</value></data>
+  <data name="Admin_Tracker_Bt_ResetOnline" xml:space="preserve"><value>重置上線時間</value></data>
+  <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>預設訂單</value></data>
+  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>子帳號 ID</value></data>
+  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>子帳號密碼</value></data>
+  <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>請輸入子帳號 ID 與密碼</value></data>
+  <data name="Admin_Tracker_SubAdminInvalid" xml:space="preserve"><value>子帳號或密碼錯誤，或無此操作權限</value></data>
+  <data name="Admin_Tracker_MapIcon" xml:space="preserve"><value>地圖圖示</value></data>
+  <data name="Admin_Tracker_IsSimBundled" xml:space="preserve"><value>是否綁定 SIM 卡</value></data>
+  <data name="Admin_Tracker_ConfirmTransfer" xml:space="preserve"><value>確定轉移</value></data>
+  <data name="Admin_Tracker_SelectObm" xml:space="preserve"><value>選擇 OBM</value></data>
+  <data name="Admin_Tracker_ImeisToUpgrade" xml:space="preserve"><value>要昇級的 IMEI（每行一筆，或留空使用選取列）</value></data>
+  <data name="Admin_Tracker_TargetFwVersion" xml:space="preserve"><value>目標韌體版本</value></data>
+  <data name="Admin_Tracker_ConfirmScheduleUpgrade" xml:space="preserve"><value>確定排程昇級</value></data>
+  <data name="Admin_Tracker_SelectVersion" xml:space="preserve"><value>選擇版本</value></data>
+  <data name="Admin_Tracker_FactoryResetWill" xml:space="preserve"><value>此操作將：</value></data>
+  <data name="Admin_Tracker_FactoryResetUnbind" xml:space="preserve"><value>解除會員綁定</value></data>
+  <data name="Admin_Tracker_FactoryResetClearName" xml:space="preserve"><value>清除裝置名稱</value></data>
+  <data name="Admin_Tracker_FactoryResetClearAlert" xml:space="preserve"><value>清除警報設定</value></data>
+  <data name="Admin_Tracker_FactoryResetClearCustom" xml:space="preserve"><value>清除自訂欄位與群組標籤</value></data>
+  <data name="Admin_Tracker_FactoryResetConfirmMsg" xml:space="preserve"><value>確定要恢復出廠嗎？此動作無法復原。</value></data>
+  <data name="Admin_Tracker_ConfirmFactoryReset" xml:space="preserve"><value>確定恢復出廠</value></data>
+  <data name="Admin_Tracker_SourceImei" xml:space="preserve"><value>來源 IMEI（舊裝置）</value></data>
+  <data name="Admin_Tracker_DestImei" xml:space="preserve"><value>目標 IMEI（新裝置）</value></data>
+  <data name="Admin_Tracker_MoveHistoryHint" xml:space="preserve"><value>歷史軌跡轉移由系統背景排程執行，完成後資料將歸屬至目標 IMEI。</value></data>
+  <data name="Admin_Tracker_SelectDeviceFirst" xml:space="preserve"><value>請先點選一台裝置</value></data>
+  <data name="Admin_Tracker_ConfirmDeleteDevice" xml:space="preserve"><value>確定刪除此裝置（IMEI: {0}）？</value></data>
+  <data name="Admin_Tracker_DeleteOk" xml:space="preserve"><value>刪除成功</value></data>
+  <data name="Admin_Tracker_EnterDateRange" xml:space="preserve"><value>請輸入日期區間</value></data>
+  <data name="Admin_Tracker_ConfirmClearAll" xml:space="preserve"><value>確定清除全部歷史資料？此動作無法復原。</value></data>
+  <data name="Admin_Tracker_ConfirmClearRange" xml:space="preserve"><value>確定清除區間歷史資料？此動作無法復原。</value></data>
+  <data name="Admin_Tracker_EnterImei" xml:space="preserve"><value>請輸入 IMEI</value></data>
+  <data name="Admin_Tracker_SelectTargetObm" xml:space="preserve"><value>請選擇目標 OBM</value></data>
+  <data name="Admin_Tracker_ConfirmBatchTransfer" xml:space="preserve"><value>確定將 {0} 台裝置轉移至選取的 OBM？</value></data>
+  <data name="Admin_Tracker_SelectFwVersion" xml:space="preserve"><value>請選擇韌體版本</value></data>
+  <data name="Admin_Tracker_ConfirmFwUpgrade" xml:space="preserve"><value>確定排程 {0} 台裝置昇級至 {1}？</value></data>
+  <data name="Admin_Tracker_BatchDeleteNeedSelect" xml:space="preserve"><value>請先勾選要刪除的裝置（或選取後使用下方整批功能）&#xA;&#xA;若要刪除會員所有裝置，請先點選有綁定會員的裝置。</value></data>
+  <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>確定刪除選取的 {0} 台裝置？此動作無法復原。</value></data>
+  <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>再次確認：確定要恢復出廠嗎？</value></data>
+  <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>來源 IMEI 需為 15 碼</value></data>
+  <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>目標 IMEI 需為 15 碼</value></data>
+  <data name="Admin_Tracker_ConfirmMoveHistory" xml:space="preserve"><value>確定將 {0} 的歷史軌跡轉移至 {1}？</value></data>
+  <data name="Common_Success" xml:space="preserve"><value>成功</value></data>
+  <data name="Common_Failed" xml:space="preserve"><value>失敗</value></data>
+  <data name="Admin_Tracker_Msg_CreateOk" xml:space="preserve"><value>新增成功</value></data>
+  <data name="Admin_Tracker_Msg_FactoryResetOk" xml:space="preserve"><value>恢復出廠成功</value></data>
+  <data name="Admin_Tracker_Msg_BatchTransferOk" xml:space="preserve"><value>已轉移 {0} 台</value></data>
+  <data name="Admin_Tracker_Msg_ClearAllHistoryOk" xml:space="preserve"><value>歷史資料已全部清除</value></data>
+  <data name="Admin_Tracker_Msg_ClearHistoryOk" xml:space="preserve"><value>刪除成功</value></data>
+  <data name="Admin_Tracker_Msg_FwUpgradeOk" xml:space="preserve"><value>已排程 {0} 筆裝置升級至 {1}</value></data>
+  <data name="Admin_Tracker_Msg_FwVersionNotFound" xml:space="preserve"><value>找不到韌體版本</value></data>
+  <data name="Admin_Tracker_Msg_FwQueueFail" xml:space="preserve"><value>排程失敗</value></data>
+  <data name="Admin_Tracker_Msg_MoveHistoryOk" xml:space="preserve"><value>已加入轉移佇列，系統背景排程執行</value></data>
+  <data name="Admin_Tracker_Msg_MoveHistoryFail" xml:space="preserve"><value>加入佇列失敗</value></data>
+  <data name="Admin_Tracker_Msg_DeviceNotFound" xml:space="preserve"><value>找不到裝置</value></data>
+  <data name="Admin_Tracker_Msg_NoImei" xml:space="preserve"><value>無 IMEI</value></data>
 </root>

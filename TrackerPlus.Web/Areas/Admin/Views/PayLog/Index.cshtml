@@ -9,6 +9,8 @@
     <a asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_PayLog_Add"]</span></a>
 </div>
 <form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="sortBy" value="@filter.SortBy" />
+    <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
     <div class="col-md-3">
         <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_PayLog_SearchPh"]" />
     </div>
@@ -21,17 +23,17 @@
     <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
 </form>
 <div class="table-responsive">
-    <table class="table table-striped table-sm">
+    <table class="table table-striped table-sm" data-grid-sort="server">
         <thead class="table-dark">
             <tr>
-                <th>TbKey</th>
-                <th>IMEI</th>
-                <th>@L["Admin_PayLog_Member"]</th>
-                <th>@L["Admin_PayLog_Amount"]</th>
-                <th>@L["Admin_PayLog_SaleModel"]</th>
-                <th>@L["Admin_PayLog_ServiceFrom"]</th>
-                <th>@L["Admin_PayLog_ServiceTo"]</th>
-                <th>@L["Field_CreatedDate"]</th>
+                <th class="@GridSortHelper.ThClass(filter, "tbKey")" data-sort="tbKey">TbKey<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "imei")" data-sort="imei">IMEI<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "member")" data-sort="member">@L["Admin_PayLog_Member"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "amount")" data-sort="amount">@L["Admin_PayLog_Amount"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "saleModel")" data-sort="saleModel">@L["Admin_PayLog_SaleModel"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "sdate")" data-sort="sdate">@L["Admin_PayLog_ServiceFrom"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "edate")" data-sort="edate">@L["Admin_PayLog_ServiceTo"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "cdate")" data-sort="cdate">@L["Field_CreatedDate"]<span class="sort-ind"></span></th>
                 <th>@L["Common_Operation"]</th>
             </tr>
         </thead>
@@ -50,7 +52,8 @@
                     <td>
                         <a asp-action="Detail" asp-route-id="@p.TbKey" class="btn btn-sm btn-info btn-with-icon">@Html.UiIcon("details")<span>@L["Common_Details"]</span></a>
                         <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@L["Common_ConfirmDelete"]')">
+                              data-tp-confirm
+                              data-tp-confirm-title="@L["Dialog_ConfirmDelete"]">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@p.TbKey" />
                             <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
@@ -66,11 +69,11 @@
     <div>
         @if (Model.HasPreviousPage)
         {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" asp-route-startDate="@filter.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@filter.EndDate?.ToString("yyyy-MM-dd")" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
         }
         @if (Model.HasNextPage)
         {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" asp-route-startDate="@filter.StartDate?.ToString("yyyy-MM-dd")" asp-route-endDate="@filter.EndDate?.ToString("yyyy-MM-dd")" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
         }
     </div>
 </div>

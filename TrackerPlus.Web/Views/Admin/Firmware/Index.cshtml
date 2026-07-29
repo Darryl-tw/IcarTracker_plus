@@ -1,94 +1,490 @@
 @using TrackerPlus.Core.Common
-@model PagedResult<TrackerPlus.Core.Models.FirmwareVersion>
+@using TrackerPlus.Core.Models
+@model PagedResult<FirmwareVersion>
 @{
     ViewData["Title"] = L["Admin_Firmware_Title"].Value;
     var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
+    var totalPages = Math.Max(Model.TotalPages, 1);
+    var pageSize = filter.PageSize > 0 ? filter.PageSize : 10;
 }
-<div class="d-flex justify-content-between mb-3">
-    <h2>@L["Admin_Firmware_Title"] (FWCONROL)</h2>
-    <a asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_Firmware_AddVersion"]</span></a>
+<style>
+.fw-toolbar {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+    padding: 8px 10px; background: #f1f3f5; border: 1px solid #ced4da; border-bottom: 0;
+    border-radius: 4px 4px 0 0;
+}
+.fw-toolbar .btn { min-width: 72px; }
+.fw-grid {
+    border: 1px solid #ced4da; border-radius: 0 0 4px 4px; background: #fff;
+    display: flex; flex-direction: column; height: 420px; min-height: 420px;
+}
+.fw-grid-body { flex: 1; overflow: auto; min-height: 0; }
+.fw-grid-body table { margin-bottom: 0; }
+.fw-grid-body thead th { position: sticky; top: 0; z-index: 1; }
+.fw-grid-body tbody tr { cursor: pointer; }
+.fw-grid-body tbody tr.selected-row td { background-color: #ffe066 !important; }
+.fw-grid-pager {
+    flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center;
+    gap: 8px 12px; padding: 8px 10px; border-top: 1px solid #ced4da;
+    background: #f8f9fa; font-size: 0.875rem;
+}
+.fw-grid-pager .pager-btns { display: inline-flex; gap: 4px; }
+.fw-grid-pager .pager-btns .btn { min-width: 4.5rem; }
+.fw-grid-pager input[type="number"] {
+    width: 56px; display: inline-block; text-align: center; padding: 2px 4px; height: 28px;
+}
+.fw-grid-pager select { width: 68px; display: inline-block; padding: 2px 4px; height: 28px; }
+.fw-grid-pager .pager-right { margin-left: auto; white-space: nowrap; }
+.fw-modal-form .field-row {
+    display: flex; align-items: center; margin-bottom: 0.65rem; gap: 8px;
+}
+.fw-modal-form .field-label {
+    width: 110px; flex-shrink: 0; text-align: right; font-weight: 600; font-size: 0.875rem;
+}
+.fw-modal-form .field-value { flex: 1; }
+#fwModal .modal-header { background: #cfe2ff; padding: 0.5rem 1rem; }
+#fwModal .modal-title { font-size: 1rem; font-weight: 700; }
+#fwScheduleModal .modal-header { background: #fff3cd; padding: 0.5rem 1rem; }
+#fwScheduleModal .modal-title { font-size: 1rem; font-weight: 700; }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="mb-2">
+    <h2 class="mb-0">@L["Admin_Firmware_Title"]</h2>
 </div>
-<form method="get" class="row g-2 mb-3">
+
+<form method="get" class="row g-2 mb-2" id="fw-search-form">
+    <input type="hidden" name="page" value="1" />
+    <input type="hidden" name="pageSize" value="@pageSize" />
+    <input type="hidden" name="sortBy" value="@filter.SortBy" />
+    <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
     <div class="col-md-4">
-        <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_Firmware_SearchPh"]" />
+        <input type="text" name="keyword" value="@filter.Keyword" class="form-control form-control-sm"
+               placeholder="@L["Admin_Firmware_SearchPh"]" />
     </div>
-    <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary btn-sm btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button>
+    </div>
 </form>
 
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <div class="alert alert-success py-2">@TempData["Success"]</div>
 }
 
-<div class="card mb-3">
-    <div class="card-header">@L["Admin_Firmware_Batch"]</div>
-    <div class="card-body">
-        <form asp-action="BatchQueue" method="post" class="row g-2">
-            @Html.AntiForgeryToken()
-            <div class="col-md-4">
-                <select name="targetFwVersion" class="form-select" required>
-                    <option value="">@L["Admin_Firmware_SelectVersion"]</option>
-                    @foreach (var f in Model.Items)
-                    {
-                        <option value="@f.FWVERSION">@f.FWVERSION</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-6">
-                <textarea name="imeiList" class="form-control" rows="2" placeholder="@L["Admin_Firmware_ImeiList"]" required></textarea>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-warning w-100 btn-with-icon">@Html.UiIcon("schedule")<span>@L["Admin_Firmware_Schedule"]</span></button>
-            </div>
+<div class="fw-toolbar">
+    <button type="button" class="btn btn-success btn-sm btn-with-icon" onclick="fwAction('create')">
+        @Html.UiIcon("add")<span>@L["Admin_Tracker_BtnAdd"]</span>
+    </button>
+    <button type="button" class="btn btn-info btn-sm btn-with-icon text-white" onclick="fwAction('view')">
+        @Html.UiIcon("eye")<span>@L["Admin_Dealer_BtnView"]</span>
+    </button>
+    <button type="button" class="btn btn-primary btn-sm btn-with-icon" onclick="fwAction('edit')">
+        @Html.UiIcon("edit")<span>@L["Admin_Dealer_Edit_Title"]</span>
+    </button>
+    <button type="button" class="btn btn-danger btn-sm btn-with-icon" onclick="fwAction('delete')">
+        @Html.UiIcon("delete")<span>@L["Common_Delete"]</span>
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm btn-with-icon" disabled title="@L["Admin_Dealer_BtnPrint"]">
+        @Html.UiIcon("export")<span>@L["Admin_Dealer_BtnPrint"]</span>
+    </button>
+    <button type="button" class="btn btn-warning btn-sm btn-with-icon" id="fwScheduleBtn" onclick="fwAction('schedule')">
+        @Html.UiIcon("schedule")<span>@L["Admin_Firmware_Schedule"]</span>
+    </button>
+</div>
+
+<div class="fw-grid mb-3">
+    <div class="fw-grid-body table-responsive">
+        <table class="table table-striped table-sm table-bordered mb-0" id="fwTable" data-grid-sort="server">
+            <thead class="table-dark">
+                <tr>
+                    <th class="@GridSortHelper.ThClass(filter, "fwversion")" data-sort="fwversion">@L["Admin_Firmware_VersionCol"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "ftpserver")" data-sort="ftpserver">@L["Admin_Firmware_FtpHost"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "ftpusername")" data-sort="ftpusername">@L["Admin_Firmware_FtpUser"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "ftppassword")" data-sort="ftppassword">@L["Admin_Firmware_FtpPass"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "ftpdir")" data-sort="ftpdir">@L["Admin_Firmware_FtpDir"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "filename")" data-sort="filename">@L["Admin_Firmware_FileName"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "filesize")" data-sort="filesize">@L["Admin_Firmware_Size"]<span class="sort-ind"></span></th>
+                    <th class="@GridSortHelper.ThClass(filter, "newfwversion")" data-sort="newfwversion">@L["Admin_Firmware_Desc"]<span class="sort-ind"></span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model.Items)
+                {
+                    <tr data-fwversion="@f.FWVERSION">
+                        <td><code>@f.FWVERSION</code></td>
+                        <td class="small">@f.FtpServer</td>
+                        <td class="small">@f.FtpUsername</td>
+                        <td class="small">@f.FtpPassword</td>
+                        <td class="small">@f.FtpDir</td>
+                        <td class="small">@f.FileName</td>
+                        <td class="small">@f.FileSize</td>
+                        <td class="small">@f.NewFwVersion</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="fw-grid-pager">
+        <div class="pager-btns">
+            @if (Model.HasPreviousPage)
+            {
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-action="Index" asp-route-page="1" asp-route-pageSize="@pageSize" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc">@L["Common_BtnFirst"]</a>
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-pageSize="@pageSize" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc">@L["Common_PreviousPage"]</a>
+            }
+            else
+            {
+                <span class="btn btn-sm btn-outline-secondary disabled">@L["Common_BtnFirst"]</span>
+                <span class="btn btn-sm btn-outline-secondary disabled">@L["Common_PreviousPage"]</span>
+            }
+            @if (Model.HasNextPage)
+            {
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-pageSize="@pageSize" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc">@L["Common_NextPage"]</a>
+                <a class="btn btn-sm btn-outline-secondary"
+                   asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-pageSize="@pageSize" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc">@L["Common_BtnLast"]</a>
+            }
+            else
+            {
+                <span class="btn btn-sm btn-outline-secondary disabled">@L["Common_NextPage"]</span>
+                <span class="btn btn-sm btn-outline-secondary disabled">@L["Common_BtnLast"]</span>
+            }
+        </div>
+        <form method="get" class="d-inline-flex align-items-center gap-1 mb-0" id="fw-jump-form">
+            <input type="hidden" name="keyword" value="@filter.Keyword" />
+            <input type="hidden" name="pageSize" value="@pageSize" />
+            <input type="hidden" name="sortBy" value="@filter.SortBy" />
+            <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
+            <span>@L["Common_PageNoPrefix"]</span>
+            <input type="number" name="page" class="form-control form-control-sm" min="1" max="@totalPages" value="@Model.PageIndex" />
+            <span>@L["Common_PageNoMid"] @totalPages @L["Common_PageNoSuffix"]</span>
         </form>
+        <form method="get" class="d-inline-flex align-items-center gap-1 mb-0" id="fw-size-form">
+            <input type="hidden" name="keyword" value="@filter.Keyword" />
+            <input type="hidden" name="page" value="1" />
+            <input type="hidden" name="sortBy" value="@filter.SortBy" />
+            <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
+            <span>@L["Common_PerPage"]</span>
+            <select name="pageSize" class="form-select form-select-sm" onchange="this.form.submit()">
+                @foreach (var size in new[] { 10, 20, 50, 100 })
+                {
+                    <option value="@size" selected="@(pageSize == size)">@size</option>
+                }
+            </select>
+            <span>@L["Common_RecordsUnit"]</span>
+        </form>
+        <div class="pager-right">@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)</div>
     </div>
 </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>@L["Admin_Firmware_VersionCol"]</th>
-                <th>@L["Admin_Firmware_FtpCol"]</th>
-                <th>@L["Admin_Firmware_FileName"]</th>
-                <th>@L["Admin_Firmware_Desc"]</th>
-                <th>@L["Admin_Firmware_CreatedCol"]</th>
-                <th>@L["Common_Operation"]</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var f in Model.Items)
-            {
-                <tr>
-                    <td><code>@f.FWVERSION</code></td>
-                    <td class="small">@f.FtpServer</td>
-                    <td class="small">@f.FileName</td>
-                    <td class="small">@f.NewFwVersion</td>
-                    <td>@f.CDate.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-fwVersion="@f.FWVERSION" class="btn btn-sm btn-outline-primary btn-with-icon">@Html.UiIcon("edit")<span>@L["Common_Edit"]</span></a>
-                        <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@L["Common_ConfirmDelete"]')">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="fwVersion" value="@f.FWVERSION" />
-                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
-<div class="d-flex justify-content-between align-items-center">
-    <span>@string.Format(L["Common_TotalRecords"].Value, Model.TotalCount)</span>
-    <div>
-        @if (Model.HasPreviousPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
-        }
-        @if (Model.HasNextPage)
-        {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
-        }
+<!-- 韌體新增／檢視／修改 Modal（全站 static + shake 規則） -->
+<div class="modal fade" id="fwModal" tabindex="-1" data-modal-static aria-labelledby="fwModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-dialog-scrollable" style="max-width:520px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="fwModalTitle">@L["Admin_Tracker_BtnAdd"]</h6>
+                <button type="button" class="btn-close" onclick="StaticModal.hide('fwModal')" aria-label="@L["Common_Close"]"></button>
+            </div>
+            <div class="modal-body">
+                <div id="fwModalError" class="alert alert-danger py-1 px-2 small d-none"></div>
+                <form id="fwModalForm" class="fw-modal-form" autocomplete="off">
+                    <input type="hidden" id="fw_OriginalVersion" />
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FWVERSION">@L["Admin_Firmware_VersionCol"]</label>
+                        <div class="field-value"><input type="text" id="fw_FWVERSION" name="FWVERSION" class="form-control form-control-sm" maxlength="50" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FtpServer">@L["Admin_Firmware_FtpHost"]</label>
+                        <div class="field-value"><input type="text" id="fw_FtpServer" name="FtpServer" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FtpUsername">@L["Admin_Firmware_FtpUser"]</label>
+                        <div class="field-value"><input type="text" id="fw_FtpUsername" name="FtpUsername" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FtpPassword">@L["Admin_Firmware_FtpPass"]</label>
+                        <div class="field-value"><input type="text" id="fw_FtpPassword" name="FtpPassword" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FtpDir">@L["Admin_Firmware_FtpDir"]</label>
+                        <div class="field-value"><input type="text" id="fw_FtpDir" name="FtpDir" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FileName">@L["Admin_Firmware_FileName"]</label>
+                        <div class="field-value"><input type="text" id="fw_FileName" name="FileName" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_FileSize">@L["Admin_Firmware_Size"]</label>
+                        <div class="field-value"><input type="text" id="fw_FileSize" name="FileSize" class="form-control form-control-sm" /></div>
+                    </div>
+                    <div class="field-row">
+                        <label class="field-label" for="fw_NewFwVersion">@L["Admin_Firmware_Desc"]</label>
+                        <div class="field-value"><textarea id="fw_NewFwVersion" name="NewFwVersion" class="form-control form-control-sm" rows="3"></textarea></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-primary btn-sm px-4" id="fwModalOk" onclick="saveFwModal()">@L["Common_Confirm"]</button>
+                <button type="button" class="btn btn-secondary btn-sm px-4" id="fwModalReset" onclick="resetFwModal()">@L["Common_Reset"]</button>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- 排程升級 Modal -->
+<div class="modal fade" id="fwScheduleModal" tabindex="-1" data-modal-static aria-labelledby="fwScheduleModalTitle" aria-modal="true" role="dialog">
+    <div class="modal-dialog" style="max-width:480px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="fwScheduleModalTitle">@L["Admin_Firmware_Schedule"]</h6>
+                <button type="button" class="btn-close" onclick="StaticModal.hide('fwScheduleModal')" aria-label="@L["Common_Close"]"></button>
+            </div>
+            <div class="modal-body">
+                <div id="fwScheduleError" class="alert alert-danger py-1 px-2 small d-none"></div>
+                <div class="mb-2 small">
+                    <span class="text-muted">@L["Admin_Firmware_VersionCol"]：</span>
+                    <code id="fwScheduleVersionLbl"></code>
+                </div>
+                <label class="form-label small fw-semibold" for="fwScheduleImeiList">@L["Admin_Firmware_ImeiList"]</label>
+                <textarea id="fwScheduleImeiList" class="form-control form-control-sm" rows="8"
+                          placeholder="@L["Admin_Firmware_ImeiList"]"></textarea>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-warning btn-sm px-4" onclick="submitFwSchedule()">@L["Common_Confirm"]</button>
+                <button type="button" class="btn btn-secondary btn-sm px-4" onclick="StaticModal.hide('fwScheduleModal')">@L["Common_Cancel"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const _fwT = {
+    add: @Json.Serialize(L["Admin_Tracker_BtnAdd"].Value),
+    view: @Json.Serialize(L["Admin_Dealer_BtnView"].Value),
+    edit: @Json.Serialize(L["Admin_Dealer_Edit_Title"].Value),
+    selectFirst: @Json.Serialize(L["Admin_Firmware_SelectFirst"].Value),
+    versionRequired: @Json.Serialize(L["Admin_Firmware_VersionRequired"].Value),
+    imeiRequired: @Json.Serialize(L["Admin_Error_ImeiRequired"].Value),
+    confirmDelete: @Json.Serialize(L["Admin_Dealer_ConfirmDelete"].Value),
+    deleteFail: @Json.Serialize(L["Admin_Tracker_DeleteFail"].Value),
+    networkError: @Json.Serialize(L["Live_NetworkError"].Value),
+    saveFailed: @Json.Serialize(L["DeviceSettings_SaveFailed"].Value)
+};
+
+let selectedFwVersion = null;
+let fwModalMode = 'create'; // create | view | edit
+let fwOriginalSnapshot = null;
+
+StaticModal.init(document.getElementById('fwModal'));
+StaticModal.init(document.getElementById('fwScheduleModal'));
+
+document.querySelectorAll('#fwTable tbody tr').forEach(tr => {
+    tr.addEventListener('click', function () {
+        document.querySelectorAll('#fwTable tbody tr').forEach(r => r.classList.remove('selected-row'));
+        this.classList.add('selected-row');
+        selectedFwVersion = this.getAttribute('data-fwversion') || null;
+    });
+    tr.addEventListener('dblclick', function () {
+        selectedFwVersion = this.getAttribute('data-fwversion') || null;
+        fwAction('edit');
+    });
+});
+
+function requireSelection() {
+    if (!selectedFwVersion) { TpDialog.alert(_fwT.selectFirst); return false; }
+    return true;
+}
+
+function token() {
+    return document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+}
+
+function setFwFieldsReadonly(ro) {
+    document.querySelectorAll('#fwModalForm input, #fwModalForm textarea').forEach(el => {
+        el.readOnly = !!ro;
+        el.tabIndex = ro ? -1 : 0;
+        el.classList.add('form-control', 'form-control-sm');
+        el.classList.remove('form-control-plaintext');
+        el.style.backgroundColor = ro ? '#e9ecef' : '';
+        el.style.cursor = ro ? 'default' : '';
+        if (ro) el.setAttribute('data-fw-readonly', '1');
+        else el.removeAttribute('data-fw-readonly');
+    });
+    document.getElementById('fwModalOk').classList.toggle('d-none', !!ro);
+    document.getElementById('fwModalReset').classList.toggle('d-none', !!ro);
+}
+
+function clearFwForm() {
+    document.getElementById('fw_OriginalVersion').value = '';
+    document.getElementById('fw_FWVERSION').value = '';
+    document.getElementById('fw_FtpServer').value = '';
+    document.getElementById('fw_FtpUsername').value = '';
+    document.getElementById('fw_FtpPassword').value = '';
+    document.getElementById('fw_FtpDir').value = '';
+    document.getElementById('fw_FileName').value = '';
+    document.getElementById('fw_FileSize').value = '';
+    document.getElementById('fw_NewFwVersion').value = '';
+    document.getElementById('fwModalError').classList.add('d-none');
+}
+
+function fillFwForm(d) {
+    document.getElementById('fw_OriginalVersion').value = d.fwVersion || '';
+    document.getElementById('fw_FWVERSION').value = d.fwVersion || '';
+    document.getElementById('fw_FtpServer').value = d.ftpServer || '';
+    document.getElementById('fw_FtpUsername').value = d.ftpUsername || '';
+    document.getElementById('fw_FtpPassword').value = d.ftpPassword || '';
+    document.getElementById('fw_FtpDir').value = d.ftpDir || '';
+    document.getElementById('fw_FileName').value = d.fileName || '';
+    document.getElementById('fw_FileSize').value = d.fileSize || '';
+    document.getElementById('fw_NewFwVersion').value = d.newFwVersion || '';
+    fwOriginalSnapshot = { ...d };
+}
+
+function openFwModal(mode, data) {
+    fwModalMode = mode;
+    const title = mode === 'create' ? _fwT.add : (mode === 'view' ? _fwT.view : _fwT.edit);
+    document.getElementById('fwModalTitle').textContent = title;
+    document.getElementById('fwModalError').classList.add('d-none');
+
+    if (mode === 'create') {
+        clearFwForm();
+        setFwFieldsReadonly(false);
+    } else if (mode === 'view') {
+        fillFwForm(data);
+        setFwFieldsReadonly(true);
+    } else {
+        fillFwForm(data);
+        setFwFieldsReadonly(false);
+    }
+    StaticModal.show('fwModal');
+}
+
+function openFwScheduleModal() {
+    document.getElementById('fwScheduleVersionLbl').textContent = selectedFwVersion || '';
+    document.getElementById('fwScheduleImeiList').value = '';
+    document.getElementById('fwScheduleError').classList.add('d-none');
+    StaticModal.show('fwScheduleModal');
+}
+
+window.fwAction = function (action) {
+    if (action === 'create') {
+        openFwModal('create');
+        return;
+    }
+    if (!requireSelection()) return;
+    if (action === 'schedule') {
+        openFwScheduleModal();
+        return;
+    }
+    if (action === 'delete') {
+        TpDialog.confirmDelete(selectedFwVersion).then(ok => {
+            if (!ok) return;
+            const fd = new FormData();
+            fd.append('fwVersion', selectedFwVersion);
+            fd.append('__RequestVerificationToken', token());
+            fetch('/Admin/Firmware/DeleteAjax', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(res => {
+                    if (!res.success) { TpDialog.alert(res.message || _fwT.deleteFail); return; }
+                    location.reload();
+                })
+                .catch(() => TpDialog.alert(_fwT.networkError));
+        });
+        return;
+    }
+    fetch('/Admin/Firmware/GetJson?fwVersion=' + encodeURIComponent(selectedFwVersion))
+        .then(r => { if (!r.ok) throw new Error(_fwT.selectFirst); return r.json(); })
+        .then(d => openFwModal(action === 'view' ? 'view' : 'edit', d))
+        .catch(e => TpDialog.alert(e.message || _fwT.networkError));
+};
+
+window.submitFwSchedule = function () {
+    const imeiList = document.getElementById('fwScheduleImeiList').value.trim();
+    const err = document.getElementById('fwScheduleError');
+    if (!selectedFwVersion) {
+        err.textContent = _fwT.selectFirst;
+        err.classList.remove('d-none');
+        return;
+    }
+    if (!imeiList) {
+        err.textContent = _fwT.imeiRequired;
+        err.classList.remove('d-none');
+        return;
+    }
+    err.classList.add('d-none');
+    const fd = new FormData();
+    fd.append('targetFwVersion', selectedFwVersion);
+    fd.append('imeiList', imeiList);
+    fd.append('__RequestVerificationToken', token());
+    fetch('/Admin/Firmware/BatchQueueAjax', { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => {
+            if (!res.success) {
+                err.textContent = res.message || _fwT.saveFailed;
+                err.classList.remove('d-none');
+                return;
+            }
+            StaticModal.hide('fwScheduleModal');
+            TpDialog.alert(res.message || '').then(() => location.reload());
+        })
+        .catch(() => TpDialog.alert(_fwT.networkError));
+};
+
+window.resetFwModal = function () {
+    if (fwModalMode === 'create') {
+        clearFwForm();
+        setFwFieldsReadonly(false);
+    } else if (fwOriginalSnapshot) {
+        fillFwForm(fwOriginalSnapshot);
+        setFwFieldsReadonly(fwModalMode === 'view');
+    }
+};
+
+window.saveFwModal = function () {
+    if (fwModalMode === 'view') { StaticModal.hide('fwModal'); return; }
+    const version = document.getElementById('fw_FWVERSION').value.trim();
+    if (!version) {
+        const err = document.getElementById('fwModalError');
+        err.textContent = _fwT.versionRequired;
+        err.classList.remove('d-none');
+        return;
+    }
+    const fd = new FormData(document.getElementById('fwModalForm'));
+    fd.append('__RequestVerificationToken', token());
+    let url = '/Admin/Firmware/CreateAjax';
+    if (fwModalMode === 'edit') {
+        url = '/Admin/Firmware/UpdateAjax';
+        fd.append('originalFwVersion', document.getElementById('fw_OriginalVersion').value || version);
+    }
+    fetch(url, { method: 'POST', body: fd })
+        .then(r => r.json())
+        .then(res => {
+            if (!res.success) {
+                const err = document.getElementById('fwModalError');
+                err.textContent = res.message || _fwT.saveFailed;
+                err.classList.remove('d-none');
+                return;
+            }
+            StaticModal.hide('fwModal');
+            location.reload();
+        })
+        .catch(() => TpDialog.alert(_fwT.networkError));
+};
+
+document.getElementById('fw-jump-form')?.addEventListener('submit', function () {
+    const input = this.querySelector('input[name="page"]');
+    const max = parseInt(input.max, 10) || 1;
+    let p = parseInt(input.value, 10);
+    if (isNaN(p) || p < 1) p = 1;
+    if (p > max) p = max;
+    input.value = p;
+});
+document.querySelector('#fw-jump-form input[name="page"]')?.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') this.form.requestSubmit();
+});
+</script>
+}

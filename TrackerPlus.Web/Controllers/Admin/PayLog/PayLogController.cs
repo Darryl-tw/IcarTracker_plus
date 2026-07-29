@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
+using TrackerPlus.Web.Helpers;
 
 namespace TrackerPlus.Web.Controllers.Admin.PayLog;
 
@@ -16,7 +17,7 @@ public class PayLogController : AdminBaseController
         _memberService = memberService;
     }
 
-    public async Task<IActionResult> Index(string? keyword, string? status, DateTime? startDate, DateTime? endDate, int page = 1)
+    public async Task<IActionResult> Index(string? keyword, string? status, DateTime? startDate, DateTime? endDate, string? sortBy, bool sortDesc = false, int page = 1)
     {
         var filter = new QueryFilter
         {
@@ -27,6 +28,7 @@ public class PayLogController : AdminBaseController
             PageIndex = page,
             PageSize = 100
         };
+        GridSortHelper.ApplySort(filter, sortBy, sortDesc, "tbKey", defaultDesc: true);
         var result = await _payLogService.GetPayLogsPagedAsync(filter);
         ViewBag.Filter = filter;
         return View(result);

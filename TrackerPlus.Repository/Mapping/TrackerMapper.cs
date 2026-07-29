@@ -142,7 +142,8 @@ internal static class TrackerMapper
             APN = row.APN?.Trim() ?? string.Empty,
             CreateDate = row.CDate,
             CurrentStatus = row.CurrentStatus?.Trim() ?? string.Empty,
-            IsSleep = row.IsSleep?.Trim() ?? string.Empty
+            IsSleep = row.IsSleep?.Trim() ?? string.Empty,
+            BindCount = row.BindCount
         };
     }
 

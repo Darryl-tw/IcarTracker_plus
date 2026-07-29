@@ -29,10 +29,11 @@ public class WebServiceIPRepository : IWebServiceIPRepository
     {
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter);
+        var orderBy = BuildOrderByClause(filter);
 
         var countSql = $"SELECT COUNT(*) FROM WebServiceIP {where}";
         var dataSql = $@"SELECT * FROM WebServiceIP {where}
-            ORDER BY TbKey DESC
+            {orderBy}
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var param = new { filter.Keyword, Offset = offset, filter.PageSize };
@@ -87,5 +88,20 @@ public class WebServiceIPRepository : IWebServiceIPRepository
         if (!string.IsNullOrWhiteSpace(filter.Keyword))
             conditions.Add("(IPAddress LIKE '%'+@Keyword+'%' OR Description LIKE '%'+@Keyword+'%')");
         return conditions.Any() ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;
+    }
+
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? "").Trim().ToLowerInvariant();
+        return key switch
+        {
+            "tbkey" => $"ORDER BY TbKey {dir}",
+            "ip" or "ipaddress" => $"ORDER BY IPAddress {dir}",
+            "description" or "desc" => $"ORDER BY Description {dir}",
+            "status" => $"ORDER BY Status {dir}",
+            "cdate" or "createdate" => $"ORDER BY CDate {dir}",
+            _ => "ORDER BY TbKey DESC"
+        };
     }
 }

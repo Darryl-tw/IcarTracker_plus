@@ -48,7 +48,8 @@ public class TrackerController : AdminBaseController
     }
 
     [HttpGet]
-    public async Task TrackerStream(string? obm, string? imei, string? account, string? keyword, string? status, int page = 1, int pageSize = 20, CancellationToken ct = default)
+    public async Task TrackerStream(string? obm, string? imei, string? account, string? keyword, string? status,
+        string? sortBy = null, bool sortDesc = false, int page = 1, int pageSize = 20, CancellationToken ct = default)
     {
         Response.ContentType = "text/event-stream";
         Response.Headers.Append("Cache-Control", "no-cache");
@@ -61,6 +62,8 @@ public class TrackerController : AdminBaseController
             Account = account,
             Keyword = keyword,
             Status = status,
+            SortBy = string.IsNullOrWhiteSpace(sortBy) ? "imei" : sortBy.Trim(),
+            SortDesc = sortDesc,
             PageIndex = page,
             PageSize = pageSize
         };
@@ -80,7 +83,7 @@ public class TrackerController : AdminBaseController
                 obmName = t.OBMName,
                 memberAccount = t.MemberAccount,
                 cname = t.CName,
-                bindCount = 0,
+                bindCount = t.BindCount,
                 createDate = t.CreateDate?.ToString("yyyy-MM-dd"),
                 serviceEndDate = t.ServiceEndDate?.ToString("yyyy-MM-dd"),
                 currentStatus = t.CurrentStatus,
@@ -219,7 +222,11 @@ public class TrackerController : AdminBaseController
             TrackerStatus = "Y"
         };
         var result = await _trackerService.CreateTrackerAsync(tracker);
-        return Json(new { success = result.Success, message = result.Message });
+        return Json(new
+        {
+            success = result.Success,
+            message = result.Success ? L["Admin_Tracker_Msg_CreateOk"].Value : result.Message
+        });
     }
 
     // ── 清除歷史資料 ─────────────────────────────────────────────────────────
@@ -242,7 +249,10 @@ public class TrackerController : AdminBaseController
             localEnd = localEnd.Date.AddDays(1).AddSeconds(-1);
             result = await _historyService.DeleteHistoryAsync(req.Imei.Trim(), localStart, localEnd, 480);
         }
-        return Json(new { success = result.Success, message = result.Message });
+        var msg = result.Success
+            ? (req.DeleteAll ? L["Admin_Tracker_Msg_ClearAllHistoryOk"].Value : L["Admin_Tracker_Msg_ClearHistoryOk"].Value)
+            : result.Message;
+        return Json(new { success = result.Success, message = msg });
     }
 
     // ── 批次轉移 OBM ─────────────────────────────────────────────────────────
@@ -252,7 +262,10 @@ public class TrackerController : AdminBaseController
         if (req == null || req.Imeis == null || !req.Imeis.Any() || req.OBMTbKey <= 0)
             return Json(new { success = false, message = L["Admin_Error_InvalidParams"].Value });
         var result = await _trackerService.BatchTransferToOBMAsync(req.Imeis, req.OBMTbKey);
-        return Json(new { success = result.Success, message = result.Message });
+        var msg = result.Success
+            ? string.Format(L["Admin_Tracker_Msg_BatchTransferOk"].Value, result.Data ?? 0)
+            : (result.Message == "無 IMEI" ? L["Admin_Tracker_Msg_NoImei"].Value : result.Message);
+        return Json(new { success = result.Success, message = msg });
     }
 
     // ── 韌體昇級 ─────────────────────────────────────────────────────────────
@@ -262,7 +275,21 @@ public class TrackerController : AdminBaseController
         if (req == null || req.Imeis == null || !req.Imeis.Any() || string.IsNullOrWhiteSpace(req.TargetVersion))
             return Json(new { success = false, message = L["Admin_Error_InvalidParams"].Value });
         var result = await _firmwareService.BatchQueueFirmwareUpdateAsync(req.TargetVersion, req.Imeis);
-        return Json(new { success = result.Success, message = result.Message });
+        string msg;
+        if (result.Success)
+        {
+            var count = result.Data is int c ? c : req.Imeis.Count();
+            msg = string.Format(L["Admin_Tracker_Msg_FwUpgradeOk"].Value, count, req.TargetVersion);
+        }
+        else if (result.Message == "找不到韌體版本")
+            msg = L["Admin_Tracker_Msg_FwVersionNotFound"].Value;
+        else if (result.Message == "未提供 IMEI")
+            msg = L["Admin_Tracker_Msg_NoImei"].Value;
+        else if (result.Message == "排程失敗")
+            msg = L["Admin_Tracker_Msg_FwQueueFail"].Value;
+        else
+            msg = result.Message;
+        return Json(new { success = result.Success, message = msg });
     }
 
     // ── 整批刪除裝置（刪除選取的 tbKey 列表） ─────────────────────────────────
@@ -312,7 +339,10 @@ public class TrackerController : AdminBaseController
         if (req == null || req.TbKey <= 0)
             return Json(new { success = false, message = L["Admin_Error_NoDeviceSelected"].Value });
         var result = await _trackerService.FactoryResetAsync(req.TbKey);
-        return Json(new { success = result.Success, message = result.Message });
+        var msg = result.Success
+            ? L["Admin_Tracker_Msg_FactoryResetOk"].Value
+            : (result.Message == "找不到裝置" ? L["Admin_Tracker_Msg_DeviceNotFound"].Value : result.Message);
+        return Json(new { success = result.Success, message = msg });
     }
 
     // ── 轉移歷史軌跡 ─────────────────────────────────────────────────────────
@@ -324,7 +354,10 @@ public class TrackerController : AdminBaseController
         if (req.SourceImei.Trim() == req.DestImei.Trim())
             return Json(new { success = false, message = L["Admin_Error_ImeiSourceTargetSame"].Value });
         var result = await _historyService.QueueMoveHistoryAsync(req.SourceImei.Trim(), req.DestImei.Trim());
-        return Json(new { success = result.Success, message = result.Message });
+        var msg = result.Success
+            ? L["Admin_Tracker_Msg_MoveHistoryOk"].Value
+            : (result.Message == "加入佇列失敗" ? L["Admin_Tracker_Msg_MoveHistoryFail"].Value : result.Message);
+        return Json(new { success = result.Success, message = msg });
     }
 
     // ── 取得 OBM 列表 ─────────────────────────────────────────────────────────

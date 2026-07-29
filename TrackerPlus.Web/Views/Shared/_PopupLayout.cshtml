@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>@(ViewData["Title"] as string ?? L["Settings_DefaultTitle"].Value)</title>
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/tp-dialog.css" asp-append-version="true" />
 <style>
 body { background: #f8fafc; font-family: Tahoma, Arial, sans-serif; font-size: 14px; }
 </style>
@@ -15,6 +16,7 @@ body { background: #f8fafc; font-family: Tahoma, Arial, sans-serif; font-size: 1
 @RenderBody()
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<partial name="_TpDialogBoot" />
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

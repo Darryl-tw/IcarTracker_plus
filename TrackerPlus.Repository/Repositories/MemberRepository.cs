@@ -47,9 +47,10 @@ public class MemberRepository : IMemberRepository
     {
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter);
+        var orderBy = BuildOrderByClause(filter);
         var countSql = $"SELECT COUNT(*) FROM dbo.Member m {where}";
         var dataSql = $@"{MemberMapper.SelectSql} {where}
-            ORDER BY m.tbKey DESC
+            {orderBy}
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var param = new { filter.Keyword, filter.Status, Offset = offset, filter.PageSize };
@@ -197,5 +198,24 @@ public class MemberRepository : IMemberRepository
         if (!string.IsNullOrWhiteSpace(filter.Status))
             conditions.Add("m.MemberStatus = @Status");
         return conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;
+    }
+
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? "").Trim().ToLowerInvariant();
+        return key switch
+        {
+            "tbkey" => $"ORDER BY m.tbKey {dir}",
+            "id" or "account" => $"ORDER BY RTRIM(m.ID) {dir}",
+            "cdate" or "createdate" => $"ORDER BY m.CDate {dir}",
+            "connectiontime" or "lastonline" => $"ORDER BY m.ConnectionTime {dir}",
+            "trackercount" => $"ORDER BY (SELECT COUNT(*) FROM dbo.Tracker tr WHERE tr.Member_tbKey = m.tbKey) {dir}, m.tbKey DESC",
+            "tel" => $"ORDER BY RTRIM(m.Tel) {dir}",
+            "email" => $"ORDER BY RTRIM(m.EMail) {dir}",
+            "addr" => $"ORDER BY RTRIM(m.Addr) {dir}",
+            "status" or "memberstatus" => $"ORDER BY m.MemberStatus {dir}, m.tbKey DESC",
+            _ => "ORDER BY m.tbKey DESC"
+        };
     }
 }

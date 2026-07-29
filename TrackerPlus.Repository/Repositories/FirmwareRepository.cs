@@ -51,8 +51,9 @@ public class FirmwareRepository : IFirmwareRepository
             : "WHERE FWVERSION LIKE '%' + @Keyword + '%' OR NEW_FWVERSION LIKE '%' + @Keyword + '%' OR fileName LIKE '%' + @Keyword + '%'";
 
         var countSql = $"SELECT COUNT(*) FROM dbo.FWCONROL {where}";
+        var orderBy = BuildOrderByClause(filter);
         var dataSql = $@"SELECT {SelectColumns} FROM dbo.FWCONROL {where}
-            ORDER BY CDate DESC
+            {orderBy}
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var param = new { filter.Keyword, Offset = offset, filter.PageSize };
@@ -124,5 +125,24 @@ public class FirmwareRepository : IFirmwareRepository
             WHERE RTRIM(IMEICode) IN @IMEIList";
         using var conn = _db.CreateMainConnection();
         return await conn.ExecuteAsync(sql, new { Target = targetFwVersion.Trim(), IMEIList = list }) > 0;
+    }
+
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? "").Trim().ToLowerInvariant();
+        return key switch
+        {
+            "fwversion" or "version" => $"ORDER BY RTRIM(FWVERSION) {dir}",
+            "ftpserver" or "ftphost" => $"ORDER BY RTRIM(FTP_SERVER) {dir}",
+            "ftpusername" or "ftpuser" => $"ORDER BY RTRIM(FTP_USERNAME) {dir}",
+            "ftppassword" or "ftppass" => $"ORDER BY RTRIM(FTP_PASSWORD) {dir}",
+            "ftpdir" => $"ORDER BY RTRIM(FTP_DIR) {dir}",
+            "filename" => $"ORDER BY RTRIM(fileName) {dir}",
+            "filesize" or "size" => $"ORDER BY RTRIM(FILESize) {dir}",
+            "newfwversion" or "desc" => $"ORDER BY RTRIM(NEW_FWVERSION) {dir}",
+            "cdate" or "createdate" => $"ORDER BY CDate {dir}",
+            _ => "ORDER BY CDate DESC"
+        };
     }
 }

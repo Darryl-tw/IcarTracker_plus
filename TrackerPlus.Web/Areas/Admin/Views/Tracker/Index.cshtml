@@ -10,39 +10,40 @@
     <div class="adm-top-panel">
         <!-- Function Toolbar -->
         <div class="adm-panel-hdr" style="background:#e9f0fb;border-bottom:1px solid #c5d5ea;flex-wrap:wrap">
-            <button class="btn btn-success btn-adm" onclick="showModal('addTrackerModal')" title="新增裝置">新增</button>
-            <button class="btn btn-danger btn-adm" onclick="cmdDelete()" title="刪除選取裝置">刪除</button>
-            <button class="btn btn-warning btn-adm" onclick="showModal('clearHistoryModal')" title="清除歷史資料">清除歷史資料</button>
-            <button class="btn btn-secondary btn-adm" onclick="openBatchTransfer()" title="批次轉移 OBM">批次轉移</button>
-            <button class="btn btn-info btn-adm text-white" onclick="openFwUpgrade()" title="韌體昇級">韌體昇級</button>
-            <button class="btn btn-dark btn-adm" onclick="cmdBatchDelete()" title="整批刪除選取裝置">整批刪除裝置</button>
-            <button class="btn btn-outline-primary btn-adm" onclick="cmdFrontend()" title="前台(單機)">前台(單機)</button>
-            <button class="btn btn-outline-danger btn-adm" onclick="showModal('factoryResetModal')" title="恢復出廠設定">恢復出廠</button>
-            <button class="btn btn-outline-secondary btn-adm" onclick="showModal('moveHistoryModal')" title="轉移歷史軌跡">轉移歷史軌跡</button>
+            <button class="btn btn-success btn-adm" onclick="showModal('addTrackerModal')" title="@L["Admin_Tracker_BtnAddTitle"]">@L["Admin_Tracker_BtnAdd"]</button>
+            <button class="btn btn-danger btn-adm" onclick="cmdDelete()" title="@L["Admin_Tracker_BtnDeleteTitle"]">@L["Common_Delete"]</button>
+            <button class="btn btn-warning btn-adm" onclick="showModal('clearHistoryModal')" title="@L["Admin_Tracker_BtnClearHistory"]">@L["Admin_Tracker_BtnClearHistory"]</button>
+            <button class="btn btn-secondary btn-adm" onclick="openBatchTransfer()" title="@L["Admin_Tracker_BtnBatchTransferTitle"]">@L["Admin_Tracker_BtnBatchTransfer"]</button>
+            <button class="btn btn-info btn-adm text-white" onclick="openFwUpgrade()" title="@L["Admin_Tracker_BtnFwUpgrade"]">@L["Admin_Tracker_BtnFwUpgrade"]</button>
+            <button class="btn btn-dark btn-adm" onclick="cmdBatchDelete()" title="@L["Admin_Tracker_BtnBatchDeleteTitle"]">@L["Admin_Tracker_BtnBatchDelete"]</button>
+            <button class="btn btn-outline-primary btn-adm" onclick="cmdFrontend()" title="@L["Admin_Tracker_BtnFrontendSingle"]">@L["Admin_Tracker_BtnFrontendSingle"]</button>
+            <button class="btn btn-outline-danger btn-adm" onclick="showModal('factoryResetModal')" title="@L["Admin_Tracker_BtnFactoryResetTitle"]">@L["Admin_Tracker_BtnFactoryReset"]</button>
+            <button class="btn btn-outline-secondary btn-adm" onclick="showModal('moveHistoryModal')" title="@L["Admin_Tracker_BtnMoveHistory"]">@L["Admin_Tracker_BtnMoveHistory"]</button>
         </div>
         <!-- Search / Filter bar -->
-        <div class="adm-panel-hdr">
+        <div class="adm-panel-hdr" style="flex-wrap:wrap;gap:6px">
             <span class="adm-panel-title">@L["Admin_Tracker_Title"]</span>
             <span id="total-info" class="badge bg-secondary ms-1" style="font-size:.75rem"></span>
-            <div class="adm-ctrl-row ms-2" style="flex:1;min-width:200px;flex-wrap:wrap">
-                <span class="text-muted" style="font-size:.8rem">@L["Admin_Tracker_Col_OBM"]</span>
-                <input type="text" id="kw-obm" class="form-control form-control-sm" style="width:100px"
-                       onkeydown="if(event.key==='Enter')doSearch()" />
-                <span class="text-muted" style="font-size:.8rem">IMEI</span>
-                <input type="text" id="kw-imei" class="form-control form-control-sm" style="width:110px"
-                       onkeydown="if(event.key==='Enter')doSearch()" />
-                <span class="text-muted" style="font-size:.8rem">@L["Admin_Tracker_Col_Account"]</span>
-                <input type="text" id="kw-account" class="form-control form-control-sm" style="width:120px"
-                       placeholder="ID / Email" onkeydown="if(event.key==='Enter')doSearch()" />
-                <select id="st" class="form-select form-select-sm" style="width:88px">
-                    <option value="">@L["Admin_Tracker_AllStatus"]</option>
-                    <option value="Y">@L["Common_Enabled"]</option>
-                    <option value="N">@L["Common_Disabled"]</option>
-                </select>
-                <button onclick="doSearch()" class="btn btn-primary btn-sm">@L["Common_Search"]</button>
+            <div class="adm-ctrl-row ms-2">
+                <label class="adm-filter-item">
+                    <span class="text-muted">@L["Admin_Tracker_Col_OBM"]</span>
+                    <input type="text" id="kw-obm" class="form-control form-control-sm" style="width:100px"
+                           onkeydown="if(event.key==='Enter')doSearch()" />
+                </label>
+                <label class="adm-filter-item">
+                    <span class="text-muted">IMEI</span>
+                    <input type="text" id="kw-imei" class="form-control form-control-sm" style="width:110px"
+                           onkeydown="if(event.key==='Enter')doSearch()" />
+                </label>
+                <label class="adm-filter-item">
+                    <span class="text-muted">@L["Admin_Tracker_Col_Account"]</span>
+                    <input type="text" id="kw-account" class="form-control form-control-sm" style="width:120px"
+                           placeholder="ID / Email" autocomplete="off" onkeydown="if(event.key==='Enter')doSearch()" />
+                </label>
+                <button type="button" onclick="doSearch()" class="btn btn-primary btn-sm">@L["Common_Search"]</button>
             </div>
             <!-- Pagination -->
-            <div class="adm-ctrl-row">
+            <div class="adm-ctrl-row ms-auto">
                 <span class="text-muted" style="font-size:.8rem">@L["Common_PerPage"]</span>
                 <select id="pg-size" class="form-select form-select-sm" style="width:68px" onchange="doSearch()">
                     <option value="20">20</option>
@@ -68,40 +69,40 @@
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <table class="table table-striped table-sm table-hover mb-0 adm-grid-table">
+            <table class="table table-striped table-sm table-hover mb-0 adm-grid-table" data-grid-sort="off">
                 <thead class="table-dark adm-sticky-head">
-                    <tr>
-                        <th style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_OBM"]</th>
-                        <th style="min-width:140px;white-space:nowrap">IMEI</th>
-                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Name"]</th>
-                        <th style="min-width:65px;white-space:nowrap">@L["Admin_Tracker_Col_BindCount"]</th>
-                        <th style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_CreateDate"]</th>
-                        <th style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_ServiceEnd"]</th>
-                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Account"]</th>
-                        <th style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_CurrentStatus"]</th>
-                        <th style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Firmware"]</th>
-                        <th style="min-width:90px;white-space:nowrap">ICCID</th>
-                        <th style="min-width:70px;white-space:nowrap">APN</th>
+                    <tr id="tracker-sort-head">
+                        <th class="sortable" data-sort="obm" style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_OBM"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="imei" style="min-width:140px;white-space:nowrap">IMEI<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="cname" style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Name"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="bindCount" style="min-width:65px;white-space:nowrap">@L["Admin_Tracker_Col_BindCount"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="createDate" style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_CreateDate"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="serviceEndDate" style="min-width:82px;white-space:nowrap">@L["Admin_Tracker_Col_ServiceEnd"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="account" style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Account"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="currentStatus" style="min-width:80px;white-space:nowrap">@L["Admin_Tracker_Col_CurrentStatus"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="firmware" style="min-width:110px;white-space:nowrap">@L["Admin_Tracker_Col_Firmware"]<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="iccid" style="min-width:90px;white-space:nowrap">ICCID<span class="sort-ind"></span></th>
+                        <th class="sortable" data-sort="apn" style="min-width:70px;white-space:nowrap">APN<span class="sort-ind"></span></th>
                     </tr>
                     <tr id="filter-row">
-                        <th><input type="text" id="f-obm"     class="col-filter" placeholder="篩選…" /></th>
-                        <th><input type="text" id="f-imei"    class="col-filter" placeholder="篩選…" /></th>
-                        <th><input type="text" id="f-cname"   class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-obm"     class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
+                        <th><input type="text" id="f-imei"    class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
+                        <th><input type="text" id="f-cname"   class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th><input type="text" id="f-account" class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-account" class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
                         <th>
                             <select id="f-cur-status" class="col-filter-sel">
-                                <option value="">全部狀態</option>
+                                <option value="">@L["Admin_Tracker_AllStatus"]</option>
                                 <option value="online">@L["Admin_Tracker_Status_Online"]</option>
                                 <option value="sleep">@L["Admin_Tracker_Status_Offline"]</option>
                                 <option value="disconnected">@L["Admin_Tracker_Status_Disconnected"]</option>
                             </select>
                         </th>
-                        <th><input type="text" id="f-firmware" class="col-filter" placeholder="篩選…" /></th>
-                        <th><input type="text" id="f-iccid"   class="col-filter" placeholder="篩選…" /></th>
-                        <th><input type="text" id="f-apn"     class="col-filter" placeholder="篩選…" /></th>
+                        <th><input type="text" id="f-firmware" class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
+                        <th><input type="text" id="f-iccid"   class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
+                        <th><input type="text" id="f-apn"     class="col-filter" placeholder="@L["Admin_Tracker_FilterPh"]" autocomplete="off" /></th>
                     </tr>
                 </thead>
                 <tbody id="tracker-tbody">
@@ -268,13 +269,16 @@
                     <select id="em-shock-mode" class="form-select form-select-sm">
                       <option value="1">汽車</option>
                       <option value="2">機車</option>
-                      <option value="3">腳踏車</option>
                     </select>
                   </div>
                   <div class="col-6">
                     <label class="form-label small mb-1">震動器靈敏度</label>
                     <select id="em-shock-sens" class="form-select form-select-sm">
-                      @for (int i = 0; i <= 9; i++) { <option value="@i">@i</option> }
+                      @for (int i = -4, n = 1; i <= 4; i++, n++)
+                      {
+                          var label = i > 0 ? $"+{i}" : i.ToString();
+                          <option value="@n">@label</option>
+                      }
                     </select>
                   </div>
                   <div class="col-12">
@@ -385,14 +389,14 @@
 <div class="modal fade" id="addTrackerModal" tabindex="-1">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">新增裝置</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnAddTitle"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small mb-1">IMEI（15碼）</label><input type="text" id="add-imei" class="form-control form-control-sm" maxlength="15" placeholder="000000000000000" /></div>
-        <div class="mb-2"><label class="form-label small mb-1">識別名稱</label><input type="text" id="add-cname" class="form-control form-control-sm" /></div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_Imei15Label"]</label><input type="text" id="add-imei" class="form-control form-control-sm" maxlength="15" placeholder="000000000000000" /></div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_Col_Name"]</label><input type="text" id="add-cname" class="form-control form-control-sm" /></div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-success btn-sm" onclick="doAddTracker()">確定新增</button>
-        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-success btn-sm" onclick="doAddTracker()">@L["Admin_Tracker_ConfirmAdd"]</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -402,24 +406,24 @@
 <div class="modal fade" id="clearHistoryModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">清除歷史資料</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnClearHistory"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2 small text-muted">選取裝置 IMEI：<strong id="ch-imei-lbl">（未選取）</strong></div>
+        <div class="mb-2 small text-muted">@L["Admin_Tracker_SelectedImei"]<strong id="ch-imei-lbl">@L["Admin_Tracker_NoneSelected"]</strong></div>
         <div class="mb-2">
-          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeAll" value="all" checked><label class="form-check-label small" for="chModeAll">刪除全部歷史資料</label></div>
-          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeRange" value="range"><label class="form-check-label small" for="chModeRange">刪除指定區間</label></div>
+          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeAll" value="all" checked><label class="form-check-label small" for="chModeAll">@L["Admin_Tracker_ClearAllHistory"]</label></div>
+          <div class="form-check"><input class="form-check-input" type="radio" name="chMode" id="chModeRange" value="range"><label class="form-check-label small" for="chModeRange">@L["Admin_Tracker_ClearRangeHistory"]</label></div>
         </div>
         <div id="chRangeRow" style="display:none">
           <div class="row g-2">
-            <div class="col-6"><label class="form-label small mb-1">開始日期</label><input type="date" id="ch-start" class="form-control form-control-sm" /></div>
-            <div class="col-6"><label class="form-label small mb-1">結束日期</label><input type="date" id="ch-end" class="form-control form-control-sm" /></div>
+            <div class="col-6"><label class="form-label small mb-1">@L["Report_StartDate"]</label><input type="date" id="ch-start" class="form-control form-control-sm" /></div>
+            <div class="col-6"><label class="form-label small mb-1">@L["Report_EndDate"]</label><input type="date" id="ch-end" class="form-control form-control-sm" /></div>
           </div>
         </div>
-        <div class="mt-2 small text-danger">注意：刪除後無法復原</div>
+        <div class="mt-2 small text-danger">@L["Admin_Tracker_ClearIrreversible"]</div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-danger btn-sm" onclick="doClearHistory()">確定清除</button>
-        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-danger btn-sm" onclick="doClearHistory()">@L["Admin_Tracker_ConfirmClear"]</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -429,14 +433,14 @@
 <div class="modal fade" id="batchTransferModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">批次轉移 OBM</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnBatchTransfer"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small fw-semibold mb-1">要轉移的 IMEI（每行一筆，或留空使用選取列）</label><textarea id="bt-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;123456789012346&#10;..."></textarea></div>
-        <div class="mb-2"><label class="form-label small mb-1">目標 OBM 經銷商</label><select id="bt-obm" class="form-select form-select-sm"><option value="">載入中…</option></select></div>
+        <div class="mb-2"><label class="form-label small fw-semibold mb-1">@L["Admin_Tracker_ImeisToTransfer"]</label><textarea id="bt-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;123456789012346&#10;..."></textarea></div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_TargetObm"]</label><select id="bt-obm" class="form-select form-select-sm"><option value="">@L["Admin_Tracker_Loading"]</option></select></div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-secondary btn-sm" onclick="doBatchTransfer()">確定轉移</button>
-        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-secondary btn-sm" onclick="doBatchTransfer()">@L["Common_Confirm"]</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -446,14 +450,14 @@
 <div class="modal fade" id="fwUpgradeModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">韌體昇級</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnFwUpgrade"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small fw-semibold mb-1">要昇級的 IMEI（每行一筆，或留空使用選取列）</label><textarea id="fw-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;..."></textarea></div>
-        <div class="mb-2"><label class="form-label small mb-1">目標韌體版本</label><select id="fw-ver" class="form-select form-select-sm"><option value="">載入中…</option></select></div>
+        <div class="mb-2"><label class="form-label small fw-semibold mb-1">@L["Admin_Tracker_ImeisToUpgrade"]</label><textarea id="fw-imeis" class="form-control form-control-sm" rows="5" placeholder="123456789012345&#10;..."></textarea></div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_TargetFwVersion"]</label><select id="fw-ver" class="form-select form-select-sm"><option value="">@L["Admin_Tracker_Loading"]</option></select></div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-info btn-sm text-white" onclick="doFwUpgrade()">確定排程昇級</button>
-        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-info btn-sm text-white" onclick="doFwUpgrade()">@L["Admin_Tracker_ConfirmScheduleUpgrade"]</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -463,15 +467,15 @@
 <div class="modal fade" id="factoryResetModal" tabindex="-1">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0 text-danger">恢復出廠設定</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0 text-danger">@L["Admin_Tracker_BtnFactoryResetTitle"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="small text-muted mb-2">選取裝置 IMEI：<strong id="fr-imei-lbl">（未選取）</strong></div>
-        <div class="small">此操作將：<ul class="mb-1"><li>解除會員綁定</li><li>清除裝置名稱</li><li>清除警報設定</li><li>清除自訂欄位與群組標籤</li></ul></div>
-        <div class="text-danger small fw-bold">確定要恢復出廠嗎？此動作無法復原。</div>
+        <div class="small text-muted mb-2">@L["Admin_Tracker_SelectedImei"]<strong id="fr-imei-lbl">@L["Admin_Tracker_NoneSelected"]</strong></div>
+        <div class="small">@L["Admin_Tracker_FactoryResetWill"]<ul class="mb-1"><li>@L["Admin_Tracker_FactoryResetUnbind"]</li><li>@L["Admin_Tracker_FactoryResetClearName"]</li><li>@L["Admin_Tracker_FactoryResetClearAlert"]</li><li>@L["Admin_Tracker_FactoryResetClearCustom"]</li></ul></div>
+        <div class="text-danger small fw-bold">@L["Admin_Tracker_FactoryResetConfirmMsg"]</div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-danger btn-sm" onclick="doFactoryReset()">確定恢復出廠</button>
-        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-danger btn-sm" onclick="doFactoryReset()">@L["Admin_Tracker_ConfirmFactoryReset"]</button>
+        <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -481,15 +485,15 @@
 <div class="modal fade" id="moveHistoryModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header py-2"><h6 class="modal-title mb-0">轉移歷史軌跡</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2"><h6 class="modal-title mb-0">@L["Admin_Tracker_BtnMoveHistory"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        <div class="mb-2"><label class="form-label small mb-1">來源 IMEI（舊裝置）</label><input type="text" id="mh-src" class="form-control form-control-sm" maxlength="15" /></div>
-        <div class="mb-2"><label class="form-label small mb-1">目標 IMEI（新裝置）</label><input type="text" id="mh-dest" class="form-control form-control-sm" maxlength="15" /></div>
-        <div class="small text-muted">歷史軌跡轉移由系統背景排程執行，完成後資料將歸屬至目標 IMEI。</div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_SourceImei"]</label><input type="text" id="mh-src" class="form-control form-control-sm" maxlength="15" /></div>
+        <div class="mb-2"><label class="form-label small mb-1">@L["Admin_Tracker_DestImei"]</label><input type="text" id="mh-dest" class="form-control form-control-sm" maxlength="15" /></div>
+        <div class="small text-muted">@L["Admin_Tracker_MoveHistoryHint"]</div>
       </div>
       <div class="modal-footer py-2">
-        <button class="btn btn-secondary btn-sm" onclick="doMoveHistory()">確定轉移</button>
-        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+        <button class="btn btn-secondary btn-sm" onclick="doMoveHistory()">@L["Admin_Tracker_ConfirmTransfer"]</button>
+        <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button>
       </div>
     </div>
   </div>
@@ -679,11 +683,43 @@
         gap: 5px;
         flex-wrap: wrap;
     }
+    .adm-filter-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        margin: 0;
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+    .adm-filter-item > .text-muted {
+        font-size: .8rem;
+    }
     .adm-sticky-head {
         position: sticky;
         top: 0;
         z-index: 1;
     }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable:hover {
+        background: #343a40;
+        color: #fff;
+    }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable .sort-ind {
+        display: inline-block;
+        margin-left: 3px;
+        font-size: .65rem;
+        opacity: .35;
+    }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable.sort-asc .sort-ind,
+    .adm-grid-table thead tr#tracker-sort-head th.sortable.sort-desc .sort-ind {
+        opacity: 1;
+    }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable.sort-asc .sort-ind::after { content: '▲'; }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable.sort-desc .sort-ind::after { content: '▼'; }
+    .adm-grid-table thead tr#tracker-sort-head th.sortable:not(.sort-asc):not(.sort-desc) .sort-ind::after { content: '↕'; }
     #loading-overlay {
         display: none;
         position: absolute;
@@ -763,60 +799,117 @@
 
 @section Scripts {
 <script>
+// Json.Serialize：避免撇號／換行破壞 JS，也避免中文被 HTML encode 成 &#x…;
 var _T = {
-    online:        '@Html.Raw(L["Admin_Tracker_Status_Online"].Value)',
-    offline:       '@Html.Raw(L["Admin_Tracker_Status_Offline"].Value)',
-    disconnected:  '@Html.Raw(L["Admin_Tracker_Status_Disconnected"].Value)',
-    enabled:       '@Html.Raw(L["Common_Enabled"].Value)',
-    disabled:      '@Html.Raw(L["Common_Disabled"].Value)',
-    paylogActive:  '@Html.Raw(L["Admin_Tracker_PayLog_Active"].Value)',
-    noSelection:   '@Html.Raw(L["Admin_Tracker_NoSelection"].Value)',
-    noData:        '@Html.Raw(L["Admin_Tracker_NoData"].Value)',
-    noOrders:      '@Html.Raw(L["Admin_Tracker_NoOrders"].Value)',
-    noBoundMember: '@Html.Raw(L["Admin_Tracker_NoBoundMember"].Value)',
-    loading:       '@Html.Raw(L["Admin_Tracker_Loading"].Value)',
-    loadFail:      '@Html.Raw(L["Admin_Tracker_LoadFail"].Value)',
-    confirmDel:       '@Html.Raw(L["Admin_Tracker_ConfirmDelete"].Value)',
-    deleteFail:       '@Html.Raw(L["Admin_Tracker_DeleteFail"].Value)',
-    details:          '@Html.Raw(L["Common_Details"].Value)',
-    delete_:          '@Html.Raw(L["Common_Delete"].Value)',
-    confirmUnbind:    '@Html.Raw(L["Admin_Tracker_ConfirmUnbind"].Value)',
-    confirmUnbindAll: '@Html.Raw(L["Admin_Tracker_ConfirmUnbindAll"].Value)',
-    noMemberBound:    '@Html.Raw(L["Admin_Tracker_NoMemberBound"].Value)',
-    plSelectFirst:    '@Html.Raw(L["Admin_PayLog_SelectFirst"].Value)',
-    plSelectDevice:   '@Html.Raw(L["Admin_PayLog_SelectDevice"].Value)',
-    plConfirmDelete:  '@Html.Raw(L["Admin_PayLog_ConfirmDelete"].Value)',
-    plImei15:         '@Html.Raw(L["Admin_PayLog_Imei15"].Value)',
-    plConfirmMove:       '@Html.Raw(L["Admin_PayLog_ConfirmMove"].Value)',
-    plEdateBeforeSdate:  '@Html.Raw(L["Admin_PayLog_EdateBeforeSdate"].Value)'
+    online:        @Json.Serialize(L["Admin_Tracker_Status_Online"].Value),
+    offline:       @Json.Serialize(L["Admin_Tracker_Status_Offline"].Value),
+    disconnected:  @Json.Serialize(L["Admin_Tracker_Status_Disconnected"].Value),
+    enabled:       @Json.Serialize(L["Common_Enabled"].Value),
+    disabled:      @Json.Serialize(L["Common_Disabled"].Value),
+    paylogActive:  @Json.Serialize(L["Admin_Tracker_PayLog_Active"].Value),
+    noSelection:   @Json.Serialize(L["Admin_Tracker_NoSelection"].Value),
+    noData:        @Json.Serialize(L["Admin_Tracker_NoData"].Value),
+    noOrders:      @Json.Serialize(L["Admin_Tracker_NoOrders"].Value),
+    noBoundMember: @Json.Serialize(L["Admin_Tracker_NoBoundMember"].Value),
+    loading:       @Json.Serialize(L["Admin_Tracker_Loading"].Value),
+    loadFail:      @Json.Serialize(L["Admin_Tracker_LoadFail"].Value),
+    confirmDel:       @Json.Serialize(L["Admin_Tracker_ConfirmDelete"].Value),
+    deleteFail:       @Json.Serialize(L["Admin_Tracker_DeleteFail"].Value),
+    details:          @Json.Serialize(L["Common_Details"].Value),
+    delete_:          @Json.Serialize(L["Common_Delete"].Value),
+    confirmUnbind:    @Json.Serialize(L["Admin_Tracker_ConfirmUnbind"].Value),
+    confirmUnbindAll: @Json.Serialize(L["Admin_Tracker_ConfirmUnbindAll"].Value),
+    noMemberBound:    @Json.Serialize(L["Admin_Tracker_NoMemberBound"].Value),
+    plSelectFirst:    @Json.Serialize(L["Admin_PayLog_SelectFirst"].Value),
+    plSelectDevice:   @Json.Serialize(L["Admin_PayLog_SelectDevice"].Value),
+    plConfirmDelete:  @Json.Serialize(L["Admin_PayLog_ConfirmDelete"].Value),
+    plImei15:         @Json.Serialize(L["Admin_PayLog_Imei15"].Value),
+    plConfirmMove:       @Json.Serialize(L["Admin_PayLog_ConfirmMove"].Value),
+    plEdateBeforeSdate:  @Json.Serialize(L["Admin_PayLog_EdateBeforeSdate"].Value),
+    selectDeviceFirst:   @Json.Serialize(L["Admin_Tracker_SelectDeviceFirst"].Value),
+    confirmDeleteDevice: @Json.Serialize(L["Admin_Tracker_ConfirmDeleteDevice"].Value),
+    deleteOk:            @Json.Serialize(L["Admin_Tracker_DeleteOk"].Value),
+    noneSelected:        @Json.Serialize(L["Admin_Tracker_NoneSelected"].Value),
+    enterDateRange:      @Json.Serialize(L["Admin_Tracker_EnterDateRange"].Value),
+    confirmClearAll:     @Json.Serialize(L["Admin_Tracker_ConfirmClearAll"].Value),
+    confirmClearRange:   @Json.Serialize(L["Admin_Tracker_ConfirmClearRange"].Value),
+    success:             @Json.Serialize(L["Common_Success"].Value),
+    failed:              @Json.Serialize(L["Common_Failed"].Value),
+    enterImei:           @Json.Serialize(L["Admin_Tracker_EnterImei"].Value),
+    selectObm:           @Json.Serialize(L["Admin_Tracker_SelectObm"].Value),
+    selectTargetObm:     @Json.Serialize(L["Admin_Tracker_SelectTargetObm"].Value),
+    confirmBatchTransfer:@Json.Serialize(L["Admin_Tracker_ConfirmBatchTransfer"].Value),
+    subAdminRequired:  @Json.Serialize(L["Admin_Tracker_SubAdminRequired"].Value),
+    subAdminInvalid:   @Json.Serialize(L["Admin_Tracker_SubAdminInvalid"].Value),
+    selectVersion:       @Json.Serialize(L["Admin_Tracker_SelectVersion"].Value),
+    selectFwVersion:     @Json.Serialize(L["Admin_Tracker_SelectFwVersion"].Value),
+    confirmFwUpgrade:    @Json.Serialize(L["Admin_Tracker_ConfirmFwUpgrade"].Value),
+    batchDeleteNeedSelect:@Json.Serialize(L["Admin_Tracker_BatchDeleteNeedSelect"].Value),
+    confirmBatchDelete:  @Json.Serialize(L["Admin_Tracker_ConfirmBatchDelete"].Value),
+    confirmFactoryResetAgain:@Json.Serialize(L["Admin_Tracker_ConfirmFactoryResetAgain"].Value),
+    sourceImei15:        @Json.Serialize(L["Admin_Tracker_SourceImei15"].Value),
+    destImei15:          @Json.Serialize(L["Admin_Tracker_DestImei15"].Value),
+    confirmMoveHistory:  @Json.Serialize(L["Admin_Tracker_ConfirmMoveHistory"].Value),
+    imei15Digits:        @Json.Serialize(L["Admin_Error_Imei15Digits"].Value)
 };
 (function () {
     // ── State ─────────────────────────────────────────────────────────────
     let curPage = 1, curPageSize = 20, totalPages = 1, totalCount = 0;
-    let curObm = '', curImei = '', curAccount = '', curStatus = '';
+    let curObm = '', curImei = '', curAccount = '';
+    let curSortBy = 'imei';
+    let curSortDesc = false;
     let activeEs = null;
     const today = new Date(); today.setHours(0,0,0,0);
 
     const saleModelLabel = {
-        1:'@L["Admin_PayLog_SM_1"].Value', 2:'@L["Admin_PayLog_SM_2"].Value',
-        3:'@L["Admin_PayLog_SM_3"].Value', 4:'@L["Admin_PayLog_SM_4"].Value',
-        5:'@L["Admin_PayLog_SM_5"].Value', 6:'@L["Admin_PayLog_SM_6"].Value',
-        7:'@L["Admin_PayLog_SM_7"].Value', 13:'@L["Admin_PayLog_SM_13"].Value',
-        14:'@L["Admin_PayLog_SM_14"].Value', 15:'@L["Admin_PayLog_SM_15"].Value',
-        16:'@L["Admin_PayLog_SM_16"].Value', 17:'@L["Admin_PayLog_SM_17"].Value',
-        18:'@L["Admin_PayLog_SM_18"].Value', 20:'@L["Admin_PayLog_SM_20"].Value',
-        21:'@L["Admin_PayLog_SM_21"].Value', 22:'@L["Admin_PayLog_SM_22"].Value'
+        1: @Json.Serialize(L["Admin_PayLog_SM_1"].Value),
+        2: @Json.Serialize(L["Admin_PayLog_SM_2"].Value),
+        3: @Json.Serialize(L["Admin_PayLog_SM_3"].Value),
+        4: @Json.Serialize(L["Admin_PayLog_SM_4"].Value),
+        5: @Json.Serialize(L["Admin_PayLog_SM_5"].Value),
+        6: @Json.Serialize(L["Admin_PayLog_SM_6"].Value),
+        7: @Json.Serialize(L["Admin_PayLog_SM_7"].Value),
+        13: @Json.Serialize(L["Admin_PayLog_SM_13"].Value),
+        14: @Json.Serialize(L["Admin_PayLog_SM_14"].Value),
+        15: @Json.Serialize(L["Admin_PayLog_SM_15"].Value),
+        16: @Json.Serialize(L["Admin_PayLog_SM_16"].Value),
+        17: @Json.Serialize(L["Admin_PayLog_SM_17"].Value),
+        18: @Json.Serialize(L["Admin_PayLog_SM_18"].Value),
+        20: @Json.Serialize(L["Admin_PayLog_SM_20"].Value),
+        21: @Json.Serialize(L["Admin_PayLog_SM_21"].Value),
+        22: @Json.Serialize(L["Admin_PayLog_SM_22"].Value)
     };
 
     // ── Init ──────────────────────────────────────────────────────────────
+    updateSortHeaders();
     loadPage(1);
+
+    document.querySelectorAll('#tracker-sort-head th.sortable').forEach(th => {
+        th.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const col = this.getAttribute('data-sort');
+            if (!col) return;
+            if (curSortBy === col) curSortDesc = !curSortDesc;
+            else { curSortBy = col; curSortDesc = false; }
+            updateSortHeaders();
+            loadPage(1);
+        });
+    });
+
+    function updateSortHeaders() {
+        document.querySelectorAll('#tracker-sort-head th.sortable').forEach(th => {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.getAttribute('data-sort') === curSortBy)
+                th.classList.add(curSortDesc ? 'sort-desc' : 'sort-asc');
+        });
+    }
 
     // ── Pagination ────────────────────────────────────────────────────────
     window.doSearch = function () {
         curObm      = document.getElementById('kw-obm').value.trim();
         curImei     = document.getElementById('kw-imei').value.trim();
         curAccount  = document.getElementById('kw-account').value.trim();
-        curStatus   = document.getElementById('st').value;
         curPageSize = parseInt(document.getElementById('pg-size').value);
         loadPage(1);
     };
@@ -837,7 +930,11 @@ var _T = {
         showSpinner(true);
         updatePagUI();
 
-        const q = new URLSearchParams({ obm: curObm, imei: curImei, account: curAccount, status: curStatus, page, pageSize: curPageSize });
+        const q = new URLSearchParams({
+            obm: curObm, imei: curImei, account: curAccount,
+            sortBy: curSortBy, sortDesc: curSortDesc ? 'true' : 'false',
+            page, pageSize: curPageSize
+        });
         const es = new EventSource('/Admin/Tracker/TrackerStream?' + q);
         activeEs = es;
 
@@ -908,32 +1005,49 @@ var _T = {
             '<td>' + escHtml(d.iccid || '-') + '</td>' +
             '<td>' + escHtml(d.apn || '-') + '</td>';
 
-        tr.addEventListener('click', () => selectRow(tr, d.tbKey, d.imei, d.memberTbKey));
-        tr.addEventListener('dblclick', () => window.openTrackerModal(d.tbKey, d.imei));
+        tr.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            selectRow(tr, d.tbKey, d.imei, d.memberTbKey, e);
+        });
+        tr.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.openTrackerModal(d.tbKey, d.imei);
+        });
         return tr;
     }
 
     // ── Row selection ─────────────────────────────────────────────────────
-    function selectRow(tr, tbKey, imei, memberTbKey) {
+    function selectRow(tr, tbKey, imei, memberTbKey, e) {
         document.querySelectorAll('#tracker-tbody tr.table-primary').forEach(r => r.classList.remove('table-primary'));
         tr.classList.add('table-primary');
-        loadMemberTrackers(memberTbKey, tbKey);
-        loadPayLogs(imei);
+        window._selTbKey = parseInt(tbKey, 10) || 0;
+        window._selImei = String(imei || '').trim();
+        window._selMemberTbKey = parseInt(memberTbKey, 10) || 0;
+        if (typeof window.loadMemberTrackers === 'function')
+            window.loadMemberTrackers(window._selMemberTbKey, window._selTbKey);
+        if (typeof window.loadPayLogs === 'function')
+            window.loadPayLogs(window._selImei);
     }
 
     // ── Bottom-left: member trackers ──────────────────────────────────────
-    function loadMemberTrackers(memberTbKey, selTbKey) {
+    window.loadMemberTrackers = function loadMemberTrackers(memberTbKey, selTbKey) {
         const tbody = document.getElementById('member-tbody');
+        if (!tbody) return;
         tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + _T.loading + '</td></tr>';
         document.getElementById('member-info').textContent = '';
 
-        const url = (memberTbKey > 0)
-            ? '/Admin/Tracker/GetMemberTrackers?memberTbKey=' + memberTbKey
-            : '/Admin/Tracker/GetMemberTrackers?memberTbKey=0&trackerTbKey=' + selTbKey;
+        const mKey = parseInt(memberTbKey, 10) || 0;
+        const tKey = parseInt(selTbKey, 10) || 0;
+        const url = (mKey > 0)
+            ? '/Admin/Tracker/GetMemberTrackers?memberTbKey=' + mKey
+            : '/Admin/Tracker/GetMemberTrackers?memberTbKey=0&trackerTbKey=' + tKey;
 
         fetch(url)
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(list => {
+                if (!Array.isArray(list)) throw new Error('invalid');
                 document.getElementById('member-info').textContent = '(' + list.length + ' 台)';
                 if (!list.length) {
                     tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">' + _T.noData + '</td></tr>';
@@ -957,8 +1071,8 @@ var _T = {
                     } else {
                         statusBadge = '<span class="badge bg-secondary">' + _T.disconnected + '</span>';
                     }
-                    return '<tr' + (t.tbKey === selTbKey ? ' class="table-warning"' : '') + '>' +
-                        '<td><code>' + t.imei + '</code></td>' +
+                    return '<tr' + (t.tbKey === tKey ? ' class="table-warning"' : '') + '>' +
+                        '<td><code>' + escHtml(t.imei) + '</code></td>' +
                         '<td>' + escHtml(t.cname) + '</td>' +
                         '<td>' + (t.createDate ?? '-') + '</td>' +
                         '<td>' + edateCell + '</td>' +
@@ -968,16 +1082,22 @@ var _T = {
                 }).join('');
             })
             .catch(() => { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">' + _T.loadFail + '</td></tr>'; });
-    }
+    };
 
     // ── Bottom-right: PayLogs ─────────────────────────────────────────────
-    function loadPayLogs(imei) {
+    window.loadPayLogs = function loadPayLogs(imei) {
         const tbody = document.getElementById('paylog-tbody');
+        if (!tbody) return;
         tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + _T.loading + '</td></tr>';
         document.getElementById('paylog-info').textContent = '';
+        if (!imei) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + _T.noSelection + '</td></tr>';
+            return;
+        }
         fetch('/Admin/Tracker/GetPayLogs?imei=' + encodeURIComponent(imei))
-            .then(r => r.json())
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
             .then(list => {
+                if (!Array.isArray(list)) throw new Error('invalid');
                 document.getElementById('paylog-info').textContent = '(' + list.length + ' 筆)';
                 if (!list.length) {
                     tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">' + _T.noOrders + '</td></tr>';
@@ -998,7 +1118,7 @@ var _T = {
                 ).join('');
             })
             .catch(() => { tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">' + _T.loadFail + '</td></tr>'; });
-    }
+    };
 
     // ── Column filters (client-side) ─────────────────────────────────────
     function applyColumnFilters() {
@@ -1026,13 +1146,25 @@ var _T = {
         });
     }
 
-    // Wire filter inputs
+    // Wire filter inputs（關閉瀏覽器自動填入，避免帳號 admin 被填進 APN 等欄位導致列全被藏起）
     ['f-obm','f-imei','f-cname','f-account','f-firmware','f-iccid','f-apn'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('input', applyColumnFilters);
+        if (!el) return;
+        el.setAttribute('autocomplete', 'off');
+        el.value = '';
+        el.addEventListener('input', applyColumnFilters);
     });
     const statusSel = document.getElementById('f-cur-status');
-    if (statusSel) statusSel.addEventListener('change', applyColumnFilters);
+    if (statusSel) {
+        statusSel.value = '';
+        statusSel.addEventListener('change', applyColumnFilters);
+    }
+    // 篩選列點擊不要冒泡到排序標題
+    const filterRow = document.getElementById('filter-row');
+    if (filterRow) {
+        filterRow.addEventListener('click', e => e.stopPropagation());
+        filterRow.addEventListener('mousedown', e => e.stopPropagation());
+    }
 
     // ── Helpers ───────────────────────────────────────────────────────────
     function showSpinner(show) {
@@ -1114,8 +1246,11 @@ var _T = {
         document.getElementById('em-sos1').value = d.sosNumber ?? '';
         document.getElementById('em-gps-time').value = d.gpsReportTime ?? 30;
         document.getElementById('em-password').value = d.sharePassword || '12345678';
-        setSelVal('em-shock-mode', d.shockMode ?? 1);
-        setSelVal('em-shock-sens', d.shockSensitive ?? 5);
+        setSelVal('em-shock-mode', Math.min(2, Math.max(1, parseInt(d.shockMode, 10) || 1)));
+        // DB 存 1~9，對應畫面 -4~+4（與舊版一致；預設 5 = 0）
+        let sens = parseInt(d.shockSensitive, 10);
+        if (!sens || sens < 1 || sens > 9) sens = 5;
+        setSelVal('em-shock-sens', sens);
         document.getElementById('em-power-saving').value = d.powerSavingMode === 'Y' ? 'Y' : 'N';
 
         // Tab 3
@@ -1224,8 +1359,10 @@ var _T = {
 
 // ── Toolbar helpers ───────────────────────────────────────────────────────
 (function () {
-    // ── State shared with toolbar ────────────────────────────────────────
-    let _selTbKey = 0, _selImei = '', _selMemberTbKey = 0;
+    // ── State shared with toolbar（與上方 DBGrid 選列共用 window 狀態）──
+    window._selTbKey = window._selTbKey || 0;
+    window._selImei = window._selImei || '';
+    window._selMemberTbKey = window._selMemberTbKey || 0;
     let _selPlTbKey = 0;
 
     function getAntiForgeryToken() {
@@ -1243,58 +1380,48 @@ var _T = {
     }
     window.showModal = showModal;
 
-    // Track selected row
-    document.addEventListener('click', e => {
-        const tr = e.target.closest('#tracker-tbody tr[data-tbkey]');
-        if (tr) {
-            _selTbKey = parseInt(tr.dataset.tbkey) || 0;
-            _selImei = tr.cells[1]?.textContent?.trim() ?? '';
-            _selMemberTbKey = parseInt(tr.dataset.memberTbkey || '0') || 0;
-        }
-    });
-
     function requireSelection(label) {
-        if (!_selTbKey) { alert('請先點選一台裝置'); return false; }
+        if (!window._selTbKey) { alert(_T.selectDeviceFirst); return false; }
         return true;
     }
 
     // ── 刪除 ────────────────────────────────────────────────────────────
-    window.cmdDelete = function () {
+    window.cmdDelete = async function () {
         if (!requireSelection()) return;
-        if (!confirm('確定刪除此裝置（IMEI: ' + _selImei + '）？')) return;
+        if (!(await TpDialog.confirmDelete(window._selImei))) return;
         postJson('/Admin/Tracker/Delete', null)
             .catch(() => {});
         // Fall back to form POST for anti-forgery
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '/Admin/Tracker/Delete';
-        const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'id'; inp.value = _selTbKey; form.appendChild(inp);
+        const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = 'id'; inp.value = window._selTbKey; form.appendChild(inp);
         const tok = document.createElement('input'); tok.type = 'hidden'; tok.name = '__RequestVerificationToken'; tok.value = getAntiForgeryToken(); form.appendChild(tok);
         document.body.appendChild(form);
         fetch('/Admin/Tracker/Delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'RequestVerificationToken': getAntiForgeryToken() },
-            body: `id=${_selTbKey}&__RequestVerificationToken=${encodeURIComponent(getAntiForgeryToken())}`
+            body: `id=${window._selTbKey}&__RequestVerificationToken=${encodeURIComponent(getAntiForgeryToken())}`
         }).then(r => {
-            if (r.ok) { alert('刪除成功'); window.doSearch(); _selTbKey = 0; _selImei = ''; }
-            else r.text().then(t => alert('刪除失敗：' + t));
+            if (r.ok) { alert(_T.deleteOk); window.doSearch(); window._selTbKey = 0; window._selImei = ''; }
+            else r.text().then(t => alert(_T.deleteFail + '：' + t));
         });
     };
 
     // ── 清除歷史資料 ────────────────────────────────────────────────────
     window.showModal = function(id) {
-        if ((id === 'clearHistoryModal' || id === 'factoryResetModal') && !_selTbKey) {
-            alert('請先點選一台裝置'); return;
+        if ((id === 'clearHistoryModal' || id === 'factoryResetModal') && !window._selTbKey) {
+            alert(_T.selectDeviceFirst); return;
         }
         if (id === 'clearHistoryModal') {
-            document.getElementById('ch-imei-lbl').textContent = _selImei || '（未選取）';
+            document.getElementById('ch-imei-lbl').textContent = window._selImei || _T.noneSelected;
             document.getElementById('ch-start').value = '';
             document.getElementById('ch-end').value = '';
             document.querySelector('[name=chMode][value=all]').checked = true;
             document.getElementById('chRangeRow').style.display = 'none';
         }
         if (id === 'factoryResetModal') {
-            document.getElementById('fr-imei-lbl').textContent = _selImei || '（未選取）';
+            document.getElementById('fr-imei-lbl').textContent = window._selImei || _T.noneSelected;
         }
         new bootstrap.Modal(document.getElementById(id)).show();
     };
@@ -1305,17 +1432,17 @@ var _T = {
         })
     );
 
-    window.doClearHistory = function () {
+    window.doClearHistory = async function () {
         const deleteAll = document.getElementById('chModeAll').checked;
-        const payload = { imei: _selImei, deleteAll };
+        const payload = { imei: window._selImei, deleteAll };
         if (!deleteAll) {
             payload.startDate = document.getElementById('ch-start').value;
             payload.endDate = document.getElementById('ch-end').value;
-            if (!payload.startDate || !payload.endDate) { alert('請輸入日期區間'); return; }
+            if (!payload.startDate || !payload.endDate) { alert(_T.enterDateRange); return; }
         }
-        if (!confirm('確定' + (deleteAll ? '清除全部' : '清除區間') + '歷史資料？此動作無法復原。')) return;
+        if (!(await TpDialog.confirm(deleteAll ? _T.confirmClearAll : _T.confirmClearRange))) return;
         postJson('/Admin/Tracker/ClearHistory', payload)
-            .then(r => { alert(r.message || (r.success ? '成功' : '失敗')); if (r.success) bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal'))?.hide(); });
+            .then(r => { alert(r.message || (r.success ? _T.success : _T.failed)); if (r.success) bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal'))?.hide(); });
     };
 
     // ── 批次轉移 ────────────────────────────────────────────────────────
@@ -1323,22 +1450,28 @@ var _T = {
         const sel = document.getElementById('bt-obm');
         if (sel.options.length <= 1) {
             const list = await fetch('/Admin/Tracker/GetOBMList').then(r => r.json());
-            sel.innerHTML = '<option value="">選擇 OBM</option>' +
+            sel.innerHTML = '<option value="">' + (_T.selectObm || '選擇 OBM') + '</option>' +
                 list.map(o => `<option value="${o.tbKey}">${escHtml(o.name)}</option>`).join('');
         }
         const imeis = getCheckedImeis();
         document.getElementById('bt-imeis').value = imeis.join('\n');
         new bootstrap.Modal(document.getElementById('batchTransferModal')).show();
     };
-    window.doBatchTransfer = function () {
+    window.doBatchTransfer = async function () {
         const raw = document.getElementById('bt-imeis').value;
         const imeis = raw.split(/[\n,\r]+/).map(s => s.trim()).filter(s => s.length === 15);
         const obmTbKey = parseInt(document.getElementById('bt-obm').value) || 0;
-        if (!imeis.length) { alert('請輸入 IMEI'); return; }
-        if (!obmTbKey) { alert('請選擇目標 OBM'); return; }
-        if (!confirm(`確定將 ${imeis.length} 台裝置轉移至選取的 OBM？`)) return;
+        if (!imeis.length) { alert(_T.enterImei); return; }
+        if (!obmTbKey) { alert(_T.selectTargetObm); return; }
+        if (!(await TpDialog.confirm(_T.confirmBatchTransfer.replace('{0}', imeis.length)))) return;
         postJson('/Admin/Tracker/BatchTransfer', { imeis, obmTbKey })
-            .then(r => { alert(r.message); if (r.success) { bootstrap.Modal.getInstance(document.getElementById('batchTransferModal'))?.hide(); window.doSearch(); } });
+            .then(r => {
+                alert(r.message);
+                if (r.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('batchTransferModal'))?.hide();
+                    window.doSearch();
+                }
+            });
     };
 
     // ── 韌體昇級 ────────────────────────────────────────────────────────
@@ -1346,29 +1479,29 @@ var _T = {
         const sel = document.getElementById('fw-ver');
         if (sel.options.length <= 1) {
             const list = await fetch('/Admin/Tracker/GetFirmwareVersions').then(r => r.json());
-            sel.innerHTML = '<option value="">選擇版本</option>' +
+            sel.innerHTML = '<option value="">' + _T.selectVersion + '</option>' +
                 list.map(f => `<option value="${escHtml(f.version)}">${escHtml(f.version)}${f.memo ? ' - ' + escHtml(f.memo) : ''}</option>`).join('');
         }
         const imeis = getCheckedImeis();
         document.getElementById('fw-imeis').value = imeis.join('\n');
         new bootstrap.Modal(document.getElementById('fwUpgradeModal')).show();
     };
-    window.doFwUpgrade = function () {
+    window.doFwUpgrade = async function () {
         const raw = document.getElementById('fw-imeis').value;
         const imeis = raw.split(/[\n,\r]+/).map(s => s.trim()).filter(s => s.length === 15);
         const targetVersion = document.getElementById('fw-ver').value.trim();
-        if (!imeis.length) { alert('請輸入 IMEI'); return; }
-        if (!targetVersion) { alert('請選擇韌體版本'); return; }
-        if (!confirm(`確定排程 ${imeis.length} 台裝置昇級至 ${targetVersion}？`)) return;
+        if (!imeis.length) { alert(_T.enterImei); return; }
+        if (!targetVersion) { alert(_T.selectFwVersion); return; }
+        if (!(await TpDialog.confirm(_T.confirmFwUpgrade.replace('{0}', imeis.length).replace('{1}', targetVersion)))) return;
         postJson('/Admin/Tracker/BatchFirmwareUpgrade', { imeis, targetVersion })
             .then(r => { alert(r.message); if (r.success) bootstrap.Modal.getInstance(document.getElementById('fwUpgradeModal'))?.hide(); });
     };
 
     // ── 整批刪除裝置 ────────────────────────────────────────────────────
-    window.cmdBatchDelete = function () {
+    window.cmdBatchDelete = async function () {
         const tbKeys = getCheckedTbKeys();
-        if (!tbKeys.length) { alert('請先勾選要刪除的裝置（或選取後使用下方整批功能）\n\n若要刪除會員所有裝置，請先點選有綁定會員的裝置。'); return; }
-        if (!confirm(`確定刪除選取的 ${tbKeys.length} 台裝置？此動作無法復原。`)) return;
+        if (!tbKeys.length) { alert(_T.batchDeleteNeedSelect); return; }
+        if (!(await TpDialog.confirm(_T.confirmBatchDelete.replace('{0}', tbKeys.length)))) return;
         postJson('/Admin/Tracker/BatchDeleteDevices', { tbKeys })
             .then(r => { alert(r.message); if (r.success) window.doSearch(); });
     };
@@ -1519,8 +1652,8 @@ var _T = {
 
     // ── 訂單管理：新增 ───────────────────────────────────────────────────
     window.cmdPayLogAdd = function () {
-        if (!_selImei) { alert(_T.plSelectDevice); return; }
-        document.getElementById('pl-add-imei').value  = _selImei;
+        if (!window._selImei) { alert(_T.plSelectDevice); return; }
+        document.getElementById('pl-add-imei').value  = window._selImei;
         document.getElementById('pl-add-model').value = '1';
         document.getElementById('pl-add-memo').value  = '';
         document.getElementById('pl-add-vaw').checked = false;
@@ -1549,7 +1682,7 @@ var _T = {
         };
         postJson('/Admin/PayLog/CreateJson', req).then(r => {
             alert(r.message);
-            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogAddModal'))?.hide(); loadPayLogs(_selImei); }
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogAddModal'))?.hide(); loadPayLogs(window._selImei); }
         });
     };
 
@@ -1583,17 +1716,17 @@ var _T = {
         };
         postJson('/Admin/PayLog/UpdateJson', req).then(r => {
             alert(r.message);
-            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogEditModal'))?.hide(); loadPayLogs(_selImei); }
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogEditModal'))?.hide(); loadPayLogs(window._selImei); }
         });
     };
 
     // ── 訂單管理：刪除 ───────────────────────────────────────────────────
-    window.cmdPayLogDelete = function () {
+    window.cmdPayLogDelete = async function () {
         if (!requirePayLogSelection()) return;
-        if (!confirm(_T.plConfirmDelete)) return;
+        if (!(await TpDialog.confirmDelete())) return;
         postJson('/Admin/PayLog/DeleteJson', { id: _selPlTbKey }).then(r => {
             alert(r.message);
-            if (r.success) { _selPlTbKey = 0; loadPayLogs(_selImei); }
+            if (r.success) { _selPlTbKey = 0; loadPayLogs(window._selImei); }
         });
     };
 
@@ -1604,20 +1737,20 @@ var _T = {
         showModal('paylogMoveModal');
     };
 
-    window.doPayLogMove = function () {
+    window.doPayLogMove = async function () {
         const newImei = document.getElementById('pl-move-imei').value.trim();
         if (!newImei || newImei.length !== 15) { alert(_T.plImei15); return; }
-        if (!confirm(_T.plConfirmMove.replace('{0}', newImei))) return;
+        if (!(await TpDialog.confirm(_T.plConfirmMove.replace('{0}', newImei)))) return;
         postJson('/Admin/PayLog/MoveJson', { id: _selPlTbKey, newImei }).then(r => {
             alert(r.message);
-            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogMoveModal'))?.hide(); _selPlTbKey = 0; loadPayLogs(_selImei); }
+            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogMoveModal'))?.hide(); _selPlTbKey = 0; loadPayLogs(window._selImei); }
         });
     };
 
     // ── 前台(單機)：產生 5 分鐘 token 後以新 tab 開啟前台即時地圖 ──────────
     window.cmdFrontend = function () {
         if (!requireSelection()) return;
-        fetch('/Admin/Tracker/GetPreviewToken?trackerTbKey=' + _selTbKey + '&memberTbKey=' + _selMemberTbKey)
+        fetch('/Admin/Tracker/GetPreviewToken?trackerTbKey=' + window._selTbKey + '&memberTbKey=' + window._selMemberTbKey)
             .then(r => r.json())
             .then(d => {
                 if (d.success) window.open('/Account/AdminPreview?t=' + encodeURIComponent(d.token), '_blank');
@@ -1626,32 +1759,32 @@ var _T = {
     };
 
     // ── 解除裝置（解除目前選取裝置的會員綁定） ─────────────────────────────
-    window.cmdUnbind = function () {
+    window.cmdUnbind = async function () {
         if (!requireSelection()) return;
-        if (!confirm(_T.confirmUnbind.replace('{0}', _selImei).replace('\\n', '\n'))) return;
-        postJson('/Admin/Tracker/UnbindDevice', { tbKey: _selTbKey })
+        if (!(await TpDialog.confirm(_T.confirmUnbind.replace('{0}', window._selImei).replace('\\n', '\n')))) return;
+        postJson('/Admin/Tracker/UnbindDevice', { tbKey: window._selTbKey })
             .then(r => {
                 alert(r.message);
-                if (r.success) { window.doSearch(); loadMemberTrackers(0, _selTbKey); }
+                if (r.success) { window.doSearch(); loadMemberTrackers(0, window._selTbKey); }
             });
     };
 
     // ── 解除所有裝置（解除此會員所有裝置的綁定） ────────────────────────────
-    window.cmdUnbindAll = function () {
+    window.cmdUnbindAll = async function () {
         if (!requireSelection()) return;
-        if (_selMemberTbKey <= 0) { alert(_T.noMemberBound); return; }
-        if (!confirm(_T.confirmUnbindAll.replace('\\n', '\n'))) return;
-        postJson('/Admin/Tracker/UnbindAllByMember', { memberTbKey: _selMemberTbKey })
+        if (window._selMemberTbKey <= 0) { alert(_T.noMemberBound); return; }
+        if (!(await TpDialog.confirm(_T.confirmUnbindAll.replace('\\n', '\n')))) return;
+        postJson('/Admin/Tracker/UnbindAllByMember', { memberTbKey: window._selMemberTbKey })
             .then(r => {
                 alert(r.message);
-                if (r.success) { window.doSearch(); loadMemberTrackers(0, _selTbKey); }
+                if (r.success) { window.doSearch(); loadMemberTrackers(0, window._selTbKey); }
             });
     };
 
     // ── 恢復出廠 ────────────────────────────────────────────────────────
-    window.doFactoryReset = function () {
-        if (!confirm('再次確認：確定要恢復出廠嗎？')) return;
-        postJson('/Admin/Tracker/FactoryReset', { tbKey: _selTbKey })
+    window.doFactoryReset = async function () {
+        if (!(await TpDialog.confirm(_T.confirmFactoryResetAgain))) return;
+        postJson('/Admin/Tracker/FactoryReset', { tbKey: window._selTbKey })
             .then(r => {
                 alert(r.message);
                 if (r.success) { bootstrap.Modal.getInstance(document.getElementById('factoryResetModal'))?.hide(); window.doSearch(); }
@@ -1659,12 +1792,12 @@ var _T = {
     };
 
     // ── 轉移歷史軌跡 ────────────────────────────────────────────────────
-    window.doMoveHistory = function () {
+    window.doMoveHistory = async function () {
         const sourceImei = document.getElementById('mh-src').value.trim();
         const destImei = document.getElementById('mh-dest').value.trim();
-        if (!sourceImei || sourceImei.length !== 15) { alert('來源 IMEI 需為 15 碼'); return; }
-        if (!destImei || destImei.length !== 15) { alert('目標 IMEI 需為 15 碼'); return; }
-        if (!confirm(`確定將 ${sourceImei} 的歷史軌跡轉移至 ${destImei}？`)) return;
+        if (!sourceImei || sourceImei.length !== 15) { alert(_T.sourceImei15); return; }
+        if (!destImei || destImei.length !== 15) { alert(_T.destImei15); return; }
+        if (!(await TpDialog.confirm(_T.confirmMoveHistory.replace('{0}', sourceImei).replace('{1}', destImei)))) return;
         postJson('/Admin/Tracker/MoveHistory', { sourceImei, destImei })
             .then(r => { alert(r.message); if (r.success) bootstrap.Modal.getInstance(document.getElementById('moveHistoryModal'))?.hide(); });
     };
@@ -1673,7 +1806,7 @@ var _T = {
     window.doAddTracker = function () {
         const imei = document.getElementById('add-imei').value.trim();
         const cName = document.getElementById('add-cname').value.trim();
-        if (!imei || imei.length !== 15) { alert('IMEI 需為 15 碼'); return; }
+        if (!imei || imei.length !== 15) { alert(_T.imei15Digits); return; }
         postJson('/Admin/Tracker/CreateTracker', { imei, cName })
             .then(r => {
                 alert(r.message);
@@ -1696,7 +1829,7 @@ var _T = {
 
     // 開啟 moveHistoryModal 時預填選取裝置的 IMEI
     document.getElementById('moveHistoryModal').addEventListener('show.bs.modal', () => {
-        if (_selImei) document.getElementById('mh-src').value = _selImei;
+        if (window._selImei) document.getElementById('mh-src').value = window._selImei;
     });
 })();
 

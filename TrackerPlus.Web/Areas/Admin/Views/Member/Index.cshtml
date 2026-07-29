@@ -4,10 +4,20 @@
     ViewData["Title"] = L["Nav_Admin_Account_Mgmt"].Value;
     var filter = ViewBag.Filter as QueryFilter ?? new QueryFilter();
 }
+<style>
+.member-action-btns { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.member-action-btns .btn-icon {
+    width: 30px; height: 30px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+}
+.member-action-btns .btn-icon .ui-icon { width: 1em; height: 1em; }
+</style>
 <div class="mb-3">
     <h2>@L["Nav_Admin_Account_Mgmt"] [@Model.Items.Count()]</h2>
 </div>
 <form method="get" class="row g-2 mb-3 align-items-center">
+    <input type="hidden" name="sortBy" value="@filter.SortBy" />
+    <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
     <div class="col-auto">
         <span class="fw-bold">@L["Admin_Member_FilterTitle"]</span>
         <span class="ms-3">@L["Admin_Member_FilterAccount"]</span>
@@ -29,18 +39,18 @@
     </div>
 </form>
 <div class="table-responsive">
-    <table class="table table-striped table-sm align-middle">
+    <table class="table table-striped table-sm align-middle" data-grid-sort="server">
         <thead class="table-dark">
             <tr>
-                <th>TbKey</th>
-                <th>@L["Admin_Member_Account"]</th>
-                <th>@L["Field_CreatedDate"]</th>
-                <th>@L["Admin_Member_Col_LastOnline"]</th>
-                <th>@L["Admin_Member_Col_TrackerCount"]</th>
-                <th>@L["Admin_Member_Col_Tel"]</th>
-                <th>@L["Admin_Member_Col_Email"]</th>
-                <th>@L["Admin_Member_Col_Addr"]</th>
-                <th>@L["Common_Status"]</th>
+                <th class="@GridSortHelper.ThClass(filter, "tbKey")" data-sort="tbKey">TbKey<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "id")" data-sort="id">@L["Admin_Member_Account"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "cdate")" data-sort="cdate">@L["Field_CreatedDate"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "lastOnline")" data-sort="lastOnline">@L["Admin_Member_Col_LastOnline"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "trackerCount")" data-sort="trackerCount">@L["Admin_Member_Col_TrackerCount"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "tel")" data-sort="tel">@L["Admin_Member_Col_Tel"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "email")" data-sort="email">@L["Admin_Member_Col_Email"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "addr")" data-sort="addr">@L["Admin_Member_Col_Addr"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "status")" data-sort="status">@L["Common_Status"]<span class="sort-ind"></span></th>
                 <th>@L["Common_Operation"]</th>
             </tr>
         </thead>
@@ -72,14 +82,23 @@
                     <td class="member-addr">@m.Addr</td>
                     <td><span class="badge status-badge @statusBadge">@statusLabel</span></td>
                     <td>
-                        <button type="button" class="btn btn-sm btn-info btn-with-icon" onclick="openEditModal(@m.TbKey)">@Html.UiIcon("edit")<span>@L["Admin_Member_EditBtn"]</span></button>
-                        <button type="button" class="btn btn-sm btn-outline-primary btn-with-icon" onclick="memberPreview(@m.TbKey)">@Html.UiIcon("details")<span>@L["Admin_Member_PreviewBtn"]</span></button>
-                        <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, m.ID)')">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@m.TbKey" />
-                            <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
-                        </form>
+                        <div class="member-action-btns">
+                            <button type="button" class="btn btn-sm btn-outline-primary btn-icon"
+                                    title="@L["Admin_Member_EditBtn"]" aria-label="@L["Admin_Member_EditBtn"]"
+                                    onclick="openEditModal(@m.TbKey)">@Html.UiIcon("edit")</button>
+                            <form asp-action="Delete" method="post" class="d-inline"
+                                  data-tp-confirm
+                                  data-tp-confirm-title="@L["Dialog_ConfirmDelete"]"
+                                  data-tp-confirm-message="@m.ID">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@m.TbKey" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger btn-icon"
+                                        title="@L["Common_Delete"]" aria-label="@L["Common_Delete"]">@Html.UiIcon("delete")</button>
+                            </form>
+                            <button type="button" class="btn btn-sm btn-outline-secondary btn-icon"
+                                    title="@L["Admin_Member_PreviewBtn"]" aria-label="@L["Admin_Member_PreviewBtn"]"
+                                    onclick="memberPreview(@m.TbKey)">@Html.UiIcon("details")</button>
+                        </div>
                     </td>
                 </tr>
             }
@@ -94,9 +113,9 @@
         @if (Model.HasPreviousPage)
         {
             <a asp-action="Index" asp-route-page="1" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("first")<span>@L["Common_FirstPage"]</span></a>
+               asp-route-status="@filter.Status" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("first")<span>@L["Common_FirstPage"]</span></a>
             <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+               asp-route-status="@filter.Status" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
         }
         else
         {
@@ -106,9 +125,9 @@
         @if (Model.HasNextPage)
         {
             <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+               asp-route-status="@filter.Status" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
             <a asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-keyword="@filter.Keyword"
-               asp-route-status="@filter.Status" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("last")<span>@L["Common_LastPage"]</span></a>
+               asp-route-status="@filter.Status" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("last")<span>@L["Common_LastPage"]</span></a>
         }
         else
         {
@@ -119,14 +138,6 @@
 </div>
 
 <style>
-    @@keyframes memberModalShake {
-        0%, 100% { transform: translateX(0); }
-        15%, 45%, 75% { transform: translateX(-10px); }
-        30%, 60%, 90% { transform: translateX(10px); }
-    }
-    .modal-shake .modal-dialog {
-        animation: memberModalShake 0.5s ease-in-out;
-    }
     #editMemberModal .field-row {
         display: flex;
         align-items: flex-start;
@@ -145,12 +156,12 @@
     }
 </style>
 
-<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-modal="true" role="dialog">
+<div class="modal fade" id="editMemberModal" tabindex="-1" data-modal-static aria-labelledby="editMemberModalLabel" aria-modal="true" role="dialog">
     <div class="modal-dialog" style="min-width:560px">
         <div class="modal-content">
             <div class="modal-header py-2">
                 <h6 class="modal-title" id="editMemberModalLabel">修改會員資料</h6>
-                <button type="button" class="btn-close" onclick="editModal.hide()" title="關閉"></button>
+                <button type="button" class="btn-close" onclick="StaticModal.hide('editMemberModal')" title="關閉"></button>
             </div>
             <div class="modal-body">
                 <div id="em_error" class="alert alert-danger d-none mb-3 py-2"></div>
@@ -244,16 +255,8 @@
         };
 
         const editModalEl = document.getElementById('editMemberModal');
-        const editModal = new bootstrap.Modal(editModalEl, { backdrop: 'static', keyboard: false });
+        const editModal = StaticModal.init(editModalEl);
         let originalData = null;
-
-        // Bootstrap static backdrop 點外側觸發 hidePrevented → 自訂震動
-        editModalEl.addEventListener('hidePrevented.bs.modal', function () {
-            editModalEl.classList.remove('modal-shake');
-            void editModalEl.offsetWidth; // reflow
-            editModalEl.classList.add('modal-shake');
-            setTimeout(() => editModalEl.classList.remove('modal-shake'), 500);
-        });
 
         function openEditModal(tbKey) {
             fetch('/Admin/Member/GetMemberJson?id=' + tbKey)
@@ -262,9 +265,9 @@
                     originalData = d;
                     populateForm(d);
                     document.getElementById('em_error').classList.add('d-none');
-                    editModal.show();
+                    StaticModal.show(editModalEl);
                 })
-                .catch(e => alert(e.message));
+                .catch(e => TpDialog.alert(e.message));
         }
 
         function populateForm(d) {
@@ -363,7 +366,7 @@
                 .then(r => r.json())
                 .then(d => {
                     if (d.success) window.open('/Account/AdminPreview?t=' + encodeURIComponent(d.token), '_blank');
-                    else alert(d.message);
+                    else TpDialog.alert(d.message);
                 });
         }
     </script>

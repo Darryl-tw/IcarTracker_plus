@@ -38,44 +38,44 @@
 <!-- 工具列 -->
 <div class="d-flex gap-1 mb-2 p-2 bg-light border rounded">
     <button class="btn btn-success btn-sm toolbar-btn" onclick="dealerAction('create')">
-        @Html.UiIcon("add")<span>新增</span>
+        @Html.UiIcon("add")<span>@L["Admin_Tracker_BtnAdd"]</span>
     </button>
     <button class="btn btn-info btn-sm toolbar-btn text-white" onclick="dealerAction('view')">
-        @Html.UiIcon("eye")<span>檢視</span>
+        @Html.UiIcon("eye")<span>@L["Admin_Dealer_BtnView"]</span>
     </button>
     <button class="btn btn-primary btn-sm toolbar-btn" onclick="dealerAction('edit')">
-        @Html.UiIcon("edit")<span>修改</span>
+        @Html.UiIcon("edit")<span>@L["Admin_Dealer_Edit_Title"]</span>
     </button>
     <button class="btn btn-danger btn-sm toolbar-btn" onclick="dealerAction('delete')">
-        @Html.UiIcon("delete")<span>刪除</span>
+        @Html.UiIcon("delete")<span>@L["Common_Delete"]</span>
     </button>
     <button class="btn btn-secondary btn-sm toolbar-btn" onclick="dealerAction('print')">
-        @Html.UiIcon("export")<span>列印</span>
+        @Html.UiIcon("export")<span>@L["Admin_Dealer_BtnPrint"]</span>
     </button>
     <button class="btn btn-warning btn-sm toolbar-btn" onclick="dealerAction('renew')">
-        @Html.UiIcon("refresh")<span>線上續約</span>
+        @Html.UiIcon("refresh")<span>@L["Admin_Dealer_BtnOnlineRenew"]</span>
     </button>
 </div>
 
 <div class="table-responsive">
-    <table class="table table-bordered table-hover table-sm dealer-table" id="dealerTable">
+    <table class="table table-bordered table-hover table-sm dealer-table" id="dealerTable" data-grid-sort="client">
         <thead class="table-dark">
             <tr>
-                <th>@L["Admin_Dealer_Col_Code"]</th>
-                <th>@L["Admin_Dealer_Col_Company"]</th>
-                <th>@L["Admin_Dealer_Col_Account"]</th>
-                <th>@L["Admin_Dealer_Col_Password"]</th>
-                <th>@L["Admin_Dealer_Col_CreateDate"]</th>
-                <th>@L["Common_Status"]</th>
-                <th>@L["Admin_Dealer_Col_OnlineContract"]</th>
-                <th class="num">@L["Admin_Dealer_Col_TotalDev"]</th>
-                <th class="num">@L["Admin_Dealer_Col_OnlineDev"]</th>
-                <th class="num">@L["Admin_Dealer_Col_YesterdayDev"]</th>
-                <th class="num">@L["Admin_Dealer_Col_YesterdayLogin"]</th>
-                <th class="num">@L["Admin_Dealer_Col_Offline90"]</th>
-                <th class="num">@L["Admin_Dealer_Col_Expired"]</th>
-                <th class="num">@L["Admin_Dealer_Col_BoundPhone"]</th>
-                <th class="num">@L["Admin_Dealer_Col_BoundEmail"]</th>
+                <th class="sortable" data-type="text">@L["Admin_Dealer_Col_Code"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="text">@L["Admin_Dealer_Col_Company"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="text">@L["Admin_Dealer_Col_Account"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="text">@L["Admin_Dealer_Col_Password"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="date">@L["Admin_Dealer_Col_CreateDate"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="text">@L["Common_Status"]<span class="sort-ind"></span></th>
+                <th class="sortable" data-type="text">@L["Admin_Dealer_Col_OnlineContract"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_TotalDev"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_OnlineDev"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_YesterdayDev"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_YesterdayLogin"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_Offline90"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_Expired"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_BoundPhone"]<span class="sort-ind"></span></th>
+                <th class="sortable num" data-type="num">@L["Admin_Dealer_Col_BoundEmail"]<span class="sort-ind"></span></th>
             </tr>
         </thead>
         <tbody>
@@ -123,6 +123,13 @@
 
 @section Scripts {
 <script>
+const _dealerT = {
+    selectFirst: @Json.Serialize(L["Admin_Dealer_SelectFirst"].Value),
+    confirmDelete: @Json.Serialize(L["Admin_Dealer_ConfirmDelete"].Value),
+    deleteFail: @Json.Serialize(L["Admin_Tracker_DeleteFail"].Value),
+    networkError: @Json.Serialize(L["Live_NetworkError"].Value),
+    renewSoon: @Json.Serialize(L["Admin_Dealer_RenewSoon"].Value)
+};
 let selectedTbKey = null;
 const POPUP_OPTS = 'width=860,height=760,scrollbars=yes,resizable=yes';
 
@@ -138,7 +145,7 @@ document.querySelectorAll('#dealerTable tbody tr').forEach(tr => {
 });
 
 function requireSelection() {
-    if (!selectedTbKey) { alert('請先選擇一筆經銷商資料'); return false; }
+    if (!selectedTbKey) { TpDialog.alert(_dealerT.selectFirst); return false; }
     return true;
 }
 
@@ -162,7 +169,7 @@ function dealerAction(action) {
             window.open(`/Admin/Dealer/Popup?id=${selectedTbKey}&mode=print`, '_blank', POPUP_OPTS);
             break;
         case 'renew':
-            alert('線上續約功能開發中');
+            TpDialog.alert(_dealerT.renewSoon);
             break;
     }
 }
@@ -170,23 +177,24 @@ function dealerAction(action) {
 function doDelete() {
     const row = document.querySelector(`#dealerTable tr[data-tbkey="${selectedTbKey}"]`);
     const name = row?.querySelector('.d-name')?.textContent ?? '';
-    if (!confirm(`確定要刪除【${name}】？此操作無法還原。`)) return;
+    TpDialog.confirmDelete(name).then(ok => {
+        if (!ok) return;
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        const fd = new FormData();
+        fd.append('tbKey', selectedTbKey);
+        fd.append('__RequestVerificationToken', token);
 
-    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-    const fd = new FormData();
-    fd.append('tbKey', selectedTbKey);
-    fd.append('__RequestVerificationToken', token);
-
-    fetch('/Admin/Dealer/DeleteAjax', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(res => {
-            if (!res.success) { alert(res.message || '刪除失敗'); return; }
-            row?.remove();
-            selectedTbKey = null;
-            const cnt = document.querySelectorAll('#dealerTable tbody tr').length;
-            document.getElementById('dealerCount').textContent = cnt;
-        })
-        .catch(() => alert('網路錯誤'));
+        fetch('/Admin/Dealer/DeleteAjax', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(res => {
+                if (!res.success) { TpDialog.alert(res.message || _dealerT.deleteFail); return; }
+                row?.remove();
+                selectedTbKey = null;
+                const cnt = document.querySelectorAll('#dealerTable tbody tr').length;
+                document.getElementById('dealerCount').textContent = cnt;
+            })
+            .catch(() => TpDialog.alert(_dealerT.networkError));
+    });
 }
 </script>
 }

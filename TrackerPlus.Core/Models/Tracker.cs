@@ -61,6 +61,8 @@ public class Tracker
     public string CurrentStatus { get; set; } = string.Empty;
     /// <summary>省電/離線狀態：Y=離線中（issleep）</summary>
     public string IsSleep { get; set; } = string.Empty;
+    /// <summary>綁定手機數（GCM_EMAIL + ClientIDRegistration，對應舊版 DXIMEIGrid Phone）</summary>
+    public int BindCount { get; set; }
     public int Voltage { get; set; }
     public int CSQ { get; set; }
     public int GPSNo { get; set; }

@@ -5,9 +5,12 @@
     var isView  = mode == "view" || mode == "print";
     var isPrint = mode == "print";
     var isCreate = mode == "create";
-    var modeTitle = isCreate ? "新增" : (isPrint ? "列印" : (isView ? "檢視" : "修改"));
+    var modeTitle = isCreate
+        ? L["Admin_Tracker_BtnAdd"].Value
+        : (isPrint ? L["Admin_Dealer_BtnPrint"].Value
+            : (isView ? L["Admin_Dealer_BtnView"].Value : L["Admin_Dealer_Edit_Title"].Value));
     var subTitle  = isCreate ? "" : $" - {Model.UserName}";
-    ViewData["Title"] = $"{modeTitle}經銷商{subTitle}";
+    ViewData["Title"] = $"{modeTitle}{L["Admin_Dealer_Entity"].Value}{subTitle}";
 }
 
 @section HeadStyles {
@@ -23,7 +26,7 @@ textarea { resize: none; }
 <div class="p-3">
     <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2 no-print">
         <h6 class="mb-0">@ViewData["Title"]</h6>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.close()">✕ 關閉</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.close()">✕ @L["Common_Close"]</button>
     </div>
 
     <form id="popupForm">
@@ -34,7 +37,7 @@ textarea { resize: none; }
         <div class="row g-2">
             <!-- 左欄：基本資料 -->
             <div class="col-md-6">
-                <div class="section-bar">基本資料</div>
+                <div class="section-bar">@L["Detail_BasicInfo"]</div>
                 <div class="row mb-1 align-items-center">
                     <label class="col-4 lbl">@L["Admin_Dealer_Col_Code"]：</label>
                     <div class="col-8">
@@ -128,7 +131,7 @@ textarea { resize: none; }
 
             <!-- 右欄：聯絡資訊 -->
             <div class="col-md-6">
-                <div class="section-bar">聯絡資訊</div>
+                <div class="section-bar">@L["Admin_Dealer_ContactSection"]</div>
                 <div class="row mb-1 align-items-center">
                     <label class="col-4 lbl">@L["Admin_Dealer_Edit_Contact"]：</label>
                     <div class="col-8">
@@ -200,7 +203,7 @@ textarea { resize: none; }
         @if (isPrint)
         {
             <button type="button" class="btn btn-secondary btn-sm" onclick="window.print()">
-                列印
+                @L["Admin_Dealer_BtnPrint"]
             </button>
         }
         <button type="button" class="btn btn-outline-secondary btn-sm" onclick="window.close()">
@@ -211,6 +214,10 @@ textarea { resize: none; }
 
 @section Scripts {
 <script>
+const _popupT = {
+    saveFailed: @Json.Serialize(L["DeviceSettings_SaveFailed"].Value),
+    networkError: @Json.Serialize(L["Live_NetworkError"].Value)
+};
 function savePopup() {
     @if (!isView)
     {
@@ -242,11 +249,11 @@ function savePopup() {
     fetch(url, { method: 'POST', body: fd })
         .then(r => r.json())
         .then(res => {
-            if (!res.success) { alert(res.message || '儲存失敗'); return; }
+            if (!res.success) { alert(res.message || _popupT.saveFailed); return; }
             if (window.opener && !window.opener.closed) window.opener.location.reload();
             window.close();
         })
-        .catch(() => alert('網路錯誤'));
+        .catch(() => alert(_popupT.networkError));
         </text>
     }
 }

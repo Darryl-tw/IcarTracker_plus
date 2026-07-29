@@ -1,0 +1,132 @@
+/* 全站系統提示／確定視窗（取代 browser alert / confirm） */
+.tp-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.45);
+    padding: 16px;
+}
+
+.tp-dialog-overlay.tp-dialog-open {
+    display: flex;
+}
+
+.tp-dialog-panel {
+    position: relative;
+    width: min(400px, 100%);
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+    padding: 36px 32px 28px;
+    text-align: center;
+}
+
+.tp-dialog-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: transparent;
+    color: #9aa0a6;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.tp-dialog-close:hover {
+    color: #5f6368;
+    background: #f1f3f4;
+}
+
+.tp-dialog-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    display: block;
+}
+
+.tp-dialog-title {
+    margin: 0 0 10px;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #3c4043;
+    line-height: 1.35;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.tp-dialog-message {
+    margin: 0 0 28px;
+    font-size: 0.95rem;
+    color: #80868b;
+    line-height: 1.45;
+    white-space: pre-line;
+    word-break: break-word;
+}
+
+.tp-dialog-message:empty {
+    display: none;
+}
+
+.tp-dialog-message:empty + .tp-dialog-actions,
+.tp-dialog-title + .tp-dialog-actions {
+    margin-top: 8px;
+}
+
+.tp-dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.tp-dialog-btn {
+    min-width: 88px;
+    padding: 8px 22px;
+    border: 0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.tp-dialog-btn:focus-visible {
+    outline: 2px solid #7b68ee;
+    outline-offset: 2px;
+}
+
+.tp-dialog-btn-yes {
+    background: #7b68ee;
+}
+
+.tp-dialog-btn-yes:hover {
+    background: #6a58d9;
+}
+
+.tp-dialog-btn-cancel,
+.tp-dialog-btn-ok {
+    background: #6c757d;
+}
+
+.tp-dialog-btn-cancel:hover,
+.tp-dialog-btn-ok:hover {
+    background: #5c636a;
+}
+
+@keyframes tp-dialog-shake {
+    0%, 100% { transform: translateX(0); }
+    15%, 45%, 75% { transform: translateX(-10px); }
+    30%, 60%, 90% { transform: translateX(10px); }
+}
+
+.tp-dialog-panel.tp-dialog-shake {
+    animation: tp-dialog-shake 0.5s ease-in-out;
+}

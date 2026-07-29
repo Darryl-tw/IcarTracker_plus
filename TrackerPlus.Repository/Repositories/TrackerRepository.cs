@@ -55,6 +55,8 @@ public class TrackerRepository : ITrackerRepository
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter, memberTbKey);
 
+        var orderBy = BuildOrderByClause(filter);
+
         var countSql = $"SELECT COUNT(*) FROM dbo.Tracker t {TrackerMemberJoins} {where}";
 
         // 先用 CTE 取出分頁的 tbKey（不含昂貴的 PayLog 子查詢），
@@ -65,16 +67,18 @@ WITH _PageKeys AS (
     FROM dbo.Tracker t
     {TrackerMemberJoins}
     {where}
-    ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC
+    {orderBy}
     OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY
 ){TrackerMapper.SelectColumns},
             RTRIM(ISNULL(m.CName,'')) AS MemberName,
             RTRIM(ISNULL(u.UserName,'')) AS OBMName,
-            RTRIM(ISNULL(m.ID,'')) AS MemberAccount
+            RTRIM(ISNULL(m.ID,'')) AS MemberAccount,
+            ISNULL((SELECT COUNT(*) FROM dbo.GCM_EMAIL g WHERE g.EMAIL = m.ID), 0)
+              + ISNULL((SELECT COUNT(*) FROM dbo.ClientIDRegistration c WHERE c.ID_tbkey = m.tbKey), 0) AS BindCount
 {TrackerMapper.FromClause}
 INNER JOIN _PageKeys pk ON t.tbKey = pk.tbKey
 {TrackerMemberJoins}
-ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC";
+{orderBy}";
 
         var param = new
         {
@@ -240,7 +244,7 @@ ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC";
                 "UPDATE dbo.IMEITable SET OBM_tbKey=@OBM WHERE RTRIM(IMEICODE)=@IMEI",
                 new { OBM = obmTbKey, IMEI = imei });
         }
-        return OperationResult.Ok($"已轉移 {count} 台", count);
+        return OperationResult.Ok($"已轉移 {count} 筆", count);
     }
 
     public async Task<OperationResult> FactoryResetAsync(int tbKey)
@@ -319,4 +323,43 @@ ORDER BY RTRIM(ISNULL(t.IMEICODE,'')) ASC";
             conditions.Add("t.TrackerEnabled = @Status");
         return conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;
     }
+
+    /// <summary>依 QueryFilter.SortBy 產生安全 ORDER BY（白名單，避免 SQL injection）。</summary>
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? string.Empty).Trim().ToLowerInvariant();
+        const string tie = "RTRIM(ISNULL(t.IMEICode,'')) ASC";
+
+        return key switch
+        {
+            "obm" => $"ORDER BY RTRIM(ISNULL(u.UserName,'')) {dir}, {tie}",
+            "imei" => $"ORDER BY RTRIM(ISNULL(t.IMEICode,'')) {dir}",
+            "cname" or "name" => $"ORDER BY RTRIM(ISNULL(t.CName,'')) {dir}, {tie}",
+            "bindcount" => $@"ORDER BY (
+                ISNULL((SELECT COUNT(*) FROM dbo.GCM_EMAIL g WHERE g.EMAIL = m.ID), 0)
+                + ISNULL((SELECT COUNT(*) FROM dbo.ClientIDRegistration c WHERE c.ID_tbkey = m.tbKey), 0)
+            ) {dir}, {tie}",
+            "createdate" => $"ORDER BY t.CDate {dir}, {tie}",
+            "serviceenddate" or "serviceend" => $@"ORDER BY (
+                SELECT TOP 1 pl.EDate
+                FROM dbo.PayLog pl
+                WHERE pl.Tracker_tbKey = t.tbKey
+                  AND pl.SDate <= GETDATE()
+                  AND pl.EDate >= DATEADD(DAY,-1,GETDATE())
+                  AND pl.SDate <> pl.EDate
+                ORDER BY pl.EDate DESC
+            ) {dir}, {tie}",
+            "account" => $"ORDER BY RTRIM(ISNULL(m.ID,'')) {dir}, {tie}",
+            "currentstatus" or "status" =>
+                $"ORDER BY ISNULL(t.CurrentStatus,'N') {dir}, ISNULL(t.issleep,'N') {dir}, {tie}",
+            "firmware" or "firmwareversion" => $"ORDER BY RTRIM(ISNULL(t.FWVersion,'')) {dir}, {tie}",
+            "iccid" => $"ORDER BY ISNULL(RTRIM(t.ICCID),'') {dir}, {tie}",
+            "apn" => $"ORDER BY ISNULL(RTRIM(t.APN),'') {dir}, {tie}",
+            "tbkey" => $"ORDER BY t.tbKey {dir}",
+            _ => "ORDER BY RTRIM(ISNULL(t.IMEICode,'')) ASC"
+        };
+    }
+
 }
+

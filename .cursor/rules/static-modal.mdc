@@ -1,0 +1,32 @@
+---
+description: Bootstrap Modal 須為 static：外側點擊／ESC 震動不關閉
+globs: TrackerPlus.Web/**/*.{cshtml,js,css}
+alwaysApply: false
+---
+
+# Static Modal 規則
+
+資料編輯／設定類 Modal 必須為 static，不可點外側或按 ESC 關閉。
+
+## 標記
+
+```html
+<div class="modal fade" id="..." data-modal-static ...>
+```
+
+## API
+
+```js
+StaticModal.init(el);
+StaticModal.show('fwModal');
+StaticModal.hide('fwModal');
+```
+
+## 行為
+
+- `backdrop: 'static'`、`keyboard: false`
+- 點外側或 ESC → `tp-modal-shake` 震動，不關閉
+- 僅確定／關閉(X)／`StaticModal.hide()` 可關閉
+- 資源：`wwwroot/js/modal-static.js`、`wwwroot/css/modal-static.css`
+
+系統提示／刪除確認請用 `TpDialog`，不要另造 Bootstrap confirm modal。

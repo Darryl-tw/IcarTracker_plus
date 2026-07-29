@@ -59,4 +59,6 @@ internal sealed class TrackerDbRow
     public string? CurrentStatus { get; set; }
     /// <summary>省電/離線狀態（Y=離線中）</summary>
     public string? IsSleep { get; set; }
+    /// <summary>綁定手機數（GCM_EMAIL + ClientIDRegistration）</summary>
+    public int BindCount { get; set; }
 }

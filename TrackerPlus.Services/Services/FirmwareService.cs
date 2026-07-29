@@ -81,7 +81,7 @@ public class FirmwareService : IFirmwareService
             if (list.Count == 0) return OperationResult.Fail("未提供 IMEI");
 
             var ok = await _firmwareRepo.QueueFirmwareUpdateAsync(targetFwVersion, list);
-            return ok ? OperationResult.Ok($"已排程 {list.Count} 筆裝置升級至 {targetFwVersion}") : OperationResult.Fail("排程失敗");
+            return ok ? OperationResult.Ok($"已排程 {list.Count} 筆裝置升級至 {targetFwVersion}", list.Count) : OperationResult.Fail("排程失敗");
         }
         catch (Exception ex)
         {

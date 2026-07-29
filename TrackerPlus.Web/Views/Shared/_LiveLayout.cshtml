@@ -10,6 +10,8 @@
 <title>@(ViewData["Title"] is string pt && pt.Length > 0 ? $"{pt} | {L["Live_Brand"]}" : L["Live_Title"].Value)</title>
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="~/css/btn-icons.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/modal-static.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/tp-dialog.css" asp-append-version="true" />
 <style>
 /* ======= NAVBAR ======= */
 #top-nav {
@@ -101,7 +103,7 @@ body { padding-top: 32px; }
 <a id="menu-geofence" href="#" style="display:none"></a>
 
 <!-- ===== SETTINGS MODAL ===== -->
-<div class="modal fade" id="settingsModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="settingsModal" tabindex="-1" data-modal-static data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-dialog-centered" id="settingsModalDialog" style="max-width:580px;">
         <div class="modal-content">
             <div class="modal-header">
@@ -120,6 +122,8 @@ body { padding-top: 32px; }
 @RenderBody()
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/modal-static.js" asp-append-version="true"></script>
+<partial name="_TpDialogBoot" />
 <script src="~/js/ui-icons.js" asp-append-version="true"></script>
 <script>
 (function () {
@@ -131,31 +135,15 @@ body { padding-top: 32px; }
         loadFailed: @Html.Raw(Json.Serialize(L["Live_LoadFailedRetry"].Value))
     };
     const modalEl = document.getElementById('settingsModal');
-    const dialogEl = document.getElementById('settingsModalDialog');
-    let bsModal = null;
+    StaticModal.init(modalEl);
 
     function getModal() {
-        if (!bsModal) bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
-        return bsModal;
+        return StaticModal.get(modalEl);
     }
-
-    function shake() {
-        dialogEl.classList.remove('shake');
-        void dialogEl.offsetWidth; // reflow to restart animation
-        dialogEl.classList.add('shake');
-    }
-
-    // backdrop click → shake (Bootstrap fires hidePrevented when backdrop=static)
-    modalEl.addEventListener('hidePrevented.bs.modal', shake);
-
-    // ESC key → shake (keyboard:false stops Bootstrap from acting, so we add our own listener)
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && modalEl.classList.contains('show')) shake();
-    });
 
     // X button → close
     document.getElementById('settingsModalCloseBtn').addEventListener('click', function () {
-        getModal().hide();
+        StaticModal.hide(modalEl);
     });
 
     function wireForm() {

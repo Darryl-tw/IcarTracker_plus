@@ -1,4 +1,7 @@
 @import url('btn-icons.css');
+@import url('modal-static.css');
+@import url('tp-dialog.css');
+@import url('grid-sort.css');
 
 html {
   font-size: 14px;

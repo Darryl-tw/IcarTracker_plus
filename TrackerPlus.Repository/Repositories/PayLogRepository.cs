@@ -50,10 +50,11 @@ public class PayLogRepository : IPayLogRepository
     {
         var offset = (filter.PageIndex - 1) * filter.PageSize;
         var where = BuildWhereClause(filter);
+        var orderBy = BuildOrderByClause(filter);
 
         var countSql = $"SELECT COUNT(*) {PayLogMapper.FromSql} {where}";
         var dataSql = $@"{PayLogMapper.SelectSql} {PayLogMapper.FromSql} {where}
-            ORDER BY p.tbKey DESC
+            {orderBy}
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 
         var param = new { filter.Keyword, filter.Status, filter.StartDate, filter.EndDate, Offset = offset, filter.PageSize };
@@ -182,5 +183,23 @@ public class PayLogRepository : IPayLogRepository
         if (filter.EndDate.HasValue)
             conditions.Add("p.CDate <= @EndDate");
         return conditions.Count > 0 ? "WHERE " + string.Join(" AND ", conditions) : string.Empty;
+    }
+
+    private static string BuildOrderByClause(QueryFilter filter)
+    {
+        var dir = filter.SortDesc ? "DESC" : "ASC";
+        var key = (filter.SortBy ?? "").Trim().ToLowerInvariant();
+        return key switch
+        {
+            "tbkey" => $"ORDER BY p.tbKey {dir}",
+            "imei" or "imeicode" => $"ORDER BY RTRIM(ISNULL(p.IMEICode,'')) {dir}",
+            "member" or "membername" => $"ORDER BY RTRIM(ISNULL(m.CName,'')) {dir}",
+            "amount" => $"ORDER BY p.Amount {dir}",
+            "salemodel" or "model" => $"ORDER BY p.Model {dir}",
+            "sdate" or "servicefrom" => $"ORDER BY p.SDate {dir}",
+            "edate" or "serviceto" => $"ORDER BY p.EDate {dir}",
+            "cdate" or "createdate" => $"ORDER BY p.CDate {dir}",
+            _ => "ORDER BY p.tbKey DESC"
+        };
     }
 }

@@ -1,0 +1,17 @@
+/* 全站：static modal 點外側／ESC 時震動提示 */
+@keyframes tp-modal-shake {
+    0%, 100% { transform: translateX(0); }
+    15%, 45%, 75% { transform: translateX(-10px); }
+    30%, 60%, 90% { transform: translateX(10px); }
+}
+
+.modal.tp-modal-shake .modal-dialog,
+.modal-dialog.tp-modal-shake {
+    animation: tp-modal-shake 0.5s ease-in-out;
+}
+
+/* 相容既有 class */
+.modal.modal-shake .modal-dialog,
+.modal-dialog.shake {
+    animation: tp-modal-shake 0.5s ease-in-out;
+}

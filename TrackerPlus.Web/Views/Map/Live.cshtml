@@ -1429,16 +1429,18 @@ function postLandmark(memo, address, lat, lng) {
 }
 
 function deleteLandmark(tbKey) {
-    if (!window.confirm(i18n.confirmDelete)) return;
-    $.ajax({
-        url: '/Map/DeleteLandmark',
-        method: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({ tbKey }),
-        success: function (res) {
-            if (res.success) loadLandmarks();
-            renderLandmarkList();
-        }
+    TpDialog.confirmDelete().then(function (ok) {
+        if (!ok) return;
+        $.ajax({
+            url: '/Map/DeleteLandmark',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ tbKey }),
+            success: function (res) {
+                if (res.success) loadLandmarks();
+                renderLandmarkList();
+            }
+        });
     });
 }
 

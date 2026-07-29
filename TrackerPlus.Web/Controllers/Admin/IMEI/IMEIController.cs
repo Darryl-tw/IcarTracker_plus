@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TrackerPlus.Core.Common;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
+using TrackerPlus.Web.Helpers;
 
 namespace TrackerPlus.Web.Controllers.Admin.IMEI;
 
@@ -16,9 +17,10 @@ public class IMEIController : AdminBaseController
         _memberService = memberService;
     }
 
-    public async Task<IActionResult> Index(string? keyword, string? status, int page = 1)
+    public async Task<IActionResult> Index(string? keyword, string? status, string? sortBy, bool sortDesc = false, int page = 1)
     {
         var filter = new QueryFilter { Keyword = keyword, Status = status, PageIndex = page, PageSize = 100 };
+        GridSortHelper.ApplySort(filter, sortBy, sortDesc, "tbKey", defaultDesc: true);
         var result = await _imeiService.GetIMEIsPagedAsync(filter);
         ViewBag.Filter = filter;
         return View(result);

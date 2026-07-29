@@ -1,0 +1,43 @@
+---
+description: 全站系統提示／確定視窗必須使用 TpDialog，禁止 browser alert/confirm
+globs: TrackerPlus.Web/**/*.{cshtml,js,css}
+alwaysApply: false
+---
+
+# 系統提示／確定視窗（TpDialog）
+
+禁止使用瀏覽器原生 `alert()`、`confirm()`、`prompt()`。一律使用 `TpDialog`（樣式：橘色驚嘆號圖示、標題、次要說明、紫色「是」／灰色「取消」）。
+
+## API
+
+```js
+// 提示（單顆確定）
+await TpDialog.alert('訊息');
+await TpDialog.alert({ title: '標題', message: '說明' });
+
+// 確定（是／取消）→ Promise<boolean>
+if (!(await TpDialog.confirm({ title: '確定要刪除嗎？', message: detail }))) return;
+if (!(await TpDialog.confirmDelete(detail))) return; // 標題預設 Dialog_ConfirmDelete
+```
+
+## 表單刪除確認
+
+```html
+<form method="post" data-tp-confirm
+      data-tp-confirm-title="@L["Dialog_ConfirmDelete"]"
+      data-tp-confirm-message="@itemKey">
+```
+
+## 行為（與 StaticModal 一致）
+
+- 僅「是／確定／取消／X」可關閉
+- 點遮罩或 ESC → 視窗震動，不關閉
+- 資源：`wwwroot/js/tp-dialog.js`、`wwwroot/css/tp-dialog.css`；layout 掛 `_TpDialogBoot`
+
+## ❌ 不要
+
+```js
+alert(msg);
+if (!confirm(msg)) return;
+onsubmit="return confirm('...')"
+```

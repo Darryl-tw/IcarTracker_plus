@@ -1299,7 +1299,7 @@
     <value>Created</value>
   </data>
   <data name="Admin_Firmware_Desc" xml:space="preserve">
-    <value>Description</value>
+    <value>New version</value>
   </data>
   <data name="Admin_Firmware_EditTitle" xml:space="preserve">
     <value>Edit firmware</value>
@@ -1311,22 +1311,22 @@
     <value>FTP</value>
   </data>
   <data name="Admin_Firmware_FtpDir" xml:space="preserve">
-    <value>FTP directory</value>
+    <value>File path</value>
   </data>
   <data name="Admin_Firmware_FtpHost" xml:space="preserve">
-    <value>FTP host</value>
+    <value>FTP account</value>
   </data>
   <data name="Admin_Firmware_FtpPass" xml:space="preserve">
-    <value>FTP password</value>
+    <value>Password</value>
   </data>
   <data name="Admin_Firmware_FtpUser" xml:space="preserve">
-    <value>FTP username</value>
+    <value>Username</value>
   </data>
   <data name="Admin_Firmware_SearchPh" xml:space="preserve">
     <value>Version / file / notes</value>
   </data>
   <data name="Admin_Firmware_Size" xml:space="preserve">
-    <value>Size</value>
+    <value>File size</value>
   </data>
   <data name="Admin_Firmware_VersionCol" xml:space="preserve">
     <value>Firmware</value>
@@ -1563,7 +1563,10 @@
     <value>Active</value>
   </data>
   <data name="Common_ConfirmDelete" xml:space="preserve">
-    <value>Delete?</value>
+    <value>Are you sure you want to delete?</value>
+  </data>
+  <data name="Dialog_ConfirmDelete" xml:space="preserve">
+    <value>Are you sure you want to delete?</value>
   </data>
   <data name="Common_ConfirmDeleteItem" xml:space="preserve">
     <value>Delete {0}?</value>
@@ -1932,6 +1935,12 @@
   <data name="Admin_Tracker_DeleteFail" xml:space="preserve"><value>Delete failed</value></data>
   <data name="Common_PerPage" xml:space="preserve"><value>Per page</value></data>
   <data name="Common_JumpTo" xml:space="preserve"><value>Jump to</value></data>
+  <data name="Common_BtnFirst" xml:space="preserve"><value>First</value></data>
+  <data name="Common_BtnLast" xml:space="preserve"><value>Last</value></data>
+  <data name="Common_PageNoPrefix" xml:space="preserve"><value>Page</value></data>
+  <data name="Common_PageNoMid" xml:space="preserve"><value>of</value></data>
+  <data name="Common_PageNoSuffix" xml:space="preserve"><value></value></data>
+  <data name="Common_RecordsUnit" xml:space="preserve"><value>records</value></data>
   <data name="Admin_Tracker_BtnUnbindAll" xml:space="preserve"><value>Unbind All</value></data>
   <data name="Admin_PayLog_SM_1" xml:space="preserve"><value>Production/Repair</value></data>
   <data name="Admin_PayLog_SM_2" xml:space="preserve"><value>Domestic Retail</value></data>
@@ -2125,4 +2134,97 @@
   <data name="Admin_Dealer_Edit_PwConfirm" xml:space="preserve"><value>Confirm Password</value></data>
   <data name="Admin_Dealer_Edit_PwTooShort" xml:space="preserve"><value>Password must be at least 6 characters</value></data>
   <data name="Admin_Dealer_Edit_PwMismatch" xml:space="preserve"><value>Passwords do not match</value></data>
+  <data name="Admin_Dealer_BtnView" xml:space="preserve"><value>View</value></data>
+  <data name="Admin_Dealer_BtnPrint" xml:space="preserve"><value>Print</value></data>
+  <data name="Admin_Dealer_BtnOnlineRenew" xml:space="preserve"><value>Online Renewal</value></data>
+  <data name="Admin_Dealer_SelectFirst" xml:space="preserve"><value>Please select a reseller first</value></data>
+  <data name="Admin_Firmware_SelectFirst" xml:space="preserve"><value>Please select a firmware version first</value></data>
+  <data name="Admin_Firmware_VersionRequired" xml:space="preserve"><value>Firmware version is required</value></data>
+  <data name="Admin_Dealer_ConfirmDelete" xml:space="preserve"><value>Delete [{0}]? This cannot be undone.</value></data>
+  <data name="Admin_Dealer_Entity" xml:space="preserve"><value>Reseller</value></data>
+  <data name="Admin_Dealer_ContactSection" xml:space="preserve"><value>Contact Info</value></data>
+  <data name="Admin_Dealer_RenewSoon" xml:space="preserve"><value>Online renewal is under development</value></data>
+  <!-- ── Admin Tracker toolbar / modals ── -->
+  <data name="Admin_Tracker_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="Admin_Tracker_BtnAddTitle" xml:space="preserve"><value>Add device</value></data>
+  <data name="Admin_Tracker_BtnDeleteTitle" xml:space="preserve"><value>Delete selected device</value></data>
+  <data name="Admin_Tracker_BtnClearHistory" xml:space="preserve"><value>Clear History</value></data>
+  <data name="Admin_Tracker_BtnBatchTransfer" xml:space="preserve"><value>Batch Transfer</value></data>
+  <data name="Admin_Tracker_BtnBatchTransferTitle" xml:space="preserve"><value>Batch transfer OBM</value></data>
+  <data name="Admin_Tracker_BtnFwUpgrade" xml:space="preserve"><value>Firmware Upgrade</value></data>
+  <data name="Admin_Tracker_BtnBatchDelete" xml:space="preserve"><value>Bulk Delete Devices</value></data>
+  <data name="Admin_Tracker_BtnBatchDeleteTitle" xml:space="preserve"><value>Bulk delete (Ctrl+click rows or paste IMEIs)</value></data>
+  <data name="Admin_Tracker_BatchDeleteHint" xml:space="preserve"><value>One 15-digit IMEI per line. Ctrl+click rows in the grid, then open this dialog to pre-fill.</value></data>
+  <data name="Admin_Tracker_BatchDeleteWarn" xml:space="preserve"><value>Deleted devices, orders, and related data cannot be restored.</value></data>
+  <data name="Admin_Tracker_BtnFrontendSingle" xml:space="preserve"><value>Frontend (single)</value></data>
+  <data name="Admin_Tracker_BtnFactoryReset" xml:space="preserve"><value>Factory Reset</value></data>
+  <data name="Admin_Tracker_BtnFactoryResetTitle" xml:space="preserve"><value>Restore Factory Settings</value></data>
+  <data name="Admin_Tracker_BtnMoveHistory" xml:space="preserve"><value>Move History</value></data>
+  <data name="Admin_Tracker_FilterPh" xml:space="preserve"><value>Filter…</value></data>
+  <data name="Admin_Tracker_Imei15Label" xml:space="preserve"><value>IMEI (15 digits)</value></data>
+  <data name="Admin_Tracker_ConfirmAdd" xml:space="preserve"><value>Confirm Add</value></data>
+  <data name="Admin_Tracker_SelectedImei" xml:space="preserve"><value>Selected IMEI: </value></data>
+  <data name="Admin_Tracker_NoneSelected" xml:space="preserve"><value>(None selected)</value></data>
+  <data name="Admin_Tracker_ClearAllHistory" xml:space="preserve"><value>Delete all history</value></data>
+  <data name="Admin_Tracker_ClearRangeHistory" xml:space="preserve"><value>Delete date range</value></data>
+  <data name="Admin_Tracker_ClearIrreversible" xml:space="preserve"><value>Warning: deletion cannot be undone</value></data>
+  <data name="Admin_Tracker_ConfirmClear" xml:space="preserve"><value>Confirm Clear</value></data>
+  <data name="Admin_Tracker_ImeisToTransfer" xml:space="preserve"><value>IMEIs to transfer (one per line, or leave blank to use selected rows)</value></data>
+  <data name="Admin_Tracker_TargetObm" xml:space="preserve"><value>Target OBM dealer</value></data>
+  <data name="Admin_Tracker_Bt_MoveDealer" xml:space="preserve"><value>Move to dealer</value></data>
+  <data name="Admin_Tracker_Bt_ResetOnline" xml:space="preserve"><value>Reset online time</value></data>
+  <data name="Admin_Tracker_Bt_DefaultPay" xml:space="preserve"><value>Default order</value></data>
+  <data name="Admin_Tracker_SubAdminId" xml:space="preserve"><value>Sub-admin ID</value></data>
+  <data name="Admin_Tracker_SubAdminPassword" xml:space="preserve"><value>Sub-admin password</value></data>
+  <data name="Admin_Tracker_SubAdminRequired" xml:space="preserve"><value>Sub-admin ID and password are required</value></data>
+  <data name="Admin_Tracker_SubAdminInvalid" xml:space="preserve"><value>Invalid sub-admin credentials or insufficient permission</value></data>
+  <data name="Admin_Tracker_MapIcon" xml:space="preserve"><value>Map icon</value></data>
+  <data name="Admin_Tracker_IsSimBundled" xml:space="preserve"><value>SIM bundled</value></data>
+  <data name="Admin_Tracker_ConfirmTransfer" xml:space="preserve"><value>Confirm Transfer</value></data>
+  <data name="Admin_Tracker_SelectObm" xml:space="preserve"><value>Select OBM</value></data>
+  <data name="Admin_Tracker_ImeisToUpgrade" xml:space="preserve"><value>IMEIs to upgrade (one per line, or leave blank to use selected rows)</value></data>
+  <data name="Admin_Tracker_TargetFwVersion" xml:space="preserve"><value>Target firmware version</value></data>
+  <data name="Admin_Tracker_ConfirmScheduleUpgrade" xml:space="preserve"><value>Schedule Upgrade</value></data>
+  <data name="Admin_Tracker_SelectVersion" xml:space="preserve"><value>Select version</value></data>
+  <data name="Admin_Tracker_FactoryResetWill" xml:space="preserve"><value>This will:</value></data>
+  <data name="Admin_Tracker_FactoryResetUnbind" xml:space="preserve"><value>Unbind member account</value></data>
+  <data name="Admin_Tracker_FactoryResetClearName" xml:space="preserve"><value>Clear device name</value></data>
+  <data name="Admin_Tracker_FactoryResetClearAlert" xml:space="preserve"><value>Clear alert settings</value></data>
+  <data name="Admin_Tracker_FactoryResetClearCustom" xml:space="preserve"><value>Clear custom fields and group labels</value></data>
+  <data name="Admin_Tracker_FactoryResetConfirmMsg" xml:space="preserve"><value>Factory reset this device? This cannot be undone.</value></data>
+  <data name="Admin_Tracker_ConfirmFactoryReset" xml:space="preserve"><value>Confirm Factory Reset</value></data>
+  <data name="Admin_Tracker_SourceImei" xml:space="preserve"><value>Source IMEI (old device)</value></data>
+  <data name="Admin_Tracker_DestImei" xml:space="preserve"><value>Target IMEI (new device)</value></data>
+  <data name="Admin_Tracker_MoveHistoryHint" xml:space="preserve"><value>History transfer runs in the background. When complete, data will belong to the target IMEI.</value></data>
+  <data name="Admin_Tracker_SelectDeviceFirst" xml:space="preserve"><value>Please select a device first</value></data>
+  <data name="Admin_Tracker_ConfirmDeleteDevice" xml:space="preserve"><value>Delete this device (IMEI: {0})?</value></data>
+  <data name="Admin_Tracker_DeleteOk" xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="Admin_Tracker_EnterDateRange" xml:space="preserve"><value>Please enter a date range</value></data>
+  <data name="Admin_Tracker_ConfirmClearAll" xml:space="preserve"><value>Clear all history? This cannot be undone.</value></data>
+  <data name="Admin_Tracker_ConfirmClearRange" xml:space="preserve"><value>Clear history in this range? This cannot be undone.</value></data>
+  <data name="Admin_Tracker_EnterImei" xml:space="preserve"><value>Please enter IMEI</value></data>
+  <data name="Admin_Tracker_SelectTargetObm" xml:space="preserve"><value>Please select a target OBM</value></data>
+  <data name="Admin_Tracker_ConfirmBatchTransfer" xml:space="preserve"><value>Transfer {0} device(s) to the selected OBM?</value></data>
+  <data name="Admin_Tracker_SelectFwVersion" xml:space="preserve"><value>Please select a firmware version</value></data>
+  <data name="Admin_Tracker_ConfirmFwUpgrade" xml:space="preserve"><value>Schedule {0} device(s) to upgrade to {1}?</value></data>
+  <data name="Admin_Tracker_BatchDeleteNeedSelect" xml:space="preserve"><value>Please select devices to delete first.&#xA;&#xA;To delete all devices for a member, select a device bound to that member first.</value></data>
+  <data name="Admin_Tracker_ConfirmBatchDelete" xml:space="preserve"><value>Delete the selected {0} device(s)? This cannot be undone.</value></data>
+  <data name="Admin_Tracker_ConfirmFactoryResetAgain" xml:space="preserve"><value>Confirm again: factory reset this device?</value></data>
+  <data name="Admin_Tracker_SourceImei15" xml:space="preserve"><value>Source IMEI must be 15 digits</value></data>
+  <data name="Admin_Tracker_DestImei15" xml:space="preserve"><value>Target IMEI must be 15 digits</value></data>
+  <data name="Admin_Tracker_ConfirmMoveHistory" xml:space="preserve"><value>Move history from {0} to {1}?</value></data>
+  <data name="Common_Success" xml:space="preserve"><value>Success</value></data>
+  <data name="Common_Failed" xml:space="preserve"><value>Failed</value></data>
+  <data name="Admin_Tracker_Msg_CreateOk" xml:space="preserve"><value>Created successfully</value></data>
+  <data name="Admin_Tracker_Msg_FactoryResetOk" xml:space="preserve"><value>Factory reset successful</value></data>
+  <data name="Admin_Tracker_Msg_BatchTransferOk" xml:space="preserve"><value>Transferred {0} device(s)</value></data>
+  <data name="Admin_Tracker_Msg_ClearAllHistoryOk" xml:space="preserve"><value>All history cleared</value></data>
+  <data name="Admin_Tracker_Msg_ClearHistoryOk" xml:space="preserve"><value>Deleted successfully</value></data>
+  <data name="Admin_Tracker_Msg_FwUpgradeOk" xml:space="preserve"><value>Queued {0} device(s) to upgrade to {1}</value></data>
+  <data name="Admin_Tracker_Msg_FwVersionNotFound" xml:space="preserve"><value>Firmware version not found</value></data>
+  <data name="Admin_Tracker_Msg_FwQueueFail" xml:space="preserve"><value>Failed to queue upgrade</value></data>
+  <data name="Admin_Tracker_Msg_MoveHistoryOk" xml:space="preserve"><value>Queued for background transfer</value></data>
+  <data name="Admin_Tracker_Msg_MoveHistoryFail" xml:space="preserve"><value>Failed to queue transfer</value></data>
+  <data name="Admin_Tracker_Msg_DeviceNotFound" xml:space="preserve"><value>Device not found</value></data>
+  <data name="Admin_Tracker_Msg_NoImei" xml:space="preserve"><value>No IMEI</value></data>
 </root>

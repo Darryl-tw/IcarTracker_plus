@@ -68,6 +68,9 @@
     @RenderBody()
 </div>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/modal-static.js" asp-append-version="true"></script>
+<script src="~/js/grid-sort.js" asp-append-version="true"></script>
+<partial name="_TpDialogBoot" />
 <form id="admin-idle-logout-form" asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="d-none">
     <input type="hidden" name="reason" value="idle" />
 </form>

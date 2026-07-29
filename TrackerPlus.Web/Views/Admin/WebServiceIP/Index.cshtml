@@ -9,20 +9,22 @@
     <a asp-action="Create" class="btn btn-success btn-with-icon">@Html.UiIcon("add")<span>+ @L["Admin_IP_Add"]</span></a>
 </div>
 <form method="get" class="row g-2 mb-3">
+    <input type="hidden" name="sortBy" value="@filter.SortBy" />
+    <input type="hidden" name="sortDesc" value="@(filter.SortDesc ? "true" : "false")" />
     <div class="col-md-4">
         <input type="text" name="keyword" value="@filter.Keyword" class="form-control" placeholder="@L["Admin_IP_SearchPh"]" />
     </div>
     <div class="col-md-2"><button type="submit" class="btn btn-primary btn-with-icon">@Html.UiIcon("search")<span>@L["Common_Search"]</span></button></div>
 </form>
 <div class="table-responsive">
-    <table class="table table-striped table-sm">
+    <table class="table table-striped table-sm" data-grid-sort="server">
         <thead class="table-dark">
             <tr>
-                <th>TbKey</th>
-                <th>@L["Admin_IP_Address"]</th>
-                <th>@L["Admin_IP_Description"]</th>
-                <th>@L["Common_Status"]</th>
-                <th>@L["Field_CreatedDate"]</th>
+                <th class="@GridSortHelper.ThClass(filter, "tbKey")" data-sort="tbKey">TbKey<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "ip")" data-sort="ip">@L["Admin_IP_Address"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "description")" data-sort="description">@L["Admin_IP_Description"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "status")" data-sort="status">@L["Common_Status"]<span class="sort-ind"></span></th>
+                <th class="@GridSortHelper.ThClass(filter, "cdate")" data-sort="cdate">@L["Field_CreatedDate"]<span class="sort-ind"></span></th>
                 <th>@L["Common_Operation"]</th>
             </tr>
         </thead>
@@ -37,7 +39,9 @@
                     <td>@ip.CDate.ToString("yyyy-MM-dd")</td>
                     <td>
                         <form asp-action="Delete" method="post" class="d-inline"
-                              onsubmit="return confirm('@string.Format(L["Common_ConfirmDeleteItem"].Value, ip.IPAddress)')">
+                              data-tp-confirm
+                              data-tp-confirm-title="@L["Dialog_ConfirmDelete"]"
+                              data-tp-confirm-message="@ip.IPAddress">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@ip.TbKey" />
                             <button type="submit" class="btn btn-sm btn-danger btn-with-icon">@Html.UiIcon("delete")<span>@L["Common_Delete"]</span></button>
@@ -53,11 +57,11 @@
     <div>
         @if (Model.HasPreviousPage)
         {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("prev")<span>@L["Common_PreviousPage"]</span></a>
         }
         @if (Model.HasNextPage)
         {
-            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
+            <a asp-action="Index" asp-route-page="@(Model.PageIndex + 1)" asp-route-keyword="@filter.Keyword" asp-route-sortBy="@filter.SortBy" asp-route-sortDesc="@filter.SortDesc" class="btn btn-sm btn-outline-secondary btn-with-icon">@Html.UiIcon("next")<span>@L["Common_NextPage"]</span></a>
         }
     </div>
 </div>

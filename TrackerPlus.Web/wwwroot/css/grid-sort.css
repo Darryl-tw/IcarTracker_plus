@@ -1,0 +1,22 @@
+/* 全站 Admin DBGrid 欄位標題排序 */
+th.sortable {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+th.sortable:hover {
+    filter: brightness(1.15);
+}
+th.sortable .sort-ind {
+    display: inline-block;
+    margin-left: 3px;
+    font-size: 0.65rem;
+    opacity: 0.35;
+}
+th.sortable.sort-asc .sort-ind,
+th.sortable.sort-desc .sort-ind {
+    opacity: 1;
+}
+th.sortable.sort-asc .sort-ind::after { content: '▲'; }
+th.sortable.sort-desc .sort-ind::after { content: '▼'; }
+th.sortable:not(.sort-asc):not(.sort-desc) .sort-ind::after { content: '↕'; }
