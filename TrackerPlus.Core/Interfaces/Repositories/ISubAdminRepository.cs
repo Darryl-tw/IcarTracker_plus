@@ -10,4 +10,7 @@ public interface ISubAdminRepository
 
     /// <summary>驗證子帳號可否新增裝置（InsertDevice=1）。</summary>
     Task<int?> ValidateInsertDeviceAsync(string subAdminId, string subAdminPassword);
+
+    /// <summary>驗證子帳號可否修改訂單／使用期限（Edit_PayLog=1）。</summary>
+    Task<int?> ValidateEditPayLogAsync(string subAdminId, string subAdminPassword);
 }

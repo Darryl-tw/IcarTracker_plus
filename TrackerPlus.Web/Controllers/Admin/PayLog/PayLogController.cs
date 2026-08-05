@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using TrackerPlus.Core.Common;
+using TrackerPlus.Core.Interfaces.Repositories;
 using TrackerPlus.Core.Interfaces.Services;
 using TrackerPlus.Core.Models;
 using TrackerPlus.Web.Helpers;
@@ -10,11 +11,16 @@ public class PayLogController : AdminBaseController
 {
     private readonly IPayLogService _payLogService;
     private readonly IMemberService _memberService;
+    private readonly ISubAdminRepository _subAdminRepo;
 
-    public PayLogController(IPayLogService payLogService, IMemberService memberService)
+    public PayLogController(
+        IPayLogService payLogService,
+        IMemberService memberService,
+        ISubAdminRepository subAdminRepo)
     {
         _payLogService = payLogService;
         _memberService = memberService;
+        _subAdminRepo = subAdminRepo;
     }
 
     public async Task<IActionResult> Index(string? keyword, string? status, DateTime? startDate, DateTime? endDate, string? sortBy, bool sortDesc = false, int page = 1)
@@ -129,11 +135,20 @@ public class PayLogController : AdminBaseController
     {
         if (req == null || req.TbKey <= 0)
             return Json(new { success = false, message = L["Admin_PayLog_NotSpecified"].Value });
+
+        if (string.IsNullOrWhiteSpace(req.SubAdminId) || string.IsNullOrWhiteSpace(req.SubAdminPassword))
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminRequired"].Value });
+
+        var subAdminKey = await _subAdminRepo.ValidateEditPayLogAsync(req.SubAdminId, req.SubAdminPassword);
+        if (subAdminKey is null or <= 0)
+            return Json(new { success = false, message = L["Admin_Tracker_SubAdminInvalid"].Value });
+
         var pl = await _payLogService.GetPayLogAsync(req.TbKey);
         if (pl == null) return Json(new { success = false, message = L["Admin_PayLog_NotFound"].Value });
+
+        // 對齊舊 PayLog_Edit：僅更新訂單號／金額／起迄日／備註／加值服務，不改銷售類型
         pl.OrderNo       = req.OrderNo?.Trim() ?? pl.OrderNo;
         pl.Amount        = req.Amount;
-        pl.SaleModel     = req.SaleModel;
         pl.SDate         = req.SDate;
         pl.EDate         = req.EDate;
         pl.Memo          = req.Memo?.Trim() ?? pl.Memo;
@@ -172,6 +187,8 @@ public class PayLogJsonRequest
     public DateTime? EDate       { get; set; }
     public string?  Memo         { get; set; }
     public int      ValueAddedWeb{ get; set; }
+    public string?  SubAdminId   { get; set; }
+    public string?  SubAdminPassword { get; set; }
 }
 public class SingleIdRequest   { public int Id  { get; set; } }
 public class PayLogMoveRequest { public int Id  { get; set; } public string? NewImei { get; set; } }

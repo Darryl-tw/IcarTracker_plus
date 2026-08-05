@@ -101,9 +101,10 @@ public class PayLogRepository : IPayLogRepository
 
     public async Task<bool> UpdateAsync(PayLog payLog)
     {
+        // 對齊舊 PayLog_Edit：不更新銷售類型 (Model)
         const string sql = @"UPDATE dbo.PayLog SET
             OrderNumber = @OrderNumber, Amount = @Amount, SDate = @SDate, EDate = @EDate,
-            CMemo = @CMemo, Model = @Model, ValueAddedWeb = @ValueAddedWeb
+            CMemo = @CMemo, ValueAddedWeb = @ValueAddedWeb
             WHERE tbKey = @TbKey";
         using var conn = _db.CreateMainConnection();
         return await conn.ExecuteAsync(sql, new
@@ -114,7 +115,6 @@ public class PayLogRepository : IPayLogRepository
             payLog.SDate,
             payLog.EDate,
             CMemo = payLog.Memo,
-            Model = payLog.SaleModel,
             payLog.ValueAddedWeb
         }) > 0;
     }

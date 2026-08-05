@@ -16,7 +16,7 @@
             <button class="btn btn-secondary btn-adm" onclick="openBatchTransfer()" title="@L["Admin_Tracker_BtnBatchTransferTitle"]">@L["Admin_Tracker_BtnBatchTransfer"]</button>
             <button class="btn btn-info btn-adm text-white" onclick="openFwUpgrade()" title="@L["Admin_Tracker_BtnFwUpgrade"]">@L["Admin_Tracker_BtnFwUpgrade"]</button>
             <button class="btn btn-dark btn-adm" onclick="cmdBatchDelete()" title="@L["Admin_Tracker_BtnBatchDeleteTitle"]">@L["Admin_Tracker_BtnBatchDelete"]</button>
-            <button class="btn btn-outline-primary btn-adm" onclick="cmdFrontend()" title="@L["Admin_Tracker_BtnFrontendSingle"]">@L["Admin_Tracker_BtnFrontendSingle"]</button>
+            <button class="btn btn-outline-primary btn-adm" onclick="cmdFrontendSingle()" title="@L["Admin_Tracker_BtnFrontendSingle"]">@L["Admin_Tracker_BtnFrontendSingle"]</button>
             <button class="btn btn-outline-danger btn-adm" onclick="showModal('factoryResetModal')" title="@L["Admin_Tracker_BtnFactoryResetTitle"]">@L["Admin_Tracker_BtnFactoryReset"]</button>
             <button class="btn btn-outline-secondary btn-adm" onclick="showModal('moveHistoryModal')" title="@L["Admin_Tracker_BtnMoveHistory"]">@L["Admin_Tracker_BtnMoveHistory"]</button>
         </div>
@@ -129,7 +129,7 @@
                 <div class="d-flex gap-1 mt-1">
                     <button class="btn btn-outline-warning btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdUnbindAll()" title="@L["Admin_Tracker_BtnUnbindAllTitle"]">@L["Admin_Tracker_BtnUnbindAll"]</button>
                     <button class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdUnbind()" title="@L["Admin_Tracker_BtnUnbindTitle"]">@L["Admin_Tracker_BtnUnbind"]</button>
-                    <button class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdFrontend()" title="@L["Admin_Tracker_BtnFrontendTitle"]">@L["Admin_Tracker_BtnFrontend"]</button>
+                    <button class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdFrontendMember()" title="@L["Admin_Tracker_BtnFrontendTitle"]">@L["Admin_Tracker_BtnFrontend"]</button>
                 </div>
             </div>
             <div class="adm-pane-body">
@@ -161,6 +161,7 @@
                 </div>
                 <div class="d-flex gap-1 mt-1">
                     <button class="btn btn-success btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogAdd()" title="@L["Admin_PayLog_BtnAddTitle"]">@L["Admin_PayLog_BtnAdd"]</button>
+                    <button class="btn btn-outline-info btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogView()" title="@L["Admin_PayLog_BtnViewTitle"]">@L["Admin_PayLog_BtnView"]</button>
                     <button class="btn btn-outline-primary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogEdit()" title="@L["Admin_PayLog_BtnEditTitle"]">@L["Admin_PayLog_BtnEdit"]</button>
                     <button class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogDelete()" title="@L["Admin_PayLog_BtnDeleteTitle"]">@L["Admin_PayLog_BtnDelete"]</button>
                     <button class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:.75rem" onclick="cmdPayLogMove()" title="@L["Admin_PayLog_BtnMoveTitle"]">@L["Admin_PayLog_BtnMove"]</button>
@@ -838,44 +839,86 @@
   </div>
 </div>
 
-<!-- ===== PayLog Edit Modal ===== -->
+<!-- ===== PayLog View Modal（對齊舊 PayLog_View：唯讀） ===== -->
+<div class="modal fade" id="paylogViewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2 bg-light">
+        <h6 class="modal-title mb-0">@L["Admin_PayLog_ViewTitle"]</h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row mb-0 pl-view-dl" style="font-size:.9rem">
+          <dt class="col-4 text-muted fw-normal">@L["Admin_PayLog_OrderNo"]</dt>
+          <dd class="col-8" id="pl-view-orderno">-</dd>
+          <dt class="col-4 text-muted fw-normal">@L["Admin_PayLog_Amount"]</dt>
+          <dd class="col-8" id="pl-view-amount">-</dd>
+          <dt class="col-4 text-muted fw-normal">@L["Admin_Tracker_Col_StartDate"]</dt>
+          <dd class="col-8" id="pl-view-sdate">-</dd>
+          <dt class="col-4 text-muted fw-normal">@L["Admin_Tracker_Bt_ExpiryDisplay"]</dt>
+          <dd class="col-8" id="pl-view-edate">-</dd>
+          <dt class="col-4 text-muted fw-normal">@L["Admin_Dealer_Edit_Memo"]</dt>
+          <dd class="col-8" id="pl-view-memo" style="white-space:pre-wrap;min-height:1.5rem">-</dd>
+          <dt class="col-4 text-muted fw-normal">@L["Admin_Tracker_Col_SaleMemo"]</dt>
+          <dd class="col-8" id="pl-view-salememo" style="white-space:pre-wrap;min-height:3rem">-</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PayLog Edit Modal（對齊舊 PayLog_Edit：不可改銷售類型） ===== -->
 <div class="modal fade" id="paylogEditModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header py-2 bg-light"><h6 class="modal-title mb-0">@L["Admin_PayLog_BtnEdit"]</h6><button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button></div>
+      <div class="modal-header py-2 bg-light">
+        <h6 class="modal-title mb-0">@L["Admin_PayLog_EditTitle"]</h6>
+        <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
+      </div>
       <div class="modal-body">
         <input type="hidden" id="pl-edit-tbkey" />
         <div class="row g-2">
-          <div class="col-12"><label class="form-label small mb-0">@L["Admin_PayLog_OrderNo"]</label><input type="text" id="pl-edit-orderno" class="form-control form-control-sm" /></div>
-          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_Amount"]</label><input type="number" id="pl-edit-amount" class="form-control form-control-sm" step="0.01" /></div>
-          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_SaleModel"]</label>
-            <select id="pl-edit-model" class="form-select form-select-sm">
-              <option value="">　</option>
-              <option value="1">@L["Admin_PayLog_SM_1"]</option>
-              <option value="2">@L["Admin_PayLog_SM_2"]</option>
-              <option value="3">@L["Admin_PayLog_SM_3"]</option>
-              <option value="16">@L["Admin_PayLog_SM_16"]</option>
-              <option value="17">@L["Admin_PayLog_SM_17"]</option>
-              <option value="18">@L["Admin_PayLog_SM_18"]</option>
-              <option value="6">@L["Admin_PayLog_SM_6"]</option>
-              <option value="7">@L["Admin_PayLog_SM_7"]</option>
-              <option value="4">@L["Admin_PayLog_SM_4"]</option>
-              <option value="5">@L["Admin_PayLog_SM_5"]</option>
-              <option value="13">@L["Admin_PayLog_SM_13"]</option>
-              <option value="14">@L["Admin_PayLog_SM_14"]</option>
-              <option value="15">@L["Admin_PayLog_SM_15"]</option>
-              <option value="20">@L["Admin_PayLog_SM_20"]</option>
-              <option value="21">@L["Admin_PayLog_SM_21"]</option>
-              <option value="22">@L["Admin_PayLog_SM_22"]</option>
-            </select>
+          <div class="col-12">
+            <label class="form-label small mb-0" for="pl-edit-orderno">@L["Admin_PayLog_OrderNo"]</label>
+            <input type="text" id="pl-edit-orderno" class="form-control form-control-sm" maxlength="50" />
           </div>
-          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceStart"]</label><input type="date" id="pl-edit-sdate" class="form-control form-control-sm" /></div>
-          <div class="col-6"><label class="form-label small mb-0">@L["Admin_PayLog_ServiceEnd"]</label><input type="date" id="pl-edit-edate" class="form-control form-control-sm" /></div>
-          <div class="col-12"><label class="form-label small mb-0">@L["Admin_Tracker_Col_SaleMemo"]</label><input type="text" id="pl-edit-memo" class="form-control form-control-sm" /></div>
-          <div class="col-12"><div class="form-check"><input type="checkbox" id="pl-edit-vaw" class="form-check-input"><label for="pl-edit-vaw" class="form-check-label small">@L["Admin_Tracker_Col_ValueAdded"]</label></div></div>
+          <div class="col-12">
+            <label class="form-label small mb-0" for="pl-edit-amount">@L["Admin_PayLog_Amount"]</label>
+            <input type="number" id="pl-edit-amount" class="form-control form-control-sm" step="0.01" />
+          </div>
+          <div class="col-12">
+            <label class="form-label small mb-0">@L["Admin_PayLog_ValueAddedLabel"]</label>
+            <div class="form-check">
+              <input type="checkbox" id="pl-edit-vaw" class="form-check-input">
+              <label for="pl-edit-vaw" class="form-check-label small">@L["Admin_Tracker_Col_ValueAdded"]</label>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-0" for="pl-edit-sdate">@L["Admin_Tracker_Col_StartDate"]</label>
+            <input type="date" id="pl-edit-sdate" class="form-control form-control-sm" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-0" for="pl-edit-edate">@L["Admin_Tracker_Bt_ExpiryDisplay"]</label>
+            <input type="date" id="pl-edit-edate" class="form-control form-control-sm" />
+          </div>
+          <div class="col-12">
+            <label class="form-label small mb-0" for="pl-edit-memo">@L["Admin_Dealer_Edit_Memo"]</label>
+            <textarea id="pl-edit-memo" class="form-control form-control-sm" rows="3" maxlength="500"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-0" for="pl-edit-sub-id">@L["Admin_Tracker_SubAdminId"]</label>
+            <input type="text" id="pl-edit-sub-id" class="form-control form-control-sm" autocomplete="username" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small mb-0" for="pl-edit-sub-pw">@L["Admin_Tracker_SubAdminPassword"]</label>
+            <input type="password" id="pl-edit-sub-pw" class="form-control form-control-sm" autocomplete="current-password" />
+          </div>
         </div>
       </div>
-      <div class="modal-footer py-2"><button class="btn btn-primary btn-sm" onclick="doPayLogEdit()">@L["Common_Save"]</button><button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">@L["Common_Cancel"]</button></div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-primary btn-sm" onclick="doPayLogEdit()">@L["Common_Confirm"]</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetPayLogEditForm()">@L["Common_Reset"]</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1419,7 +1462,7 @@ var _T = {
                     return;
                 }
                 tbody.innerHTML = list.map(l =>
-                    '<tr data-pl-tbkey="' + l.tbKey + '" data-pl-imei="' + escHtml(l.imei ?? '') + '" style="cursor:pointer" onclick="selectPayLogRow(this)">' +
+                    '<tr data-pl-tbkey="' + l.tbKey + '" data-pl-imei="' + escHtml(l.imei ?? '') + '" style="cursor:pointer" onclick="selectPayLogRow(this)" ondblclick="onPayLogRowDblClick(this)">' +
                     '<td>' + (l.cDate ?? '-') + '</td>' +
                     '<td>' + escHtml(l.orderNo ?? '') + '</td>' +
                     '<td title="' + escHtml(l.memo ?? '') + '">' + escHtml(l.memo ?? '') + '</td>' +
@@ -2119,9 +2162,30 @@ var _T = {
         _selPlTbKey = parseInt(tr.dataset.plTbkey) || 0;
     };
 
+    /** 雙擊列 = 選取後開啟檢視（對齊舊 tp_PaylogGrid onRowDblClicked） */
+    window.onPayLogRowDblClick = function (tr) {
+        selectPayLogRow(tr);
+        cmdPayLogView();
+    };
+
     function requirePayLogSelection() {
         if (!_selPlTbKey) { alert(_T.plSelectFirst); return false; }
         return true;
+    }
+
+    function formatPayLogViewDate(isoOrEmpty, saleModel) {
+        if (!isoOrEmpty) return '';
+        const s = String(isoOrEmpty).replace(/-/g, '/').substring(0, 10);
+        // 對齊舊 PayLog_View：自動開通且 1900/01/01 顯示空白
+        if (saleModel === 7 && s === '1900/01/01') return '';
+        return s;
+    }
+
+    function setPayLogViewText(id, text) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const v = (text == null || text === '') ? '' : String(text);
+        el.textContent = v || '-';
     }
 
     // ── 訂單期限自動計算邏輯（對應舊系統 PayLog_New.aspx JS） ────────────
@@ -2292,37 +2356,88 @@ var _T = {
         });
     };
 
-    // ── 訂單管理：修改 ───────────────────────────────────────────────────
+    // ── 訂單管理：檢視（對齊舊 PayLog_View） ───────────────────────────────
+    window.cmdPayLogView = function () {
+        if (!requirePayLogSelection()) return;
+        fetch('/Admin/PayLog/GetJson?id=' + _selPlTbKey).then(r => r.json()).then(d => {
+            if (!d.success) { TpDialog.alert(d.message); return; }
+            setPayLogViewText('pl-view-orderno', d.orderNo);
+            setPayLogViewText('pl-view-amount', d.amount);
+            setPayLogViewText('pl-view-sdate', formatPayLogViewDate(d.sDate, d.saleModel));
+            setPayLogViewText('pl-view-edate', formatPayLogViewDate(d.eDate, d.saleModel));
+            setPayLogViewText('pl-view-memo', d.memo);
+            setPayLogViewText('pl-view-salememo', d.saleMemo);
+            showModal('paylogViewModal');
+        }).catch(() => TpDialog.alert(_T.loadFail));
+    };
+
+    // ── 訂單管理：修改（對齊舊 PayLog_Edit） ───────────────────────────────
+    var _plEditSnapshot = null;
+
+    function fillPayLogEditForm(d) {
+        document.getElementById('pl-edit-tbkey').value   = d.tbKey;
+        document.getElementById('pl-edit-orderno').value = d.orderNo ?? '';
+        document.getElementById('pl-edit-amount').value  = d.amount;
+        document.getElementById('pl-edit-sdate').value   = d.sDate ?? '';
+        document.getElementById('pl-edit-edate').value   = d.eDate ?? '';
+        document.getElementById('pl-edit-memo').value    = d.memo ?? '';
+        document.getElementById('pl-edit-vaw').checked   = d.valueAddedWeb === 1;
+        document.getElementById('pl-edit-sub-id').value  = '';
+        document.getElementById('pl-edit-sub-pw').value  = '';
+    }
+
+    window.resetPayLogEditForm = function () {
+        if (_plEditSnapshot) fillPayLogEditForm(_plEditSnapshot);
+    };
+
     window.cmdPayLogEdit = function () {
         if (!requirePayLogSelection()) return;
         fetch('/Admin/PayLog/GetJson?id=' + _selPlTbKey).then(r => r.json()).then(d => {
-            if (!d.success) { alert(d.message); return; }
-            document.getElementById('pl-edit-tbkey').value  = d.tbKey;
-            document.getElementById('pl-edit-orderno').value= d.orderNo ?? '';
-            document.getElementById('pl-edit-amount').value = d.amount;
-            document.getElementById('pl-edit-model').value  = d.saleModel;
-            document.getElementById('pl-edit-sdate').value  = d.sDate ?? '';
-            document.getElementById('pl-edit-edate').value  = d.eDate ?? '';
-            document.getElementById('pl-edit-memo').value   = d.memo ?? '';
-            document.getElementById('pl-edit-vaw').checked  = d.valueAddedWeb === 1;
+            if (!d.success) { TpDialog.alert(d.message); return; }
+            _plEditSnapshot = {
+                tbKey: d.tbKey,
+                orderNo: d.orderNo ?? '',
+                amount: d.amount,
+                sDate: d.sDate ?? '',
+                eDate: d.eDate ?? '',
+                memo: d.memo ?? '',
+                valueAddedWeb: d.valueAddedWeb
+            };
+            fillPayLogEditForm(_plEditSnapshot);
             showModal('paylogEditModal');
         });
     };
 
-    window.doPayLogEdit = function () {
+    window.doPayLogEdit = async function () {
+        const sdate = document.getElementById('pl-edit-sdate').value || null;
+        const edate = document.getElementById('pl-edit-edate').value || null;
+        if (edate && sdate && edate < sdate) {
+            await TpDialog.alert(_T.plEdateBeforeSdate);
+            return;
+        }
+        const subAdminId = document.getElementById('pl-edit-sub-id').value.trim();
+        const subAdminPassword = document.getElementById('pl-edit-sub-pw').value;
+        if (!subAdminId || !subAdminPassword) {
+            await TpDialog.alert(_T.subAdminRequired);
+            return;
+        }
         const req = {
-            tbKey       : parseInt(document.getElementById('pl-edit-tbkey').value),
-            orderNo     : document.getElementById('pl-edit-orderno').value.trim(),
-            amount      : parseFloat(document.getElementById('pl-edit-amount').value) || 0,
-            saleModel   : parseInt(document.getElementById('pl-edit-model').value) || 1,
-            sDate       : document.getElementById('pl-edit-sdate').value || null,
-            eDate       : document.getElementById('pl-edit-edate').value || null,
-            memo        : document.getElementById('pl-edit-memo').value.trim(),
-            valueAddedWeb: document.getElementById('pl-edit-vaw').checked ? 1 : 0
+            tbKey        : parseInt(document.getElementById('pl-edit-tbkey').value),
+            orderNo      : document.getElementById('pl-edit-orderno').value.trim(),
+            amount       : parseFloat(document.getElementById('pl-edit-amount').value) || 0,
+            sDate        : sdate,
+            eDate        : edate,
+            memo         : document.getElementById('pl-edit-memo').value.trim(),
+            valueAddedWeb: document.getElementById('pl-edit-vaw').checked ? 1 : 0,
+            subAdminId,
+            subAdminPassword
         };
-        postJson('/Admin/PayLog/UpdateJson', req).then(r => {
-            alert(r.message);
-            if (r.success) { bootstrap.Modal.getInstance(document.getElementById('paylogEditModal'))?.hide(); loadPayLogs(window._selImei); }
+        postJson('/Admin/PayLog/UpdateJson', req).then(async r => {
+            await TpDialog.alert(r.message);
+            if (r.success) {
+                bootstrap.Modal.getInstance(document.getElementById('paylogEditModal'))?.hide();
+                loadPayLogs(window._selImei);
+            }
         });
     };
 
@@ -2353,8 +2468,8 @@ var _T = {
         });
     };
 
-    // ── 前台(單機)：產生 5 分鐘 token 後以新 tab 開啟前台即時地圖 ──────────
-    window.cmdFrontend = function () {
+    // ── 前台(單機)：只顯示選取的那一台（對齊舊 ReIndex type=Device） ───────
+    window.cmdFrontendSingle = function () {
         if (!requireSelection()) return;
         fetch('/Admin/Tracker/GetPreviewToken?trackerTbKey=' + window._selTbKey + '&memberTbKey=' + window._selMemberTbKey)
             .then(r => r.json())
@@ -2363,6 +2478,28 @@ var _T = {
                 else alert(d.message);
             });
     };
+
+    // ── 前台：以會員身分進入，顯示該群組全部裝置（對齊舊 ReIndex 無 type） ─
+    window.cmdFrontendMember = function () {
+        if (!requireSelection()) return;
+        if (!window._selMemberTbKey || window._selMemberTbKey <= 0) {
+            alert(_T.noMemberBound);
+            return;
+        }
+        const focus = window._selTbKey || 0;
+        fetch('/Admin/Member/GetPreviewToken?memberTbKey=' + window._selMemberTbKey)
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    const url = '/Account/AdminPreview?t=' + encodeURIComponent(d.token)
+                        + (focus > 0 ? '&focus=' + focus : '');
+                    window.open(url, '_blank');
+                } else alert(d.message);
+            });
+    };
+
+    // 相容舊呼叫名稱
+    window.cmdFrontend = window.cmdFrontendSingle;
 
     // ── 解除裝置（解除目前選取裝置的會員綁定） ─────────────────────────────
     window.cmdUnbind = async function () {

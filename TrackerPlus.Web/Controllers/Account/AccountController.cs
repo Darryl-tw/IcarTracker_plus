@@ -177,9 +177,12 @@ public class AccountController : Controller
     public IActionResult AccessDenied() => View();
 
     // ── 管理員前台預覽：解碼 token 後以對應會員身份簽入，跳轉至即時地圖 ────
+    // t = trackerTbKey:memberTbKey:expiry
+    //   trackerTbKey>0 → 前台(單機)，僅顯示該台
+    //   trackerTbKey=0 → 會員前台，顯示該會員全部裝置；可用 focus 指定聚焦台
     [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> AdminPreview(string t)
+    public async Task<IActionResult> AdminPreview(string t, int focus = 0)
     {
         if (string.IsNullOrWhiteSpace(t))
             return BadRequest();
@@ -197,6 +200,10 @@ public class AccountController : Controller
             if (DateTimeOffset.UtcNow.ToUnixTimeSeconds() > expiry)
                 return Content($"<html><body><p>{_L["Account_AdminPreviewExpired"].Value}</p></body></html>", "text/html");
 
+            // 單機預覽才寫入 AdminPreviewTbKey；會員整組預覽不寫入，左側才會載入全部裝置
+            var singlePreviewKey = trackerTbKey > 0 ? trackerTbKey : 0;
+            var focusTbKey = focus > 0 ? focus : trackerTbKey;
+
             List<Claim> claims;
             if (memberTbKey > 0)
             {
@@ -208,8 +215,7 @@ public class AccountController : Controller
                     new(ClaimTypes.NameIdentifier, member.TbKey.ToString()),
                     new("Timezoom", member.Timezoom.ToString()),
                     new("CName", member.CName),
-                    new("UserLanguage", member.UserLanguage),
-                    new("AdminPreviewTbKey", trackerTbKey.ToString())
+                    new("UserLanguage", member.UserLanguage)
                 };
             }
             else
@@ -220,17 +226,20 @@ public class AccountController : Controller
                     new(ClaimTypes.NameIdentifier, "0"),
                     new("Timezoom", "480"),
                     new("CName", "Admin Preview"),
-                    new("UserLanguage", "zh-TW"),
-                    new("AdminPreviewTbKey", trackerTbKey.ToString())
+                    new("UserLanguage", "zh-TW")
                 };
             }
+
+            if (singlePreviewKey > 0)
+                claims.Add(new Claim("AdminPreviewTbKey", singlePreviewKey.ToString()));
 
             var identity  = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                 new AuthenticationProperties { IsPersistent = false });
 
-            return Redirect($"/Map/Live?focus={trackerTbKey}");
+            var liveUrl = focusTbKey > 0 ? $"/Map/Live?focus={focusTbKey}" : "/Map/Live";
+            return Redirect(liveUrl);
         }
         catch
         {

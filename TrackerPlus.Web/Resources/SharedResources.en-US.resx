@@ -1960,11 +1960,16 @@
   <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>App Tracker Trial</value></data>
   <data name="Admin_PayLog_SM_9" xml:space="preserve"><value>Online renewal</value></data>
   <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>Add</value></data>
+  <data name="Admin_PayLog_BtnView" xml:space="preserve"><value>View</value></data>
   <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>Edit</value></data>
   <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>Delete</value></data>
   <data name="Admin_PayLog_BtnMove" xml:space="preserve"><value>Transfer</value></data>
   <data name="Admin_PayLog_BtnAddTitle" xml:space="preserve"><value>Add new order</value></data>
+  <data name="Admin_PayLog_BtnViewTitle" xml:space="preserve"><value>View selected order</value></data>
   <data name="Admin_PayLog_BtnEditTitle" xml:space="preserve"><value>Edit selected order</value></data>
+  <data name="Admin_PayLog_ViewTitle" xml:space="preserve"><value>View service period</value></data>
+  <data name="Admin_PayLog_EditTitle" xml:space="preserve"><value>Edit service period</value></data>
+  <data name="Admin_PayLog_ValueAddedLabel" xml:space="preserve"><value>Value-added service</value></data>
   <data name="Admin_PayLog_BtnDeleteTitle" xml:space="preserve"><value>Delete selected order</value></data>
   <data name="Admin_PayLog_BtnMoveTitle" xml:space="preserve"><value>Transfer order to another device</value></data>
   <data name="Admin_PayLog_MoveTarget" xml:space="preserve"><value>Target device IMEI</value></data>
@@ -1997,7 +2002,7 @@
   <data name="Admin_Tracker_BtnFrontend" xml:space="preserve"><value>Frontend</value></data>
   <data name="Admin_Tracker_BtnUnbindAllTitle" xml:space="preserve"><value>Unbind all devices from this member's account</value></data>
   <data name="Admin_Tracker_BtnUnbindTitle" xml:space="preserve"><value>Unbind the selected device from its member account</value></data>
-  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>Open device frontend page in new window</value></data>
+  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>Open frontend as this member (show all devices in the group)</value></data>
   <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>Unbind device IMEI: {0} from its member account?\n(Device will be kept, only member binding and password will be reset)</value></data>
   <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>Unbind all devices from this member's account?\n(All devices will be kept, only member binding and password will be reset)</value></data>
   <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>This device is not bound to any member</value></data>

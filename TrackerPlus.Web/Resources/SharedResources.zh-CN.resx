@@ -1960,11 +1960,16 @@
   <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>app tracker 试用单</value></data>
   <data name="Admin_PayLog_SM_9" xml:space="preserve"><value>线上续约</value></data>
   <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>新增</value></data>
+  <data name="Admin_PayLog_BtnView" xml:space="preserve"><value>检视</value></data>
   <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>修改</value></data>
   <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>删除</value></data>
   <data name="Admin_PayLog_BtnMove" xml:space="preserve"><value>转移</value></data>
   <data name="Admin_PayLog_BtnAddTitle" xml:space="preserve"><value>新增订单</value></data>
+  <data name="Admin_PayLog_BtnViewTitle" xml:space="preserve"><value>检视选取订单</value></data>
   <data name="Admin_PayLog_BtnEditTitle" xml:space="preserve"><value>修改选取订单</value></data>
+  <data name="Admin_PayLog_ViewTitle" xml:space="preserve"><value>检视使用期限记录</value></data>
+  <data name="Admin_PayLog_EditTitle" xml:space="preserve"><value>修改使用期限记录</value></data>
+  <data name="Admin_PayLog_ValueAddedLabel" xml:space="preserve"><value>加值服务</value></data>
   <data name="Admin_PayLog_BtnDeleteTitle" xml:space="preserve"><value>删除选取订单</value></data>
   <data name="Admin_PayLog_BtnMoveTitle" xml:space="preserve"><value>将订单转移至其他设备</value></data>
   <data name="Admin_PayLog_MoveTarget" xml:space="preserve"><value>目标设备 IMEI</value></data>
@@ -1997,7 +2002,7 @@
   <data name="Admin_Tracker_BtnFrontend" xml:space="preserve"><value>前台</value></data>
   <data name="Admin_Tracker_BtnUnbindAllTitle" xml:space="preserve"><value>解除此会员所有设备的账号绑定</value></data>
   <data name="Admin_Tracker_BtnUnbindTitle" xml:space="preserve"><value>解除当前选取设备的账号绑定</value></data>
-  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>在新窗口中打开前台设备页</value></data>
+  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>以该会员身份打开前台（显示群组全部设备）</value></data>
   <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>确定解除设备 IMEI: {0} 的账号绑定？\n（设备将保留，仅解除会员绑定并重置密码）</value></data>
   <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>确定解除此会员所有设备的账号绑定？\n（所有设备将保留，仅解除会员绑定并重置密码）</value></data>
   <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>此设备尚未绑定任何会员</value></data>

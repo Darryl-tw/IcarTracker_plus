@@ -1961,11 +1961,16 @@
   <data name="Admin_PayLog_SM_22" xml:space="preserve"><value>app tracker 試用單</value></data>
   <data name="Admin_PayLog_SM_9" xml:space="preserve"><value>線上續約</value></data>
   <data name="Admin_PayLog_BtnAdd" xml:space="preserve"><value>新增</value></data>
+  <data name="Admin_PayLog_BtnView" xml:space="preserve"><value>檢視</value></data>
   <data name="Admin_PayLog_BtnEdit" xml:space="preserve"><value>修改</value></data>
   <data name="Admin_PayLog_BtnDelete" xml:space="preserve"><value>刪除</value></data>
   <data name="Admin_PayLog_BtnMove" xml:space="preserve"><value>轉移</value></data>
   <data name="Admin_PayLog_BtnAddTitle" xml:space="preserve"><value>新增訂單</value></data>
+  <data name="Admin_PayLog_BtnViewTitle" xml:space="preserve"><value>檢視選取訂單</value></data>
   <data name="Admin_PayLog_BtnEditTitle" xml:space="preserve"><value>修改選取訂單</value></data>
+  <data name="Admin_PayLog_ViewTitle" xml:space="preserve"><value>檢視使用期限記錄</value></data>
+  <data name="Admin_PayLog_EditTitle" xml:space="preserve"><value>修改使用期限記錄</value></data>
+  <data name="Admin_PayLog_ValueAddedLabel" xml:space="preserve"><value>加值服務</value></data>
   <data name="Admin_PayLog_BtnDeleteTitle" xml:space="preserve"><value>刪除選取訂單</value></data>
   <data name="Admin_PayLog_BtnMoveTitle" xml:space="preserve"><value>將訂單轉移至其他裝置</value></data>
   <data name="Admin_PayLog_MoveTarget" xml:space="preserve"><value>目標裝置 IMEI</value></data>
@@ -1998,7 +2003,7 @@
   <data name="Admin_Tracker_BtnFrontend" xml:space="preserve"><value>前台</value></data>
   <data name="Admin_Tracker_BtnUnbindAllTitle" xml:space="preserve"><value>解除此會員所有裝置的帳號綁定</value></data>
   <data name="Admin_Tracker_BtnUnbindTitle" xml:space="preserve"><value>解除目前選取裝置的帳號綁定</value></data>
-  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>以新視窗開啟前台裝置頁</value></data>
+  <data name="Admin_Tracker_BtnFrontendTitle" xml:space="preserve"><value>以該會員身分開啟前台（顯示群組全部裝置）</value></data>
   <data name="Admin_Tracker_ConfirmUnbind" xml:space="preserve"><value>確定解除裝置 IMEI: {0} 的帳號綁定？\n（裝置將保留，僅解除會員綁定並重設密碼）</value></data>
   <data name="Admin_Tracker_ConfirmUnbindAll" xml:space="preserve"><value>確定解除此會員所有裝置的帳號綁定？\n（所有裝置將保留，僅解除會員綁定並重設密碼）</value></data>
   <data name="Admin_Tracker_NoMemberBound" xml:space="preserve"><value>此裝置尚未綁定任何會員</value></data>
